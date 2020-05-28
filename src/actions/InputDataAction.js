@@ -1,5 +1,6 @@
 import { UPLOADING_INPUT_DATA, UPLOADING_INPUT_DATA_SUCCESS, UPLOADING_INPUT_DATA_FAILED } from "../redux/ActionTypes"
 import axios from 'axios'
+import { BaseUrl } from "./Constants"
 
 export const uploadInputData = (file) => {
   return (dispatch) => {
@@ -10,7 +11,7 @@ export const uploadInputData = (file) => {
     const formData = new FormData();
       formData.append("file", file);
 
-    axios.defaults.baseURL = 'https://api-ml-web-tool.herokuapp.com'
+    axios.defaults.baseURL = BaseUrl
     axios
       .post("/upload-input-data", formData)
       .then(res => {

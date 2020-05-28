@@ -1,0 +1,1 @@
+export const BaseUrl = 'https://api-ml-web-tool.herokuapp.com'

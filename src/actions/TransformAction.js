@@ -1,6 +1,7 @@
 import { APPLY_TRANSFORM_SETTINGS, SELECT_TRANSFORM, CLEAR_TRANSFORMS, ADD_TRANSFORM, ADD_TRANSFORM_TO_MLA, MOVE_TRANSFORM, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_FAILED } from "../redux/ActionTypes";
 import axios from 'axios'
 import qs from 'querystring'
+import { BaseUrl } from "./Constants";
 
 
 export const clearTransforms = () => {
@@ -116,7 +117,7 @@ export const getTransformData = (allTransforms, transformId) => {
       transforms.push(transform)
     }
 
-    axios.defaults.baseURL = 'https://api-ml-web-tool.herokuapp.com'
+    axios.defaults.baseURL = BaseUrl
     axios.post('/get-transform-data', {
       transforms: transforms.reverse()
     }).then(res=>{
