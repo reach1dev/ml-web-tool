@@ -20,7 +20,7 @@
     "redux-thunk": "^2.3.0"
   },
   "scripts": {
-    "start": "cd api && pip install -r requirements.txt && flask run && cd .. && react-scripts start",
+    "start": "cd api && pip install -r requirements.txt && flask run & && cd .. && react-scripts start",
     "start-api": "cd api && flask run",
     "build": "react-scripts build",
     "test": "react-scripts test",
