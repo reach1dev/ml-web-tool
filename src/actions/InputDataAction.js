@@ -10,6 +10,7 @@ export const uploadInputData = (file) => {
     const formData = new FormData();
       formData.append("file", file);
 
+    axios.defaults.baseURL = 'https://api-ml-web-tool.herokuapp.com'
     axios
       .post("/upload-input-data", formData)
       .then(res => {

@@ -116,6 +116,7 @@ export const getTransformData = (allTransforms, transformId) => {
       transforms.push(transform)
     }
 
+    axios.defaults.baseURL = 'https://api-ml-web-tool.herokuapp.com'
     axios.post('/get-transform-data', {
       transforms: transforms.reverse()
     }).then(res=>{
