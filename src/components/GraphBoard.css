@@ -1,0 +1,18 @@
+.GraphBoard {
+  z-index: 2;
+  flex: auto;
+  min-width: 360px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  padding-left: 8px;
+}
+
+.Graph {
+  flex: auto;
+  background: lightgray;
+  padding: 8px;
+  font-size: 12px;
+  justify-content: center;
+  align-items: center;
+}

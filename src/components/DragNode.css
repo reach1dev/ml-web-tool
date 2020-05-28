@@ -1,0 +1,11 @@
+.Drag {
+  border-radius: 5px;
+  border-width: 1px;
+  background-color: grey;
+  width: fit-content;
+  padding: 4px;
+  font-size: 12px;
+  color: white;
+  z-index: 10;
+  cursor: pointer;
+}
