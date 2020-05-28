@@ -118,6 +118,7 @@ export const getTransformData = (allTransforms, transformId) => {
     }
 
     axios.defaults.baseURL = BaseUrl
+    //  axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*'
     axios.post('/get-transform-data', {
       transforms: transforms.reverse()
     }).then(res=>{
