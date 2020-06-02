@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as TransformAction from '../actions/TransformAction'
 
-function GraphBoard({transforms, transform, parentTransform, chartTop, chartBottom, loading, width, transformAction}) {
+function GraphBoard({transforms, transform, parentTransform, chartTop, chartBottom, trainMetrics, loading, width, transformAction}) {
 
   useEffect(() => {
     if (transform) {
@@ -13,28 +13,54 @@ function GraphBoard({transforms, transform, parentTransform, chartTop, chartBott
     }
   }, [transforms, transform, parentTransform, transformAction])
 
-  const inParams = parentTransform ? parentTransform.outputParameters.filter((p, idx) => transform.inputParameters[idx]).slice(2) : []
+  const inParams = parentTransform ? parentTransform.outputParameters.filter((p, idx) => transform.inputParameters ? transform.inputParameters[idx] : false).slice(2) : []
+
+  const _renderMetrics = () => {
+    if (loading || trainMetrics === null) {
+      return null
+    }
+
+    return (
+      <div className='Graph'>
+        <p><b>Train Metrics</b></p>
+        <div>
+          <div className='Table-Row'>
+            <span className='Table-Cell'>Cluster</span>
+            <span className='Table-Cell'>Train</span>
+            <span className='Table-Cell'>Test</span>
+          </div>
+
+          { trainMetrics.map((tr, idx) => (
+            <div className='Table-Row'>
+              <span className='Table-Cell'>{'C-' + (idx+1)}</span>
+              { tr.map((td) => (
+                <span className='Table-Cell'>{td}</span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className='GraphBoard'>
-      { !loading && chartTop && chartTop.data && chartTop.data.length > 0 ? 
+      { !loading && chartTop ? 
         <Graph 
           title='Input data graph' 
           inputParameterLabels={inParams}
-          inputData={chartTop.data} 
-          dataMin={chartTop.dataMin} 
-          dataMax={chartTop.dataMax} 
+          inputData={chartTop}
           width={width}></Graph> : null }
 
-      { !loading && chartBottom && chartBottom.data && chartBottom.data.length > 0 ? 
+      { !loading && chartBottom ? 
         <Graph 
           title='Output data graph'
           inputParameterLabels={transform && transform.outputParameters ? transform.outputParameters : inParams}
-          inputData={chartBottom.data} 
-          dataMin={chartBottom.dataMin} 
-          dataMax={chartBottom.dataMax} 
+          inputData={chartBottom} 
           width={width}></Graph> : null }
       { loading ? <div>Loading input and output data</div> : null}
+
+      { _renderMetrics() }
     </div>
   )
 }
@@ -42,8 +68,9 @@ function GraphBoard({transforms, transform, parentTransform, chartTop, chartBott
 const mapStateToProps = (state) => {
   return {
     transforms: state.transforms.transforms,
-    chartTop: state.transforms.inputData || {data: []},
-    chartBottom: state.transforms.outputData || {data: []},
+    chartTop: state.transforms.inputData || null,
+    chartBottom: state.transforms.outputData || null,
+    trainMetrics: state.transforms.trainMetrics || null,
     loading: state.transforms.getTransformLoading
   }
 }

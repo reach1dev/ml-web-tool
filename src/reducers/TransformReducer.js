@@ -1,4 +1,4 @@
-import { ADD_TRANSFORM, MOVE_TRANSFORM, ADD_TRANSFORM_TO_MLA, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_FAILED, CLEAR_TRANSFORMS, SELECT_TRANSFORM, APPLY_TRANSFORM_SETTINGS } from "../redux/ActionTypes";
+import { ADD_TRANSFORM, MOVE_TRANSFORM, ADD_TRANSFORM_TO_MLA, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_FAILED, CLEAR_TRANSFORMS, SELECT_TRANSFORM, APPLY_TRANSFORM_SETTINGS, REMOVE_TRANSFORM, TRAIN_AND_TEST_SUCCESS } from "../redux/ActionTypes";
 import { IDS } from "../components/ItemTypes";
 
 const initialState = {
@@ -21,21 +21,19 @@ const initialState = {
     tool: {shortName: 'ML Algorithm', plusIcon: false, id: IDS.MLAlgorithm},
     x: 5,
     y: 5,
-    inputParameters: [],
-    outputParameters: [],
+    inputParameters: ['Date', 'Time'],
+    outputParameters: ['Date', 'Time', 'Label'],
+    inputFilters: [true, true],
     parameters: {},
     visible: true,
     inputData: null,
     outputData: null,
     target: false
   }],
-  selectedTransform: -1,
-  inputData: {
-    data: []
-  },
-  outputData: {
-    data: []
-  }
+  selectedTransform: null,
+  inputData: null,
+  outputData: null,
+  trainMetrics: null
 };
 
 export default function(state = initialState, action) {
@@ -52,34 +50,61 @@ export default function(state = initialState, action) {
       };
     }
     case MOVE_TRANSFORM: {
-      const {index, x, y} = action.payload
-      const transforms = state.transforms
-      transforms[index] = {
-        ...state.transforms[index],
-        x: x,
-        y: y
-      }
+      const {id, x, y} = action.payload
       return {
         ...state,
-        transforms: transforms
+        transforms: state.transforms.map((t) => {
+          if (t.id === id) {
+            return {
+              ...t,
+              x: x,
+              y: y
+            }
+          }
+          return t
+        })
       };
     }
     case ADD_TRANSFORM_TO_MLA: {
-      const {index} = action.payload
-      const transforms = state.transforms
-      transforms[index] = {
-        ...state.transforms[index],
-        target: true
-      }
+      const {id} = action.payload
+      const tr = state.transforms.filter(t => t.id === id)[0]
       return {
         ...state,
-        transforms: transforms
+        transforms: state.transforms.map((t) => {
+          if (t.id === id) {
+            return {
+              ...t,
+              target: true
+            }
+          } else if (t.id === IDS.MLAlgorithm) {
+            let params = []
+            state.transforms.forEach(t => {
+              if (t.target || t.id === id) {
+                params = [
+                  ...params,
+                  ...t.outputParameters.filter(t => t !== 'Date' && t !== 'Time').map(p => p + '#' + t.id)
+                ]
+              }
+            })
+            const inputParameters = [
+              'Date', 'Time',
+              ...params
+            ]
+            return {
+              ...t,
+              inputParameters: inputParameters,
+              inputFilters: inputParameters.map(t => true)
+            }
+          }
+          return t
+        })
       };
     }
     case SELECT_TRANSFORM: {
+      const transforms = state.transforms.filter((t) => t.id === action.payload.id)
       return {
         ...state,
-        selectedTransform: action.payload.index
+        selectedTransform: transforms.length>0?transforms[0]:null
       }
     }
     case GET_TRANSFORM_DATA_START: {
@@ -88,12 +113,24 @@ export default function(state = initialState, action) {
         getTransformLoading: true
       }
     }
+    case TRAIN_AND_TEST_SUCCESS: {
+      const {graph, metrics} = action.payload
+      console.log('graph >> ' + JSON.stringify(graph))
+      return {
+        ...state,
+        trainMetrics: metrics,
+        inputData: null,
+        outputData: graph,
+        getTransformLoading: false
+      }
+    }
     case GET_TRANSFORM_DATA_SUCCESS: {
       const {inputData, outputData} = action.payload
       return {
         ...state,
         inputData: inputData,
         outputData: outputData,
+        trainMetrics: null,
         getTransformLoading: false
       };
     }
@@ -104,15 +141,60 @@ export default function(state = initialState, action) {
       }
     }
     case APPLY_TRANSFORM_SETTINGS: {
-      const {index, settings} = action.payload
-      let transforms = state.transforms
-      transforms[index] = {
-        ...transforms[index],
-        ...settings
-      }
+      const {id, settings} = action.payload
       return {
         ...state,
-        transforms: transforms
+        transforms: state.transforms.map((t) => {
+          if (t.id === id) {
+            return {
+              ...t,
+              ...settings
+            }
+          } else if (t.id === IDS.MLAlgorithm) {
+            let params = []
+            state.transforms.forEach(t => {
+              if (t.target) {
+                if (t.id === id) {
+                  params = [
+                    ...params,
+                    ...settings.outputParameters.filter(t => t !== 'Date' && t !== 'Time').map(p => p + '#' + t.id)
+                  ]
+                } else {
+                  params = [
+                    ...params,
+                    ...t.outputParameters.filter(t => t !== 'Date' && t !== 'Time').map(p => p + '#' + t.id)
+                  ]
+                }
+              }
+            })
+            const inputParameters = [
+              'Date', 'Time',
+              ...params
+            ]
+            return {
+              ...t,
+              inputParameters: inputParameters,
+              inputFilters: inputParameters.map(t => true)
+            }
+          }
+          return t
+        })
+      }
+    }
+    case REMOVE_TRANSFORM: {
+      const {transformId} = action.payload
+      return {
+        ...state,
+        selectedTransform: state.transforms[0],
+        transforms: state.transforms.filter((t) => t.id !== transformId).map(t => {
+          if (t.parentId === transformId) {
+            return {
+              ...t,
+              parentId: -1
+            }
+          }
+          return t
+        })
       }
     }
     default:

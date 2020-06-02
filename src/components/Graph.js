@@ -4,24 +4,38 @@ import { LineChart, XAxis, YAxis, Tooltip, CartesianGrid, Line, ReferenceArea } 
 
 const LineColors = ['#3d93ca', '#acfc7f', '#f4a4c1', '#c4a573', '#7a5892', '#009ab2']
 
-export default function({title, inputData, dataMin, dataMax, width}) {
+export default function({title, inputData, width}) {
   const [dotHide, setDotHide] = useState(true)
-  let inputType = inputData && inputData.length > 0 ? Object.keys(inputData[0]).filter((k) => k!=='undefined' && k!=='Date' && k !== 'Time') : {}
+  const [inputType] = useState(inputData && inputData.length > 0 ? Object.keys(inputData[0]).filter((k) => k!=='undefined' && k!=='Date' && k !== 'Time') : [])
   const [hideArray] = useState(inputType.map((i) => false))
   const [showZoomOut, setShowZoomOut] = useState(false)
+  const yAxisName = inputType[0] ? inputType[0].startsWith('C-') ? '' : inputType[0] :''
+  const yAxisName2 = inputType[inputType.length-1] ? inputType[inputType.length-1].startsWith('C-') ? '' : inputType[inputType.length-1] : ''
 
   const getAxisYDomain = (from, to, ref, offset) => {
     const refData = (from === '' && to === '') ? inputData : inputData.slice(from, to);
-    let [ bottom, top ] = [ refData[0][ref], refData[0][ref] ];
-    refData.forEach( d => {
-      if ( d[ref] > top ) top = d[ref];
-      if ( d[ref] < bottom ) bottom = d[ref];
-    });
-    return [ Math.floor((bottom)), Math.ceil(top) ]
+    if (refData && refData.length > 0 && (ref === '' || refData[0][ref])) {
+      let [ bottom, top ] = ref !== '' ? [ refData[0][ref], refData[0][ref] ] : [9999999, -9999999];
+      refData.forEach( d => {
+        if (ref !== '') {
+          if ( d[ref] > top ) top = d[ref];
+          if ( d[ref] < bottom ) bottom = d[ref];
+        } else {
+          inputType.forEach( (type) => {
+            if ( d[type] > top ) top = d[type];
+            if ( d[type] < bottom ) bottom = d[type];
+          })
+        }
+      });
+      console.log('bottom >> ' + bottom)
+      return [ Math.floor((bottom)), Math.ceil(top) ]
+    }
+    console.log('bug >> ' + JSON.stringify(refData) + ' f ' + from + ' t  ' + to)
+    return [0, 0]
   }
 
-  const [ bottom, top ] = getAxisYDomain( '', '', 'High', 1 );
-  const [ bottom2, top2 ] = getAxisYDomain( '', '', 'Vol', 1 );
+  const [ bottom, top ] = getAxisYDomain( '', '', yAxisName, 1 );
+  const [ bottom2, top2 ] = getAxisYDomain( '', '', yAxisName2, 1 );
   
   const initialState = {
     data: inputData,
@@ -54,8 +68,8 @@ export default function({title, inputData, dataMin, dataMax, width}) {
     		[ refAreaLeft, refAreaRight ] = [ refAreaRight, refAreaLeft ];
 
     // yAxis domain
-    const [ bottom, top ] = getAxisYDomain( refAreaLeft, refAreaRight, 'High', 1 );
-    const [ bottom2, top2 ] = getAxisYDomain( refAreaLeft, refAreaRight, 'Vol', 1 );
+    const [ bottom, top ] = getAxisYDomain( refAreaLeft, refAreaRight, yAxisName, 1 );
+    const [ bottom2, top2 ] = getAxisYDomain( refAreaLeft, refAreaRight, yAxisName2, 1 );
     
     setState( () => ({
       ...state,
@@ -70,8 +84,8 @@ export default function({title, inputData, dataMin, dataMax, width}) {
   }
 
   const zoomOut = () => {
-    const [ bottom, top ] = getAxisYDomain( '', '', 'High', 1 );
-    const [ bottom2, top2 ] = getAxisYDomain( '', '', 'Vol', 1 );
+    const [ bottom, top ] = getAxisYDomain( '', '', yAxisName, 1 );
+    const [ bottom2, top2 ] = getAxisYDomain( '', '', yAxisName2, 1 );
     setState({
       ...initialState,
       bottom, top,
@@ -93,7 +107,7 @@ export default function({title, inputData, dataMin, dataMax, width}) {
       </div>
       <LineChart
         width={width || 360}
-        height={330}
+        height={360}
         data={state.data}
         style={{backgroundColor: 'white'}}
         onMouseDown={e => e && setState({ ...state, refAreaLeft: e.activeLabel })}
@@ -128,7 +142,7 @@ export default function({title, inputData, dataMin, dataMax, width}) {
             hide={hideArray[idx]} 
             dot={!dotHide}
             stroke={LineColors[idx]} 
-            yAxisId={inputType[idx] !== 'Vol' && inputType[idx] !== 'OI' ? 1 : 2}></Line>
+            yAxisId={inputType[idx].startsWith('C') ? 1 : (inputType[idx] === 'Vol' || inputType[idx] === 'OI' ? 2: 1)}></Line>
         )) }
         { (state.refAreaLeft && state.refAreaRight) ? (
             <ReferenceArea yAxisId="1" x1={state.refAreaLeft} x2={state.refAreaRight} stopColor="blue" strokeOpacity={0.3} /> ) : null

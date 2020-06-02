@@ -12,7 +12,7 @@ export const uploadInputData = (file) => {
       formData.append("file", file);
 
     axios.defaults.baseURL = BaseUrl
-    axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*'
+    // axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*'
     axios
       .post("/upload-input-data", formData)
       .then(res => {

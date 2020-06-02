@@ -1,4 +1,4 @@
-import { APPLY_TRANSFORM_SETTINGS, SELECT_TRANSFORM, CLEAR_TRANSFORMS, ADD_TRANSFORM, ADD_TRANSFORM_TO_MLA, MOVE_TRANSFORM, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_FAILED } from "../redux/ActionTypes";
+import { TRAIN_AND_TEST_SUCCESS, TRAIN_AND_TEST_FAILED, REMOVE_TRANSFORM, APPLY_TRANSFORM_SETTINGS, SELECT_TRANSFORM, CLEAR_TRANSFORMS, ADD_TRANSFORM, ADD_TRANSFORM_TO_MLA, MOVE_TRANSFORM, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_FAILED } from "../redux/ActionTypes";
 import axios from 'axios'
 import qs from 'querystring'
 import { BaseUrl } from "./Constants";
@@ -20,38 +20,38 @@ export const addTransform = (transformData) => {
   }
 }
 
-export const addTransformToMLA = (index) => {
+export const addTransformToMLA = (id) => {
   return (dispatch) => {
     dispatch({
       type: ADD_TRANSFORM_TO_MLA,
-      payload: { index }
+      payload: { id }
     })
   }
 }
 
-export const moveTransform = (index, x, y) => {
+export const moveTransform = (id, x, y) => {
   return (dispatch) => {
     dispatch({
       type: MOVE_TRANSFORM,
-      payload: { index, x, y }
+      payload: { id, x, y }
     })
   }
 }
 
-export const applySettings = (index, settings) => {
+export const applySettings = (id, settings) => {
   return (dispatch) => {
     dispatch({
       type: APPLY_TRANSFORM_SETTINGS,
-      payload: { index, settings }
+      payload: { id, settings }
     })
   }
 }
 
-export const selectTransform = (index, id) => {
+export const selectTransform = (id) => {
   return (dispatch) => {
     dispatch({
       type: SELECT_TRANSFORM,
-      payload: { index }
+      payload: { id }
     })
   }
 }
@@ -65,17 +65,8 @@ function getChartData(data, parameters) {
     }
   }
   const chartData = []
-  let dataMin = 99999999, dataMax = -99999999
   let k = 0
-  for(let i=0; i<data.length; i+=50) {
-    for(let j=2; j<8; j++) {
-      if (data[i][j] > dataMax) {
-        dataMax = data[i][j]
-      }
-      if (data[i][j] < dataMin) {
-        dataMin = data[i][j]
-      }
-    }
+  for(let i=0; i<data.length; i++) {
     const obj = {
       Date: data[i][0],
       Time: k++
@@ -87,11 +78,7 @@ function getChartData(data, parameters) {
     })
     chartData.push(obj)
   }
-  return {
-    data: chartData,
-    dataMin: dataMin,
-    dataMax: dataMax
-  }
+  return chartData
 }
 
 export const getTransformData = (allTransforms, transformId) => {
@@ -124,8 +111,8 @@ export const getTransformData = (allTransforms, transformId) => {
     }).then(res=>{
       const [inputData, outputData] = res.data
       const [inputChartData, outputChartData] = [
-        getChartData(inputData, transform.inputParameters), 
-        getChartData(outputData, transform.outputParameters)
+        getChartData(inputData, lastTransform.inputParameters), 
+        getChartData(outputData, lastTransform.outputParameters)
       ]
 
       dispatch({
@@ -142,6 +129,62 @@ export const getTransformData = (allTransforms, transformId) => {
           errorMessage: err
         }
       })
+    })
+  }
+}
+
+
+export const trainAndTest = (transforms, algorithmParameters) => {
+  return (dispatch) => {
+    dispatch({
+      type: GET_TRANSFORM_DATA_START,
+    })
+    
+    axios.defaults.baseURL = BaseUrl
+    //  axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*'
+    axios.post('/train-and-test', {
+      transforms: transforms,
+      parameters: algorithmParameters
+    }).then(res=>{
+      const [graph, metrics] = res.data
+      let graphData = []
+      for(let i=0; i<graph[0].length; i++) {
+        if (i%20 !== 0) {
+          continue
+        }
+        let data = {'Time': i/20}
+        for(let j=0; j<graph.length; j++) {
+          data['C-' + (j+1)] = graph[j][i]
+        }
+        graphData.push(data)
+      }
+
+      dispatch({
+        type: TRAIN_AND_TEST_SUCCESS,
+        payload: {
+          metrics: metrics,
+          graph: graphData
+        }
+      })
+    }).catch((err) => {
+      dispatch({
+        type: TRAIN_AND_TEST_FAILED,
+        payload: {
+          errorMessage: err
+        }
+      })
+    })
+  }
+}
+
+
+export const removeTransform = (transformId) => {
+  return (dispatch) => {
+    dispatch({
+      type: REMOVE_TRANSFORM,
+      payload: {
+        transformId: transformId
+      }
     })
   }
 }

@@ -7,7 +7,7 @@ import * as TransformAction from '../actions/TransformAction'
 import { IDS } from './ItemTypes'
 import { TransformParameters } from './TransformParameters'
 
-function PropertyWidget({hide, setHide, inputFile, transforms, transformIndex, transform, parentTransform, inputDataAction, transformAction}) {
+function PropertyWidget({hide, setHide, inputFile, transforms, transform, parentTransform, inputDataAction, transformAction}) {
 
   const [file, setFile] = useState(null)
   const [error, setError] = useState(false)
@@ -15,12 +15,17 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transformIndex, t
   const [filterChanged, setFilterChanged] = useState(1)
   const [parameters, setParameters] = useState(transform ? transform.parameters : [])
   const [parameterTypes, setParameterTypes] = useState([])
+  const [algorithmType, setAlgorithmType] = useState(0)
   
   useEffect(() => {
     setInputFilters(transform ? transform.inputFilters || [] : [])
     setParameters(transform ? transform.parameters : [])
     setParameterTypes(transform ? TransformParameters[transform.tool.id] : [])
-  }, [transform, transformIndex])
+  }, [transform])
+
+  useEffect(() => {
+    setParameters([])
+  }, [algorithmType])
 
   const uploadFile = () => {
     if (file === null) {
@@ -36,16 +41,34 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transformIndex, t
     setFilterChanged(filterChanged+1)
   }
 
+  const removeNode = () => {
+    if (window.confirm('Are you sure to remove this transform?')) {
+      transformAction.removeTransform(transform.id)      
+    }
+  }
+
+  const trainAndTest = () => {
+    transformAction.trainAndTest(transforms, parameters)
+  }
+
+  const drawGraph = () => {
+    transformAction.getTransformData(transforms, transform.id)
+  }
+
   const applyFilters = () => {
     const outParams = transform.inputParameters.filter((param, idx) => inputFilters[idx])
-    transformAction.applySettings(transformIndex, {
+    const settings = {
       outputParameters: outParams,
       inputFilters: inputFilters,
       parameters: parameters
+    }
+    transformAction.applySettings(transform.id, settings)
+  }
+
+  const saveMLAlgorithm = () => {
+    transformAction.applySettings(transform.id, {
+      inputFilters: inputFilters,
     })
-    setTimeout(() => {
-      transformAction.getTransformData(transforms, transform.id)
-    }, 300)
   }
 
   const _renderInputData = () => {
@@ -59,7 +82,7 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transformIndex, t
   }
 
   const _renderInputParams = () => {
-    const outputParameters = parentTransform.outputParameters
+    const outputParameters = parentTransform ? parentTransform.outputParameters : null
     const inputParameters = transform.inputParameters
     return (
       <div className='Property-Item-Container' key={1}>
@@ -67,9 +90,35 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transformIndex, t
           <b>Input Parameters: {inputFile} </b> 
           {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
         </p>
-        { outputParameters && inputParameters ? outputParameters.map((param, idx) => (
+        { (inputParameters?inputParameters:outputParameters).map((param, idx) => (
           <div><input type='checkbox' checked={filterChanged>0 && inputFilters[idx]} onClick={()=>changeInputFilter(idx)} /> {param} </div>
-        )) : null}
+        ))}
+      </div>
+    )
+  }
+
+  const _renderMLParameters = () => {
+    return (
+      <div className='Property-Item-Container' key={2}>
+        <p className='Property-Item-Header'>
+          <b>ML Algorithm Parameters</b> 
+          {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
+        </p>
+        <p className='Property-Item-Header'>
+          <b>Algorithm Type</b> 
+          <select onChange={(e) => setAlgorithmType(e.target.value)} value={algorithmType}>
+            <option value={0}>k-Mean</option>
+            <option value={1}>k-NN</option>
+          </select>
+        </p>
+        <div style={{display: 'flex', alignItems: 'stretch', flexDirection: 'column'}}>
+          { parameters && parameterTypes && parameterTypes[algorithmType] && parameterTypes[algorithmType].parameters? parameterTypes[algorithmType].parameters.map((param) => (
+            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
+              <label style={{marginRight: 10}}>{param.name}</label>
+              <input style={{width: '100%', maxWidth: 180}} value={parameters[param.name]} onChange={(e)=> changeParameter(param.name, e.target.value, param.type)}></input>
+            </div>
+          )) : null }
+        </div>
       </div>
     )
   }
@@ -88,7 +137,7 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transformIndex, t
     return (
       <div className='Property-Item-Container' key={2}>
         <p className='Property-Item-Header'>
-          <b>Transform Parameters </b> 
+          <b>Transform Parameters</b> 
           {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
         </p>
         <div style={{display: 'flex', alignItems: 'stretch', flexDirection: 'column'}}>
@@ -103,15 +152,29 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transformIndex, t
     )
   }
 
+  const _renderDetails = () => {
+    return (
+      <div className='Property-Item-Container' key={3}>
+        <p className='Property-Item-Header'>
+          <b>ID: #{transform.id}</b> 
+        </p>
+      </div>
+    )
+  }
+
   const _render = () => {
     const type = transform.tool.id
     let items = []
     if (type === IDS.InputData) {
       items = [_renderInputData()]
     } else if (type === IDS.MLAlgorithm) {
-      items = [_renderTransformParameters()]
+      items = [
+        _renderMLParameters(),
+        _renderInputParams()
+      ]
     } else {
       items = [
+        _renderDetails(),
         _renderTransformParameters(),
         _renderInputParams()
       ]
@@ -131,9 +194,19 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transformIndex, t
           <b style={{cursor: 'pointer'}} onClick={() => setHide(true)}>Hide</b>
         </div>
         <div className='Properties-Container'>
-        <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-          <input type='button' onClick={applyFilters} value='Save settings and draw graph' />
-        </div>
+        {
+          transform ?
+          <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+            { transform.id > IDS.InputData && transform.id < IDS.MLAlgorithm && <input type='button' onClick={removeNode} value='Remove' /> }
+            <span style={{width: 10}}></span>
+            { transform.id > IDS.InputData && transform.id < IDS.MLAlgorithm && <input type='button' onClick={applyFilters} value='Save' /> }
+            { transform.id === IDS.MLAlgorithm && <input type='button' onClick={saveMLAlgorithm} value='Save' /> }
+            <span style={{width: 10}}></span>
+            { transform.id >= IDS.InputData && transform.id < IDS.MLAlgorithm && <input type='button' onClick={drawGraph} value='Draw' /> }
+            { transform.id === IDS.MLAlgorithm && <input type='button' onClick={trainAndTest} value='Train & Test' /> }
+          </div> : null
+        }
+        
         { transform ? _render() : null }
         </div>
       </div>
@@ -142,15 +215,14 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transformIndex, t
 }
 
 const mapStateToProps = (state) => {
-  const transform = state.transforms.selectedTransform >= 0 ? state.transforms.transforms[state.transforms.selectedTransform] : null
+  const transform = state.transforms.selectedTransform
   const parentTransforms = transform ? state.transforms.transforms.filter((t) => t.id === transform.parentId) : []
   const parentTransform = parentTransforms.length > 0 ? parentTransforms[0] : null
   
   return {
     inputFile: state.inputData.file,
     parentTransform: parentTransform,
-    transformIndex: state.transforms.selectedTransform,
-    transform: transform,
+    transform: state.transforms.selectedTransform,
     transforms: state.transforms.transforms
   }
 }

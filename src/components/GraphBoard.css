@@ -9,10 +9,28 @@
 }
 
 .Graph {
-  flex: auto;
   background: lightgray;
   padding: 8px;
   font-size: 12px;
   justify-content: center;
   align-items: center;
+}
+
+.Table-Row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: gray;
+}
+
+.Table-Cell {
+  color: white;
+  font-size: 15px;
+  margin: 8px;
+  text-align: left;
+  width: 30%;
+}
+
+.Table-Row:nth-child(even) {
+  background-color: #99a;
 }

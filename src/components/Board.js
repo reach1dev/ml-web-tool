@@ -27,7 +27,7 @@ function renderGridItem(i, dragItems, moveDragNode, setDragNode, checkDraggable,
   let dragItem = null
 
   for (var j=0; j<dragItems.length; j++) {
-    if (dragItems[j].x === x && dragItems[j].y === y) {
+    if (dragItems[j] && dragItems[j].x === x && dragItems[j].y === y) {
       if (dragItems[j].visible) {
         dragItem = dragItems[j]
         break
@@ -39,9 +39,9 @@ function renderGridItem(i, dragItems, moveDragNode, setDragNode, checkDraggable,
     <div key={i}>
       <DropNode moveDragNode={moveDragNode} checkDraggable={checkDraggable} x={x} y={y}>
         {dragItem ? 
-          <DragNode id={dragItem.index} 
+          <DragNode id={dragItem.id} 
             data={dragItem} 
-            onClick={() => setSelectedDrag(dragItem.index)} 
+            onClick={() => setSelectedDrag(dragItem.id)} 
             selected={selectedDrag===dragItem.id} 
             fixed={dragItem.fixed} 
             dragHandler={(id) => setDragNode(id)} 
@@ -70,10 +70,10 @@ function getComponent({shortName, plusIcon}, id) {
 
 function Board({transforms, getTransformLoading, transformAction, selectedTransform}) {
   const [status, setStatus] = useState(0)
-  let dragNodeIdx = -1
+  let dragNodeId = -1
   let selectedTool = null
   const [propertiesHide, setPropertiesHide] = useState(false)
-  const [graphWidth, setGraphWidth] = useState(370)
+  const [graphWidth, setGraphWidth] = useState(550)
 
   const forceUpdate = () => {
     setStatus(status+1)
@@ -83,8 +83,8 @@ function Board({transforms, getTransformLoading, transformAction, selectedTransf
     }, 100)
   }
 
-  const setDragNode = (idx) => {
-    dragNodeIdx = idx
+  const setDragNode = (id) => {
+    dragNodeId = id
   }
 
   const isEmpty = (x, y) => {
@@ -117,9 +117,23 @@ function Board({transforms, getTransformLoading, transformAction, selectedTransf
 
   const checkDraggable = (x, y) => {
     const lastItem = isEmpty(x, y)
-    if (dragNodeIdx >= 0) {
+    if (dragNodeId >= 0) {
       if (lastItem === 1) {
         return true
+      } else if (lastItem > 1) {
+        const parentId = transforms[lastItem].parentId
+        if (transforms[lastItem].id === dragNodeId) {
+          return false
+        }
+        if (parentId < 0) {
+          return true
+        } else {
+          const parents = transforms.filter(t => t.id === parentId)
+          const children = transforms.filter(t => t.parentId === dragNodeId)
+          if (parents.length > 0 && children.length === 0) {
+            return true
+          }
+        }
       }
       if (lastItem >= 0) {
         return false
@@ -140,21 +154,44 @@ function Board({transforms, getTransformLoading, transformAction, selectedTransf
       newPos.x = x + 1
       newPos.y = findEmpty(x + 1, y)
     }
-    if (dragNodeIdx >= 0) {
+    if (dragNodeId >= 0) {
       if (lastItem < 0) {
-        transformAction.moveTransform(dragNodeIdx, newPos.x, newPos.y)
+        transformAction.moveTransform(dragNodeId, newPos.x, newPos.y)
         forceUpdate()
       } else if (lastItem === 1) {
-        transformAction.addTransformToMLA(dragNodeIdx)
+        transformAction.addTransformToMLA(dragNodeId)
         forceUpdate()
+      } else if (lastItem > 1){
+        const parentId = transforms[lastItem].parentId
+        if (transforms[lastItem].id !== dragNodeId) {
+          if (parentId < 0) {
+            transformAction.applySettings(transforms[lastItem].id, {
+              parentId: dragNodeId
+            })
+          } else {
+            const parents = transforms.filter(t => t.id === parentId)
+            if (parents.length > 0) {
+              const children = transforms.filter(t => t.parentId === dragNodeId)
+              if (children.length === 0) {
+                transformAction.applySettings(transforms[lastItem].id, {
+                  parentId: dragNodeId
+                })
+                transformAction.applySettings(dragNodeId, {
+                  parentId: parentId
+                })
+              }
+            }
+          }
+        }
       }
+      dragNodeId = -1
     } else if (selectedTool != null) {
       if (lastItem < 0) {
         return
       }
       const tool = {
         ...selectedTool,
-        id: IDS.InputData + transforms.length
+        id: transforms[transforms.length===2?0:(transforms.length-1)].id + 1
       }
       const parameters = {}
       const defaultParams = TransformParameters[selectedTool.id]
@@ -164,7 +201,6 @@ function Board({transforms, getTransformLoading, transformAction, selectedTransf
       transformAction.addTransform({
         id: tool.id,
         tool: selectedTool,
-        index: transforms.length,
         inputParameters: transforms[lastItem].outputParameters.map((param) => param),
         inputFilters: transforms[lastItem].outputParameters.map((param) => true),
         outputParameters: transforms[lastItem].outputParameters.map((param) => param),
@@ -181,7 +217,7 @@ function Board({transforms, getTransformLoading, transformAction, selectedTransf
   }
 
   const hideProperties = (hide) => {
-    setGraphWidth(hide ? 640 : 400)
+    setGraphWidth(hide ? 810 : 550)
     setPropertiesHide(hide)
   }
 
@@ -196,33 +232,22 @@ function Board({transforms, getTransformLoading, transformAction, selectedTransf
     for (let j=0; j<width; j++) {
       gridRow.push(renderGridItem(
         i*width+j, transforms, 
-        moveDragNode, setDragNode, checkDraggable, (idx) => 
+        moveDragNode, setDragNode, checkDraggable, (id) => 
           transformAction.selectTransform(
-          idx, 
-          transforms[idx].id),  //transforms[idx].inputData === null && transforms[idx].outputData === null ? 
-          selectedTransform>=0 ? transforms[selectedTransform].id : -1)
+          id),  //transforms[idx].inputData === null && transforms[idx].outputData === null ? 
+          selectedTransform ? selectedTransform.id : -1)
       )
     }
     grid.push(gridRow)
   }
 
   const tools = TransformationTools
-
-  const [chartTop, setChartTop] = useState({data: [], dataMin: 0, dataMax: 0})
-  const [chartBottom, setChartBottom] = useState({data: [], dataMin: 0, dataMax: 0})
   
   useEffect(() => {
     // transformAction.clearTransforms()
     forceUpdate()
   }, [transforms])
 
-  useEffect(() => {
-    if (selectedTransform < 0) {
-      return
-    }
-    setChartTop(transforms[selectedTransform].inputData || {data: []})
-    setChartBottom(transforms[selectedTransform].outputData || {data: []})
-  }, [transforms, selectedTransform, getTransformLoading])
 
   let lines = []
   for(let i=0; i<transforms.length; i++ ){
@@ -236,8 +261,7 @@ function Board({transforms, getTransformLoading, transformAction, selectedTransf
     }
   }
 
-  const selTransform = selectedTransform>=0?transforms[selectedTransform]:null
-  const selParentTransforms = selTransform?transforms.filter((t) => t.id === transforms[selectedTransform].parentId):[]
+  const selParentTransforms = selectedTransform?transforms.filter((t) => t.id === selectedTransform.parentId):[]
   const selParentTransform = selParentTransforms.length > 0 ? selParentTransforms[0] : null
 
   return (
@@ -273,11 +297,9 @@ function Board({transforms, getTransformLoading, transformAction, selectedTransf
       </DndProvider>
       <PropertyWidget hide={propertiesHide} setHide={hideProperties}></PropertyWidget>
       <GraphBoard 
-        transform={selTransform}
+        transform={selectedTransform}
         parentTransform={selParentTransform}
         loading={getTransformLoading} 
-        chartTop={chartTop} 
-        chartBottom={chartBottom} 
         width={graphWidth}></GraphBoard>
     </div>
   )

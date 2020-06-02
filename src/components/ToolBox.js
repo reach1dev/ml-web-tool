@@ -11,7 +11,21 @@ export default function renderToolBox({tools, toolSelector, showProperties}) {
       </div>
       <div className='ToolBox-ScrollView'>
         <div className='ToolBox-Container'>
-          { tools.map((tool) => tool.transform && (
+          { tools.map((tool, idx) => idx<=9 && tool.transform && (
+            <DragNode
+              key={tool.id}
+              id={tool.id}
+              className='ToolItem'
+              fixed={false}
+              dragHandler={(id) => toolSelector(tool)}
+            >
+              <span style={{fontSize: 12}}>{tool.name}</span>
+            </DragNode>
+          ))}
+        </div>
+
+        <div className='ToolBox-Container'>
+          { tools.map((tool, idx) => idx>9 && tool.transform && (
             <DragNode
               key={tool.id}
               id={tool.id}
