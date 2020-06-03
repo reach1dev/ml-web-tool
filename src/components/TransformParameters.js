@@ -45,5 +45,13 @@ export const TransformParameters = {
     name: 'rolling',
     type: 'number',
     default: 20
+  }, {
+    name: 'min',
+    type: 'number',
+    default: 0
+  }, {
+    name: 'max',
+    type: 'number',
+    default: 1
   }]
 }

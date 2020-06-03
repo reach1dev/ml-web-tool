@@ -14,7 +14,7 @@ export default function({title, inputData, width}) {
 
   const getAxisYDomain = (from, to, ref, offset) => {
     const refData = (from === '' && to === '') ? inputData : inputData.slice(from, to);
-    if (refData && refData.length > 0 && (ref === '' || refData[0][ref])) {
+    if (refData && refData.length > 0 && (ref === '' || refData[0][ref] !== undefined)) {
       let [ bottom, top ] = ref !== '' ? [ refData[0][ref], refData[0][ref] ] : [9999999, -9999999];
       refData.forEach( d => {
         if (ref !== '') {
@@ -30,7 +30,7 @@ export default function({title, inputData, width}) {
       console.log('bottom >> ' + bottom)
       return [ Math.floor((bottom)), Math.ceil(top) ]
     }
-    console.log('bug >> ' + JSON.stringify(refData) + ' f ' + from + ' t  ' + to)
+    console.log('bug >> ' + JSON.stringify(refData) + ' f ' + from + ' t  ' + to + ' ref ' + ref)
     return [0, 0]
   }
 

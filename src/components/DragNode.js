@@ -22,7 +22,7 @@ export default function DragNode(props) {
     <div
       className={props.className ? 'Drag ' + props.className : 'Drag'}
       style={props.selected ? {border: 'solid 3px white'} : null}
-      onClick={() => props.onClick(props.data.id)}
+      onClick={() => props.data && props.onClick(props.data.id)}
       ref={props.fixed===false ? drag : null}
     >
       {children || props.component}
