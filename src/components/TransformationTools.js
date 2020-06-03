@@ -1,6 +1,17 @@
 export const TR_IDS = {
   Normalization: 101,
   Standardization: 102,
+  Fisher: 103,
+  SubtractMedium: 104,
+  SubtractAverage: 105,
+  FirstDiff: 106,
+  PercentRet: 107,
+  LogReturn: 108,
+  Windsorizing: 109,
+  TurnC2CD: 110,
+  TurnRanking: 111,
+  TurnPercentiles: 112,
+  PowerFunctions: 113,
   MLAlgorithm: 10000
 }
 
@@ -75,7 +86,7 @@ export const TransformationTools = [{
   transform: true
 }, {
   id: 113,
-  shortName: 'Power Functions',
+  shortName: 'Power',
   name: 'Power Functions',
   transform: true
 }]

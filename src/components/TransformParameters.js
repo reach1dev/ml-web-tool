@@ -61,5 +61,63 @@ export const TransformParameters = {
     name: 'rolling',
     type: 'number',
     default: 20
+  }],
+
+  [TR_IDS.Fisher]: [],
+
+  [TR_IDS.SubtractMedium]: [{
+    name: 'rolling',
+    type: 'number',
+    default: 20
+  }],
+
+  [TR_IDS.SubtractAverage]: [{
+    name: 'rolling',
+    type: 'number',
+    default: 20
+  }],
+
+  [TR_IDS.FirstDiff]: [{
+    name: 'shift',
+    type: 'number',
+    default: 1
+  }],
+
+  [TR_IDS.PercentRet]: [],
+
+  [TR_IDS.LogReturn]: [{
+    name: 'shift',
+    type: 'number',
+    default: 1
+  }],
+
+  [TR_IDS.Windsorizing]: [{
+    name: 'min',
+    type: 'number',
+    default: 0
+  }, {
+    name: 'max',
+    type: 'number',
+    default: 0
+  }, {
+    name: 'min_value',
+    type: 'number',
+    default: 0
+  }, {
+    name: 'max_value',
+    type: 'number',
+    default: 2.5
+  }],
+
+  [TR_IDS.TurnC2CD]: [],
+
+  [TR_IDS.TurnRanking]: [],
+
+  [TR_IDS.TurnPercentiles]: [],
+
+  [TR_IDS.PowerFunctions]: [{
+    name: 'function',
+    type: 'string',
+    default: 'square'
   }]
 }
