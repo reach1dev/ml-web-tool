@@ -55,5 +55,11 @@ export const TransformParameters = {
     name: 'max',
     type: 'number',
     default: 1
+  }],
+
+  [TR_IDS.Standardization]: [{
+    name: 'rolling',
+    type: 'number',
+    default: 20
   }]
 }
