@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as TransformAction from '../actions/TransformAction'
 import * as InputDataAction from '../actions/InputDataAction'
-import { TransformParameters } from './TransformParameters'
+import { TransformParameters, getDefaultParameters } from './TransformParameters'
 
 let width = 12
 let height = Math.floor((window.innerHeight-200)/50)
@@ -116,76 +116,92 @@ function Board({transforms, getTransformLoading, transformAction, selectedTransf
   }
 
   const checkDraggable = (x, y) => {
-    const lastItem = isEmpty(x, y)
+    return getDraggable(x, y) > 0
+  }
+
+  const getDraggable = (x, y, _lastItem) => {
+    const lastItem = _lastItem || isEmpty(x, y)
     if (dragNodeId >= 0) {
+      const transform = transforms.filter(t=>t.id === dragNodeId)[0]
       if (lastItem === 1) {
-        return true
+        // target is MLA
+        return 1
       } else if (lastItem > 1) {
-        const parentId = transforms[lastItem].parentId
+        //target has node
+        if (transforms[lastItem].id === transform.parentId) {
+          //target is parent
+          return 0
+        }
+        const parentId = transforms[lastItem].parentId // the parent of target node
         if (transforms[lastItem].id === dragNodeId) {
-          return false
+          // target is myself
+          return 0
         }
         if (parentId < 0) {
-          return true
+          //target node has no parent, will add me to his parent
+          return 2
         } else {
           const parents = transforms.filter(t => t.id === parentId)
           const children = transforms.filter(t => t.parentId === dragNodeId)
           if (parents.length > 0 && children.length === 0) {
-            return true
+            //target has parent and drag node has no child, will add me in between of target node and his parent.
+            return 3
           }
         }
       }
       if (lastItem >= 0) {
-        return false
+        return 0
       }
-      return true
+      
+      if (transform.parentId > 0) {
+        const parents = transforms.filter(t => t.id === transform.parentId)
+        if (parents.length > 0 && parents[0]) {
+          if (parents[0].x >= x) {
+            //target position is behind of my parent position
+            return 0
+          }
+        }
+      }
+      return 4
     }
     if (selectTool !== null && lastItem < 0) {
       return false
     }
-    return true
+    return 5
 
   }
 
   const moveDragNode = (x, y) => {
     const lastItem = isEmpty(x, y)
+    const dragStatus = getDraggable(x, y, lastItem)
     const newPos = {x: x, y: y}
     if (lastItem >= 0) {
       newPos.x = x + 1
       newPos.y = findEmpty(x + 1, y)
     }
-    if (dragNodeId >= 0) {
-      if (lastItem < 0) {
-        transformAction.moveTransform(dragNodeId, newPos.x, newPos.y)
-        forceUpdate()
-      } else if (lastItem === 1) {
-        transformAction.addTransformToMLA(dragNodeId)
-        forceUpdate()
-      } else if (lastItem > 1){
-        const parentId = transforms[lastItem].parentId
-        if (transforms[lastItem].id !== dragNodeId) {
-          if (parentId < 0) {
-            transformAction.applySettings(transforms[lastItem].id, {
-              parentId: dragNodeId
-            })
-          } else {
-            const parents = transforms.filter(t => t.id === parentId)
-            if (parents.length > 0) {
-              const children = transforms.filter(t => t.parentId === dragNodeId)
-              if (children.length === 0) {
-                transformAction.applySettings(transforms[lastItem].id, {
-                  parentId: dragNodeId
-                })
-                transformAction.applySettings(dragNodeId, {
-                  parentId: parentId
-                })
-              }
-            }
-          }
+    if (dragStatus === 1) {
+      transformAction.addTransformToMLA(dragNodeId)
+    } else if (dragStatus === 2) {
+      transformAction.applySettings(transforms[lastItem].id, {
+        parentId: dragNodeId
+      })
+    } else if (dragStatus === 3) {
+      const parentId = transforms[lastItem].parentId
+      const parents = transforms.filter(t => t.id === parentId)
+      if (parents.length > 0) {
+        const children = transforms.filter(t => t.parentId === dragNodeId)
+        if (children.length === 0) {
+          transformAction.applySettings(transforms[lastItem].id, {
+            parentId: dragNodeId
+          })
+          transformAction.applySettings(dragNodeId, {
+            parentId: parentId
+          })
         }
       }
-      dragNodeId = -1
-    } else if (selectedTool != null) {
+    } else if (dragStatus === 4) {
+      transformAction.moveTransform(dragNodeId, newPos.x, newPos.y)
+    } else if (dragStatus === 5) {
       if (lastItem < 0) {
         return
       }
@@ -204,6 +220,7 @@ function Board({transforms, getTransformLoading, transformAction, selectedTransf
         inputParameters: transforms[lastItem].outputParameters.map((param) => param),
         inputFilters: transforms[lastItem].outputParameters.map((param) => true),
         outputParameters: transforms[lastItem].outputParameters.map((param) => param),
+        outputFilters: transforms[lastItem].outputParameters.map((param) => true),
         parameters: parameters,
         parentId: transforms[lastItem].id,
         x: newPos.x,

@@ -2,6 +2,7 @@ import { CLEAR_TRANSFORMS, UPLOADING_INPUT_DATA_SUCCESS, UPLOADING_INPUT_DATA, U
 
 const initialState = {
   file: null,
+  fileId: null,
   uploading: false
 };
 
@@ -10,11 +11,12 @@ export default function(state = initialState, action) {
     case CLEAR_TRANSFORMS:
       return initialState
     case UPLOADING_INPUT_DATA_SUCCESS: {
-      const { file } = action.payload;
+      const { file, fileId } = action.payload;
       return {
         ...state,
         uploading: false,
-        file: file
+        file: file,
+        fileId: fileId
       };
     }
     case UPLOADING_INPUT_DATA: {

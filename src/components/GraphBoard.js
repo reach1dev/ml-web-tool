@@ -25,15 +25,15 @@ function GraphBoard({transforms, transform, parentTransform, chartTop, chartBott
         <p><b>Train Metrics</b></p>
         <div>
           <div className='Table-Row'>
-            <span className='Table-Cell'>Cluster</span>
+            <span className='Table-Cell'>{trainMetrics.length === 1 ? 'Metric Type' : 'Cluster'}</span>
             <span className='Table-Cell'>Train</span>
             <span className='Table-Cell'>Test</span>
           </div>
 
           { trainMetrics.map((tr, idx) => (
             <div className='Table-Row'>
-              <span className='Table-Cell'>{'C-' + (idx+1)}</span>
-              { tr.map((td) => (
+              <span className='Table-Cell'>{trainMetrics.length === 1 ? 'Score' : 'C-' + (idx+1)}</span>
+              { Array.isArray(tr) && tr.map((td) => (
                 <span className='Table-Cell'>{td}</span>
               ))}
             </div>

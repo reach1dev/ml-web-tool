@@ -81,7 +81,7 @@ function getChartData(data, parameters) {
   return chartData
 }
 
-export const getTransformData = (allTransforms, transformId) => {
+export const getTransformData = (fileId, allTransforms, transformId) => {
   return (dispatch) => {
     const temp = allTransforms.filter((t) => t.id === transformId)
     if (temp.length === 0) {
@@ -105,8 +105,7 @@ export const getTransformData = (allTransforms, transformId) => {
     }
 
     axios.defaults.baseURL = BaseUrl
-    //  axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*'
-    axios.post('/get-transform-data', {
+    axios.post('/get-transform-data/' + fileId, {
       transforms: transforms.reverse()
     }).then(res=>{
       const [inputData, outputData] = res.data
@@ -123,6 +122,7 @@ export const getTransformData = (allTransforms, transformId) => {
         }
       })
     }).catch((err) => {
+      window.alert('No file uploaded')
       dispatch({
         type: GET_TRANSFORM_DATA_FAILED,
         payload: {
@@ -134,7 +134,7 @@ export const getTransformData = (allTransforms, transformId) => {
 }
 
 
-export const trainAndTest = (transforms, algorithmParameters) => {
+export const trainAndTest = (fileId, transforms, algorithmParameters) => {
   return (dispatch) => {
     dispatch({
       type: GET_TRANSFORM_DATA_START,
@@ -142,7 +142,7 @@ export const trainAndTest = (transforms, algorithmParameters) => {
     
     axios.defaults.baseURL = BaseUrl
     //  axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*'
-    axios.post('/train-and-test', {
+    axios.post('/train-and-test/' + fileId, {
       transforms: transforms,
       parameters: algorithmParameters
     }).then(res=>{
@@ -167,6 +167,7 @@ export const trainAndTest = (transforms, algorithmParameters) => {
         }
       })
     }).catch((err) => {
+      window.alert('Something wrong, train label should  be categorized.')
       dispatch({
         type: TRAIN_AND_TEST_FAILED,
         payload: {

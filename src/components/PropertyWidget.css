@@ -35,3 +35,14 @@
   display: flex;
   justify-content: space-between;
 }
+
+.Property-Item {
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+}
+
+.Property-Item-Row {
+  display: flex;
+  justify-content: space-between;
+}

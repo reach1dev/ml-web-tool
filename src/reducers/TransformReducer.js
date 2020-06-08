@@ -1,5 +1,7 @@
 import { ADD_TRANSFORM, MOVE_TRANSFORM, ADD_TRANSFORM_TO_MLA, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_FAILED, CLEAR_TRANSFORMS, SELECT_TRANSFORM, APPLY_TRANSFORM_SETTINGS, REMOVE_TRANSFORM, TRAIN_AND_TEST_SUCCESS } from "../redux/ActionTypes";
 import { IDS } from "../components/ItemTypes";
+import { getDefaultParameters } from "../components/TransformParameters";
+import { TR_IDS } from "../components/TransformationTools";
 
 const initialState = {
   transforms: [{
@@ -24,7 +26,9 @@ const initialState = {
     inputParameters: ['Date', 'Time'],
     outputParameters: ['Date', 'Time', 'Label'],
     inputFilters: [true, true],
-    parameters: {},
+    trainLabel: '',
+    algorithmType: 'kmean',
+    parameters: {n_clusters: 8},
     visible: true,
     inputData: null,
     outputData: null,
@@ -157,7 +161,7 @@ export default function(state = initialState, action) {
                 if (t.id === id) {
                   params = [
                     ...params,
-                    ...settings.outputParameters.filter(t => t !== 'Date' && t !== 'Time').map(p => p + '#' + t.id)
+                    ...(settings.outputParameters || t.outputParameters).filter(t => t !== 'Date' && t !== 'Time').map(p => p + '#' + t.id)
                   ]
                 } else {
                   params = [

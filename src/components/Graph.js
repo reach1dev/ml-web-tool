@@ -9,8 +9,8 @@ export default function({title, inputData, width}) {
   const [inputType] = useState(inputData && inputData.length > 0 ? Object.keys(inputData[0]).filter((k) => k!=='undefined' && k!=='Date' && k !== 'Time') : [])
   const [hideArray] = useState(inputType.map((i) => false))
   const [showZoomOut, setShowZoomOut] = useState(false)
-  const yAxisName = inputType[0] ? inputType[0].startsWith('C-') ? '' : inputType[0] :''
-  const yAxisName2 = inputType[inputType.length-1] ? inputType[inputType.length-1].startsWith('C-') ? '' : inputType[inputType.length-1] : ''
+  const [yAxisName, setYAxisName] = useState(inputType[0] ? inputType[0].startsWith('C-') ? '' : inputType[0] :'')
+  const [yAxisName2, setYAxisName2] = useState(inputType[inputType.length-1] ? inputType[inputType.length-1].startsWith('C-') ? '' : inputType[inputType.length-1] : '')
 
   const getAxisYDomain = (from, to, ref, offset) => {
     const refData = (from === '' && to === '') ? inputData : inputData.slice(from, to);
@@ -27,7 +27,7 @@ export default function({title, inputData, width}) {
           })
         }
       });
-      console.log('bottom >> ' + bottom)
+      console.log('bottom >> ' + top)
       return [ Math.floor((bottom)), Math.ceil(top) ]
     }
     console.log('bug >> ' + JSON.stringify(refData) + ' f ' + from + ' t  ' + to + ' ref ' + ref)
@@ -83,9 +83,9 @@ export default function({title, inputData, width}) {
     } ) );
   }
 
-  const zoomOut = () => {
-    const [ bottom, top ] = getAxisYDomain( '', '', yAxisName, 1 );
-    const [ bottom2, top2 ] = getAxisYDomain( '', '', yAxisName2, 1 );
+  const zoomOut = (ax1, ax2) => {
+    const [ bottom, top ] = getAxisYDomain( '', '', ax1 || yAxisName, 1 );
+    const [ bottom2, top2 ] = getAxisYDomain( '', '', ax2 || yAxisName2, 1 );
     setState({
       ...initialState,
       bottom, top,
@@ -96,7 +96,13 @@ export default function({title, inputData, width}) {
 
   const changeHide = (idx) => {
     hideArray[idx] = !hideArray[idx]
-    zoomOut()
+    const shown = inputType.filter((p, idx) => !hideArray[idx])
+    const ax1 = shown[0] ? shown[0].startsWith('C-') ? '' : shown[0] :''
+    const ax2 = shown[shown.length-1] ? shown[shown.length-1].startsWith('C-') ? '' : shown[shown.length-1] : ''
+    setYAxisName(ax1)
+    setYAxisName2(ax2)
+
+    zoomOut(ax1, ax2)
   }
 
   return (

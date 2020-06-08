@@ -5,27 +5,34 @@ import { bindActionCreators } from 'redux'
 import * as InputDataAction from '../actions/InputDataAction'
 import * as TransformAction from '../actions/TransformAction'
 import { IDS } from './ItemTypes'
-import { TransformParameters } from './TransformParameters'
+import { TransformParameters, getDefaultParameters } from './TransformParameters'
 
-function PropertyWidget({hide, setHide, inputFile, transforms, transform, parentTransform, inputDataAction, transformAction}) {
+function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, transform, parentTransform, inputDataAction, transformAction}) {
 
   const [file, setFile] = useState(null)
   const [error, setError] = useState(false)
   const [inputFilters, setInputFilters] = useState(transform ? transform.inputFilters || [] : [])
+  const [outputFilters, setOutputFilters] = useState(transform ? transform.outputFilters || [] : [])
   const [filterChanged, setFilterChanged] = useState(1)
-  const [parameters, setParameters] = useState(transform ? transform.parameters : [])
+  const [parameters, setParameters] = useState(transform ? transform.parameters: {})
   const [parameterTypes, setParameterTypes] = useState([])
   const [algorithmType, setAlgorithmType] = useState(0)
+  const [trainLabel, setTrainLabel] = useState('')
+  const [testShift, setTestShift] = useState(1)
   
   useEffect(() => {
     setInputFilters(transform ? transform.inputFilters || [] : [])
-    setParameters(transform ? transform.parameters : [])
+    setOutputFilters(transform ? transform.outputFilters || [] : [])
+    setParameters(transform ? transform.parameters: {} )
     setParameterTypes(transform ? TransformParameters[transform.tool.id] : [])
+    setAlgorithmType(transform && transform.parameters ? transform.parameters['algorithmType'] || 0 : 0)
+    setTrainLabel(transform && transform.parameters ? transform.parameters['trainLabel'] || '' : '')
+    setTestShift(transform && transform.parameters ? transform.parameters['testShift'] || 1 : 1)
   }, [transform])
 
-  useEffect(() => {
-    setParameters([])
-  }, [algorithmType])
+  // useEffect(() => {
+  //   setParameters([])
+  // }, [algorithmType])
 
   const uploadFile = () => {
     if (file === null) {
@@ -36,8 +43,21 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transform, parent
   }
 
   const changeInputFilter = (idx) => {
+    if (transform.inputParameters[idx] === 'Date' || transform.inputParameters[idx] === 'Time') {
+      return
+    }
     inputFilters[idx] = !inputFilters[idx]
+    setOutputFilters(transform.inputParameters.filter((p, i) => inputFilters[i]).map((p) => true))
     setInputFilters(inputFilters)
+    setFilterChanged(filterChanged+1)
+  }
+
+  const changeOutputFilter = (idx) => {
+    if (transform.outputParameters[idx] === 'Date' || transform.outputParameters[idx] === 'Time') {
+      return
+    }
+    outputFilters[idx] = !outputFilters[idx]
+    setOutputFilters(outputFilters)
     setFilterChanged(filterChanged+1)
   }
 
@@ -48,26 +68,65 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transform, parent
   }
 
   const trainAndTest = () => {
-    transformAction.trainAndTest(transforms, parameters)
+    if (inputFileId) {
+      const params = parameters
+      for (let paramName in parameters) {
+        const paramType = parameterTypes[algorithmType].parameters.filter(p => p.name === paramName)[0]
+        if (paramType && paramType.type === 'number') {
+          params[paramName] = parseFloat(parameters[paramName])
+        }
+      }
+      const allParams = {
+        ...params,
+        algorithmType: algorithmType,
+        trainLabel: trainLabel,
+        testShift: testShift
+      }
+      setParameters(allParams)
+      transformAction.trainAndTest(inputFileId, transforms, allParams)
+    } else {
+      window.alert('Please upload input file.')
+    }
   }
 
   const drawGraph = () => {
-    transformAction.getTransformData(transforms, transform.id)
+    if (inputFileId) {
+      transformAction.getTransformData(inputFileId, transforms, transform.id)
+    } else{
+      window.alert('Please upload input file')
+    }
   }
 
   const applyFilters = () => {
     const outParams = transform.inputParameters.filter((param, idx) => inputFilters[idx])
+    const params = parameters
+    for (let paramName in parameters) {
+      const paramType = parameterTypes.find(p => p.name === paramName)
+      if (paramType.type === 'number') {
+        params[paramName] = parseFloat(params[paramName])
+      }
+      setParameters(params)
+    }
     const settings = {
       outputParameters: outParams,
       inputFilters: inputFilters,
-      parameters: parameters
+      outputFilters: outputFilters,
+      parameters: params
     }
     transformAction.applySettings(transform.id, settings)
   }
 
   const saveMLAlgorithm = () => {
     transformAction.applySettings(transform.id, {
+      algorithmType: algorithmType,
       inputFilters: inputFilters,
+      trainLabel: trainLabel,
+      parameters: {
+        ...parameters,
+        algorithmType: algorithmType,
+        trainLabel: trainLabel,
+        testShift: testShift
+      }
     })
   }
 
@@ -87,11 +146,26 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transform, parent
     return (
       <div className='Property-Item-Container' key={1}>
         <p className='Property-Item-Header'>
-          <b>Input Parameters: {inputFile} </b> 
+          <b>Input Parameters</b> 
           {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
         </p>
         { (inputParameters?inputParameters:outputParameters).map((param, idx) => (
           <div><input type='checkbox' checked={filterChanged>0 && inputFilters[idx]} onClick={()=>changeInputFilter(idx)} /> {param} </div>
+        ))}
+      </div>
+    )
+  }
+
+  const _renderOutputParams = () => {
+    const outputParameters = transform.inputParameters.filter((p, i) => transform.inputFilters[i])
+    return (
+      <div className='Property-Item-Container' key={5}>
+        <p className='Property-Item-Header'>
+          <b>Output Parameters to apply transform</b> 
+          {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
+        </p>
+        { outputParameters.map((param, idx) => (
+          <div><input type='checkbox' checked={filterChanged>0 && outputFilters[idx]} onClick={()=>changeOutputFilter(idx)} /> {param} </div>
         ))}
       </div>
     )
@@ -106,7 +180,7 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transform, parent
         </p>
         <p className='Property-Item-Header'>
           <b>Algorithm Type</b> 
-          <select onChange={(e) => setAlgorithmType(e.target.value)} value={algorithmType}>
+          <select onChange={(e) => setAlgorithmType(parseInt(e.target.value))} value={algorithmType}>
             <option value={0}>k-Mean</option>
             <option value={1}>k-NN</option>
           </select>
@@ -125,7 +199,7 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transform, parent
 
   const changeParameter = (name, value, type) => {
     if (type === 'number') {
-      parameters[name] = parseFloat(value)
+      parameters[name] = value //parseFloat(value)
     } else {
       parameters[name] = value
     }
@@ -140,7 +214,7 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transform, parent
           <b>Transform Parameters</b> 
           {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
         </p>
-        <div style={{display: 'flex', alignItems: 'stretch', flexDirection: 'column'}}>
+        <div className='Property-Item'>
           { parameters && parameterTypes ? parameterTypes.map((param) => (
             <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
               <label style={{marginRight: 10}}>{param.name}</label>
@@ -162,6 +236,28 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transform, parent
     )
   }
 
+  const _renderTargetParam = () => {
+    return (
+      <div className='Property-Item-Container' key={3}>
+        <p className='Property-Item-Header'>
+          <b>Select Train Label & Test Shift</b> 
+        </p>
+        <p className='Property-Item-Row'>
+          <span>Train label: </span>
+          <select style={{width: 120}} value={trainLabel} onChange={(e) => setTrainLabel(e.target.value)}>
+            { transform.inputParameters.filter((p, idx) => idx >= 2).map((p, idx) => (
+              <option value={p} style={{width: 120}}>&nbsp;{p}&nbsp;</option>
+            ))}
+          </select>
+        </p>
+        <p className='Property-Item-Row'>
+          <span>Test shift: </span>
+          <input style={{width: 110}} value={testShift} onChange={(e) => setTestShift(parseInt(e.target.value))} />
+        </p>
+      </div>
+    )
+  }
+
   const _render = () => {
     const type = transform.tool.id
     let items = []
@@ -170,13 +266,15 @@ function PropertyWidget({hide, setHide, inputFile, transforms, transform, parent
     } else if (type === IDS.MLAlgorithm) {
       items = [
         _renderMLParameters(),
-        _renderInputParams()
+        _renderInputParams(),
+        _renderTargetParam()
       ]
     } else {
       items = [
         _renderDetails(),
         _renderTransformParameters(),
-        _renderInputParams()
+        _renderInputParams(),
+        _renderOutputParams()
       ]
     }
     return items
@@ -220,6 +318,7 @@ const mapStateToProps = (state) => {
   const parentTransform = parentTransforms.length > 0 ? parentTransforms[0] : null
   
   return {
+    inputFileId: state.inputData.fileId,
     inputFile: state.inputData.file,
     parentTransform: parentTransform,
     transform: state.transforms.selectedTransform,

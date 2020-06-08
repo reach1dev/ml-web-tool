@@ -20,7 +20,8 @@ export const uploadInputData = (file) => {
           dispatch({
             type: UPLOADING_INPUT_DATA_SUCCESS,
             payload: {
-              file: file.name
+              file: file.name,
+              fileId: res.data.file_id
             }
           })
         } else {
