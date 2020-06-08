@@ -122,7 +122,7 @@ export const getTransformData = (fileId, allTransforms, transformId) => {
         }
       })
     }).catch((err) => {
-      window.alert('No file uploaded')
+      window.alert('Something went wrong, you may set wrong input data for any transforms.')
       dispatch({
         type: GET_TRANSFORM_DATA_FAILED,
         payload: {
