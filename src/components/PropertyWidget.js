@@ -213,6 +213,7 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
       transformAction.addTransformToMLA(transform.id)
     }
     transform.target = !transform.target
+    setFilterChanged(filterChanged+1)
   }
 
   const _renderTransformParameters = () => {
