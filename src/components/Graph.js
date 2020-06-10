@@ -137,7 +137,7 @@ export default function({title, chart, width, hides}) {
       >
         <defs>
           { columns.map((col, idx) => (
-            <linearGradient id={col} x1="0" y1="0" x2="0" y2="1">
+            <linearGradient key={idx} id={col} x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor={AreaColors[idx%AreaColors.length]} stopOpacity={0.4}/>
               <stop offset="95%" stopColor={AreaColors[idx%AreaColors.length]} stopOpacity={0}/>
             </linearGradient>
@@ -165,7 +165,7 @@ export default function({title, chart, width, hides}) {
         />
         <Tooltip />
         { columns.map((col, idx) => (
-          <Line type="monotone" 
+          <Line key={idx} type="monotone" 
             dataKey={columns[idx]} 
             hide={hideArray[idx]} 
             dot={!dotHide}
@@ -180,11 +180,11 @@ export default function({title, chart, width, hides}) {
       { Array.from(Array(Math.ceil(columns.length/7)).keys()).map((idx) => {
         const cols = columns.slice(idx*7, (idx+1)*7)
         return (
-          <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 8}}>
+          <div key={idx} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 8}}>
             {idx === 0 ? <span>
             <input type='checkbox' readOnly onClick={() => setDotHide(!dotHide)} checked={!dotHide} />Dot </span> : null } &nbsp;
             { cols.map((col, j) => (
-              <span>
+              <span key={j}>
                 <input type='checkbox' readOnly onClick={() => changeHide(idx*7+j)} checked={!hideArray[idx*7+j]} /> 
                 {cols[j]} &nbsp;
               </span>

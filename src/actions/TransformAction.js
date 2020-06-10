@@ -1,4 +1,4 @@
-import { UPLOADING_INPUT_DATA, UPLOADING_INPUT_DATA_SUCCESS, UPLOADING_INPUT_DATA_FAILED } from "../redux/ActionTypes"
+import { TRAIN_AND_TEST_STARTED, UPLOADING_INPUT_DATA, UPLOADING_INPUT_DATA_SUCCESS, UPLOADING_INPUT_DATA_FAILED } from "../redux/ActionTypes"
 import axios from 'axios'
 import { BaseUrl } from "./Constants"
 import { REMOVE_TRANSFORM_FROM_MLA, TRAIN_AND_TEST_SUCCESS, TRAIN_AND_TEST_FAILED, REMOVE_TRANSFORM, APPLY_TRANSFORM_SETTINGS, SELECT_TRANSFORM, CLEAR_TRANSFORMS, ADD_TRANSFORM, ADD_TRANSFORM_TO_MLA, MOVE_TRANSFORM, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_FAILED } from "../redux/ActionTypes";
@@ -143,6 +143,54 @@ export const getTransformData = (fileId, allTransforms, transformId) => {
 }
 
 
+export const getTrainResult = (resFileId, algorithmParameters) => {
+  return async (dispatch) => {
+    axios.defaults.baseURL = BaseUrl
+    const res = await axios.post('/get-train-result/' + resFileId)
+    if (res.status !== 200) {
+      return false
+    }
+    const [graph, metrics] = res.data
+    let graphData = []
+    let mins = {}
+    let maxes = {}
+    for(let i=0; i<graph[0].length; i++) {
+      // if (i%20 !== 0) {
+      //   continue
+      // }
+      let data = {'Time': i} ///20
+
+      for(let j=0; j<graph.length; j++) {
+        let label = 'C-' + (j+1)
+        if (algorithmParameters.algorithmType === 1) {
+          label = (j === 0 ? 'Predict' : 'Target')
+        }
+        data[label] = graph[j][i]
+        if (mins[label] === undefined || graph[j][i] < mins[label]) {
+          mins[label] = graph[j][i]
+        }
+        if (maxes[label] === undefined || graph[j][i] > maxes[label]) {
+          maxes[label] = graph[j][i]
+        }
+      }
+      graphData.push(data)
+    }
+
+    dispatch({
+      type: TRAIN_AND_TEST_SUCCESS,
+      payload: {
+        metrics: metrics,
+        chart: {
+          data: graphData,
+          mins: mins,
+          maxes: maxes
+        }
+      }
+    })
+    return true
+  }
+}
+
 export const trainAndTest = (fileId, transforms, algorithmParameters) => {
   return (dispatch) => {
     dispatch({
@@ -155,40 +203,24 @@ export const trainAndTest = (fileId, transforms, algorithmParameters) => {
       transforms: transforms,
       parameters: algorithmParameters
     }).then(res=>{
-      const [graph, metrics] = res.data
-      let graphData = []
-      let mins = {}
-      let maxes = {}
-      for(let i=0; i<graph[0].length; i++) {
-        if (i%20 !== 0) {
-          continue
-        }
-        let data = {'Time': i/20}
-
-        for(let j=0; j<graph.length; j++) {
-          const label = 'C-' + (j+1)
-          data[label] = graph[j][i]
-          if (!mins[label] || graph[j][i] < mins[label]) {
-            mins[label] = graph[j][i]
-          }
-          if (!maxes[label] || graph[j][i] > maxes[label]) {
-            maxes[label] = graph[j][i]
-          }
-        }
-        graphData.push(data)
-      }
-
       dispatch({
-        type: TRAIN_AND_TEST_SUCCESS,
+        type: TRAIN_AND_TEST_STARTED,
         payload: {
-          metrics: metrics,
-          chart: {
-            data: graphData,
-            mins: mins,
-            maxes: maxes
-          }
+          resFileId: res.data.res_file_id
         }
       })
+
+      let time = 0
+      const timer = setInterval(async () => {
+        if (time < 120) {
+          if(await getTrainResult(res.data.res_file_id, algorithmParameters)(dispatch)) {
+            clearInterval(timer)
+          }
+        } else {
+          clearInterval(timer)
+        }
+        time ++
+      }, 2000)
     }).catch((err) => {
       window.alert('Something wrong, train label should  be categorized.')
       dispatch({

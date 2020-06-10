@@ -6,7 +6,7 @@ import * as TransformAction from '../actions/TransformAction'
 import { IDS } from './ItemTypes'
 import { TransformParameters } from './TransformParameters'
 
-function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, transform, transformAction}) {
+function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, transforms, transform, transformAction}) {
 
   const [file, setFile] = useState(null)
   const [error, setError] = useState(false)
@@ -26,6 +26,17 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
     setTrainLabel(transform && transform.parameters ? transform.parameters['trainLabel'] || '' : '')
     setTestShift(transform && transform.parameters ? transform.parameters['testShift'] || 1 : 1)
   }, [transform])
+
+  const changeAlgorithmType = (type) => {
+    setAlgorithmType(type)
+    if (parameterTypes && parameterTypes[type] && parameterTypes[type].parameters) {
+      const params = {}
+      parameterTypes[type].parameters.map((p) => {
+        params[p.name] = p.default
+      })
+      setParameters(params)
+    }
+  }
 
   const uploadFile = () => {
     if (file === null) {
@@ -75,7 +86,7 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
     const params = parameters
     for (let paramName in parameters) {
       const paramType = parameterTypes.find(p => p.name === paramName)
-      if (paramType.type === 'number') {
+      if (paramType && paramType.type === 'number') {
         params[paramName] = parseFloat(params[paramName])
       }
       setParameters(params)
@@ -118,7 +129,7 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
   const _renderInputData = () => {
     return (
       <div className='Property-Item-Container' key={0}>
-        <p style={{display: 'flex', justifyContent: 'space-between'}}><b>Input Data: {inputFile} </b> <input type='button' onClick={uploadFile} value='Upload' /></p>
+        <p style={{display: 'flex', justifyContent: 'space-between'}}><b>Input Data: {uploading ? 'uploading...' : inputFile} </b> <input type='button' onClick={uploadFile} value='Upload' /></p>
         <input id='files' type='file' onChange={(e) => setFile(e.target.files[0])} />
         <p style={{color: 'red'}}>{error && !file ? 'Please select file' : ''}</p>
       </div>
@@ -143,7 +154,7 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
           {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
         </p>
         { (inputParameters).map((param, idx) => (
-          <div><input type='checkbox' checked={filterChanged>0 && inputFilters[idx]} onClick={()=>changeInputFilter(idx)} /> {param} </div>
+          <div key={idx}><input type='checkbox' checked={filterChanged>0 && inputFilters[idx]} onChange={(e) => changeInputFilter(idx)} /> {param} </div>
         ))}
       </div>
     )
@@ -179,14 +190,14 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
         </p>
         <p className='Property-Item-Header'>
           <b>Algorithm Type</b> 
-          <select onChange={(e) => setAlgorithmType(parseInt(e.target.value))} value={algorithmType}>
+          <select onChange={(e) => changeAlgorithmType(parseInt(e.target.value))} value={algorithmType}>
             <option value={0}>k-Mean</option>
             <option value={1}>k-NN</option>
           </select>
         </p>
         <div style={{display: 'flex', alignItems: 'stretch', flexDirection: 'column'}}>
-          { parameters && parameterTypes && parameterTypes[algorithmType] && parameterTypes[algorithmType].parameters? parameterTypes[algorithmType].parameters.map((param) => (
-            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
+          { parameters && parameterTypes && parameterTypes[algorithmType] && parameterTypes[algorithmType].parameters? parameterTypes[algorithmType].parameters.map((param, idx) => (
+            <div key={idx} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
               <label style={{marginRight: 10}}>{param.name}</label>
               <input style={{width: '100%', maxWidth: 180}} value={parameters[param.name]} onChange={(e)=> changeParameter(param.name, e.target.value, param.type)}></input>
             </div>
@@ -258,8 +269,8 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
         <p className='Property-Item-Row'>
           <span>Train label: </span>
           <select style={{width: 120}} value={trainLabel} onChange={(e) => setTrainLabel(e.target.value)}>
-            { transform.inputParameters.filter((p, idx) => idx >= 2).map((p, idx) => (
-              <option value={p} style={{width: 120}}>&nbsp;{p}&nbsp;</option>
+            { transform.inputParameters.map((p, idx) => (
+              <option key={idx} value={p} style={{width: 120}}>&nbsp;{p}&nbsp;</option>
             ))}
           </select>
         </p>
@@ -332,6 +343,7 @@ const mapStateToProps = (state) => {
   return {
     inputFileId: state.transforms.fileId,
     inputFile: state.transforms.file,
+    uploading: state.transforms.uploading,
     parentTransform: parentTransform,
     transform: state.transforms.selectedTransform,
     transforms: state.transforms.transforms

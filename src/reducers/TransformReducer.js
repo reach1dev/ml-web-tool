@@ -1,5 +1,5 @@
 import { UPLOADING_INPUT_DATA_SUCCESS, UPLOADING_INPUT_DATA, UPLOADING_INPUT_DATA_FAILED, REMOVE_TRANSFORM_FROM_MLA } from "../redux/ActionTypes"
-import { ADD_TRANSFORM, MOVE_TRANSFORM, ADD_TRANSFORM_TO_MLA, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_FAILED, CLEAR_TRANSFORMS, SELECT_TRANSFORM, APPLY_TRANSFORM_SETTINGS, REMOVE_TRANSFORM, TRAIN_AND_TEST_SUCCESS } from "../redux/ActionTypes"
+import { TRAIN_AND_TEST_STARTED, ADD_TRANSFORM, MOVE_TRANSFORM, ADD_TRANSFORM_TO_MLA, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_FAILED, CLEAR_TRANSFORMS, SELECT_TRANSFORM, APPLY_TRANSFORM_SETTINGS, REMOVE_TRANSFORM, TRAIN_AND_TEST_SUCCESS } from "../redux/ActionTypes"
 import { IDS } from "../components/ItemTypes";
 
 const initialState = {
@@ -163,6 +163,12 @@ export default function(state = initialState, action) {
       return {
         ...state,
         getTransformLoading: true
+      }
+    }
+    case TRAIN_AND_TEST_STARTED: {
+      return {
+        ...state,
+        resFileId: action.payload.resFileId
       }
     }
     case TRAIN_AND_TEST_SUCCESS: {
