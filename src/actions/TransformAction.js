@@ -130,7 +130,7 @@ export const getTransformData = (fileId, allTransforms, transformId) => {
         }
       })
     }).catch((err) => {
-      window.alert('Something went wrong, you may set wrong input data for any transforms.')
+      window.alert('Server is busy or you may set wrong input data for any transforms.')
       console.log(err)
       dispatch({
         type: GET_TRANSFORM_DATA_FAILED,
