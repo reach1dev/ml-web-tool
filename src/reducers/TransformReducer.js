@@ -1,7 +1,6 @@
-import { ADD_TRANSFORM, MOVE_TRANSFORM, ADD_TRANSFORM_TO_MLA, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_FAILED, CLEAR_TRANSFORMS, SELECT_TRANSFORM, APPLY_TRANSFORM_SETTINGS, REMOVE_TRANSFORM, TRAIN_AND_TEST_SUCCESS } from "../redux/ActionTypes";
+import { UPLOADING_INPUT_DATA_SUCCESS, UPLOADING_INPUT_DATA, UPLOADING_INPUT_DATA_FAILED, REMOVE_TRANSFORM_FROM_MLA } from "../redux/ActionTypes"
+import { ADD_TRANSFORM, MOVE_TRANSFORM, ADD_TRANSFORM_TO_MLA, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_FAILED, CLEAR_TRANSFORMS, SELECT_TRANSFORM, APPLY_TRANSFORM_SETTINGS, REMOVE_TRANSFORM, TRAIN_AND_TEST_SUCCESS } from "../redux/ActionTypes"
 import { IDS } from "../components/ItemTypes";
-import { getDefaultParameters } from "../components/TransformParameters";
-import { TR_IDS } from "../components/TransformationTools";
 
 const initialState = {
   transforms: [{
@@ -10,8 +9,8 @@ const initialState = {
     tool: {shortName: 'Input Data', id: IDS.InputData},
     x: 0,
     y: 5,
-    inputParameters: ['Date', 'Time', 'High', 'Low', 'Open', 'Close', 'Vol', 'OI'],
-    outputParameters: ['Date', 'Time', 'High', 'Low', 'Open', 'Close', 'Vol', 'OI'],
+    inputParameters: [],
+    outputParameters: {},
     inputFilters: [true, true, true, true, true, true, true, true],
     visible: true,
     inputData: null,
@@ -21,7 +20,7 @@ const initialState = {
     id: IDS.MLAlgorithm,
     index: 1,
     tool: {shortName: 'ML Algorithm', plusIcon: false, id: IDS.MLAlgorithm},
-    x: 5,
+    x: 6,
     y: 5,
     inputParameters: ['Date', 'Time'],
     outputParameters: ['Date', 'Time', 'Label'],
@@ -37,13 +36,51 @@ const initialState = {
   selectedTransform: null,
   inputData: null,
   outputData: null,
-  trainMetrics: null
+  trainMetrics: null,
+  fileId: null,
+  file: null,
+  uploading: false,  
 };
 
 export default function(state = initialState, action) {
   switch (action.type) {
     case CLEAR_TRANSFORMS:
       return initialState
+    case UPLOADING_INPUT_DATA_SUCCESS: {
+      const { file, fileId, columns } = action.payload;
+      return {
+        ...state,
+        uploading: false,
+        file: file,
+        fileId: fileId,
+        transforms: state.transforms.map(t => {
+          if (t.id === IDS.InputData) {
+            const outputs = {}
+            columns.forEach(col => {
+              outputs[col] = col
+            })
+            return {
+              ...t,
+              outputParameters: outputs
+            }
+          } else {
+            return t
+          }
+        })
+      };
+    }
+    case UPLOADING_INPUT_DATA: {
+      return {
+        ...state,
+        uploading: true,
+      };
+    }
+    case UPLOADING_INPUT_DATA_FAILED: {
+      return {
+        ...state,
+        uploading: true,
+      };
+    }
     case ADD_TRANSFORM: {
       return {
         ...state,
@@ -69,6 +106,21 @@ export default function(state = initialState, action) {
         })
       };
     }
+    case REMOVE_TRANSFORM_FROM_MLA: {
+      const {id} = action.payload
+      return {
+        ...state,
+        transforms: state.transforms.map((t) => {
+          if (t.id === id) {
+            return {
+              ...t,
+              target: false
+            }
+          }
+          return t
+        })
+      }
+    }
     case ADD_TRANSFORM_TO_MLA: {
       const {id} = action.payload
       const tr = state.transforms.filter(t => t.id === id)[0]
@@ -86,18 +138,14 @@ export default function(state = initialState, action) {
               if (t.target || t.id === id) {
                 params = [
                   ...params,
-                  ...t.outputParameters.filter(t => t !== 'Date' && t !== 'Time').map(p => p + '#' + t.id)
+                  ...Object.values(t.outputParameters)
                 ]
               }
             })
-            const inputParameters = [
-              'Date', 'Time',
-              ...params
-            ]
             return {
               ...t,
-              inputParameters: inputParameters,
-              inputFilters: inputParameters.map(t => true)
+              inputParameters: params,
+              inputFilters: params.map(t => true)
             }
           }
           return t
@@ -118,22 +166,21 @@ export default function(state = initialState, action) {
       }
     }
     case TRAIN_AND_TEST_SUCCESS: {
-      const {graph, metrics} = action.payload
-      console.log('graph >> ' + JSON.stringify(graph))
+      const {chart, metrics} = action.payload
       return {
         ...state,
         trainMetrics: metrics,
         inputData: null,
-        outputData: graph,
+        outputData: chart,
         getTransformLoading: false
       }
     }
     case GET_TRANSFORM_DATA_SUCCESS: {
-      const {inputData, outputData} = action.payload
+      const {chart} = action.payload
       return {
         ...state,
-        inputData: inputData,
-        outputData: outputData,
+        inputData: chart,
+        outputData: chart,
         trainMetrics: null,
         getTransformLoading: false
       };
@@ -146,39 +193,47 @@ export default function(state = initialState, action) {
     }
     case APPLY_TRANSFORM_SETTINGS: {
       const {id, settings} = action.payload
+      let parentTransform = {...state.transforms.filter(t => t.id===id)[0], ...settings}
+      let transform = state.transforms.filter(t => t.parentId === parentTransform.id)[0]
+      let transforms = {[parentTransform.id]: parentTransform}
+
+      while(transform) {
+        const tr = transform
+        const outputParameters = {}
+        const newInputParameters = parentTransform.inputParameters.concat(Object.values(parentTransform.outputParameters))
+        newInputParameters.forEach(p => {
+          if (tr.outputParameters[p]) {
+            outputParameters[p] = tr.outputParameters[p]
+          }
+        });
+        const trNew = {
+          ...tr,
+          outputParameters: outputParameters,
+          inputParameters: newInputParameters
+        }
+        transforms[tr.id] = trNew
+        parentTransform = trNew
+        transform = state.transforms.filter(t => t.parentId === tr.id)[0]
+      }
       return {
         ...state,
         transforms: state.transforms.map((t) => {
-          if (t.id === id) {
-            return {
-              ...t,
-              ...settings
-            }
+          if (transforms[t.id]) {
+            return transforms[t.id]
           } else if (t.id === IDS.MLAlgorithm) {
             let params = []
             state.transforms.forEach(t => {
               if (t.target) {
-                if (t.id === id) {
-                  params = [
-                    ...params,
-                    ...(settings.outputParameters || t.outputParameters).filter(t => t !== 'Date' && t !== 'Time').map(p => p + '#' + t.id)
-                  ]
-                } else {
-                  params = [
-                    ...params,
-                    ...t.outputParameters.filter(t => t !== 'Date' && t !== 'Time').map(p => p + '#' + t.id)
-                  ]
-                }
+                params = [
+                  ...params,
+                  ...Object.values((transforms[t.id] ? transforms[t.id] : t).outputParameters)
+                ]
               }
             })
-            const inputParameters = [
-              'Date', 'Time',
-              ...params
-            ]
             return {
               ...t,
-              inputParameters: inputParameters,
-              inputFilters: inputParameters.map(t => true)
+              inputParameters: params,
+              inputFilters: params.map(t => true)
             }
           }
           return t

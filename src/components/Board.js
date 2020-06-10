@@ -14,8 +14,7 @@ import { TransformationTools } from './TransformationTools'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as TransformAction from '../actions/TransformAction'
-import * as InputDataAction from '../actions/InputDataAction'
-import { TransformParameters, getDefaultParameters } from './TransformParameters'
+import { TransformParameters } from './TransformParameters'
 
 let width = 12
 let height = Math.floor((window.innerHeight-200)/50)
@@ -68,7 +67,7 @@ function getComponent({shortName, plusIcon}, id) {
   )
 }
 
-function Board({transforms, getTransformLoading, transformAction, selectedTransform}) {
+function Board({fileId, transforms, getTransformLoading, transformAction, selectedTransform}) {
   const [status, setStatus] = useState(0)
   let dragNodeId = -1
   let selectedTool = null
@@ -205,6 +204,10 @@ function Board({transforms, getTransformLoading, transformAction, selectedTransf
       if (lastItem < 0) {
         return
       }
+      if (!fileId) {
+        window.alert('Please upload input file')
+        return
+      }
       const tool = {
         ...selectedTool,
         id: transforms[transforms.length===2?0:(transforms.length-1)].id + 1
@@ -214,13 +217,12 @@ function Board({transforms, getTransformLoading, transformAction, selectedTransf
       for(let i=0; i<defaultParams.length; i++) {
         parameters[defaultParams[i].name] = defaultParams[i].default
       }
+      const inputParams = transforms[lastItem].inputParameters.concat(Object.values(transforms[lastItem].outputParameters))
       transformAction.addTransform({
         id: tool.id,
         tool: selectedTool,
-        inputParameters: transforms[lastItem].outputParameters.map((param) => param),
-        inputFilters: transforms[lastItem].outputParameters.map((param) => true),
-        outputParameters: transforms[lastItem].outputParameters.map((param) => param),
-        outputFilters: transforms[lastItem].outputParameters.map((param) => true),
+        inputParameters: inputParams,
+        outputParameters: {},
         parameters: parameters,
         parentId: transforms[lastItem].id,
         x: newPos.x,
@@ -324,6 +326,7 @@ function Board({transforms, getTransformLoading, transformAction, selectedTransf
 
 const mapStateToProps = (state) => {
   return {
+    fileId: state.transforms.fileId,
     transforms: state.transforms.transforms,
     selectedTransform: state.transforms.selectedTransform,
     getTransformLoading: state.transforms.getTransformLoading
@@ -332,7 +335,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    inputDataAction: bindActionCreators(InputDataAction, dispatch),
     transformAction: bindActionCreators(TransformAction, dispatch)
   }
 }

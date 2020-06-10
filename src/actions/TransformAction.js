@@ -1,7 +1,7 @@
-import { TRAIN_AND_TEST_SUCCESS, TRAIN_AND_TEST_FAILED, REMOVE_TRANSFORM, APPLY_TRANSFORM_SETTINGS, SELECT_TRANSFORM, CLEAR_TRANSFORMS, ADD_TRANSFORM, ADD_TRANSFORM_TO_MLA, MOVE_TRANSFORM, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_FAILED } from "../redux/ActionTypes";
+import { UPLOADING_INPUT_DATA, UPLOADING_INPUT_DATA_SUCCESS, UPLOADING_INPUT_DATA_FAILED } from "../redux/ActionTypes"
 import axios from 'axios'
-import qs from 'querystring'
-import { BaseUrl } from "./Constants";
+import { BaseUrl } from "./Constants"
+import { REMOVE_TRANSFORM_FROM_MLA, TRAIN_AND_TEST_SUCCESS, TRAIN_AND_TEST_FAILED, REMOVE_TRANSFORM, APPLY_TRANSFORM_SETTINGS, SELECT_TRANSFORM, CLEAR_TRANSFORMS, ADD_TRANSFORM, ADD_TRANSFORM_TO_MLA, MOVE_TRANSFORM, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_FAILED } from "../redux/ActionTypes";
 
 
 export const clearTransforms = () => {
@@ -16,6 +16,15 @@ export const addTransform = (transformData) => {
     dispatch({
       type: ADD_TRANSFORM,
       payload: transformData
+    })
+  }
+}
+
+export const removeTransformFromMLA = (id) => {
+  return (dispatch) => {
+    dispatch({
+      type: REMOVE_TRANSFORM_FROM_MLA,
+      payload: { id }
     })
   }
 }
@@ -56,13 +65,9 @@ export const selectTransform = (id) => {
   }
 }
 
-function getChartData(data, parameters) {
+function getChartData(data, columns) {
   if (data === null) {
-    return {
-      data: [],
-      dataMin: 0,
-      dataMax: 0
-    }
+    return []
   }
   const chartData = []
   let k = 0
@@ -71,7 +76,7 @@ function getChartData(data, parameters) {
       Date: data[i][0],
       Time: k++
     }
-    parameters.map((param, idx) => {
+    columns.map((param, idx) => {
       if (param !== 'Date' && param !== 'Time') {
         obj[param] = data[i][idx]
       }
@@ -108,21 +113,25 @@ export const getTransformData = (fileId, allTransforms, transformId) => {
     axios.post('/get-transform-data/' + fileId, {
       transforms: transforms.reverse()
     }).then(res=>{
-      const [inputData, outputData] = res.data
-      const [inputChartData, outputChartData] = [
-        getChartData(inputData, lastTransform.inputParameters), 
-        getChartData(outputData, lastTransform.outputParameters)
-      ]
-
+      const mins = {}, maxes = {}
+      res.data.columns[0].forEach((col, idx) => {
+        if (col === 'Date' || col === 'Time') return
+        mins[col] = res.data.columns[1][idx]
+        maxes[col] = res.data.columns[2][idx]
+      })
       dispatch({
         type: GET_TRANSFORM_DATA_SUCCESS,
         payload: {
-          inputData: inputChartData,
-          outputData: outputChartData
+          chart: {
+            data: getChartData(res.data.data, res.data.columns[0]),
+            mins: mins,
+            maxes: maxes
+          },
         }
       })
     }).catch((err) => {
       window.alert('Something went wrong, you may set wrong input data for any transforms.')
+      console.log(err)
       dispatch({
         type: GET_TRANSFORM_DATA_FAILED,
         payload: {
@@ -148,13 +157,23 @@ export const trainAndTest = (fileId, transforms, algorithmParameters) => {
     }).then(res=>{
       const [graph, metrics] = res.data
       let graphData = []
+      let mins = {}
+      let maxes = {}
       for(let i=0; i<graph[0].length; i++) {
         if (i%20 !== 0) {
           continue
         }
         let data = {'Time': i/20}
+
         for(let j=0; j<graph.length; j++) {
-          data['C-' + (j+1)] = graph[j][i]
+          const label = 'C-' + (j+1)
+          data[label] = graph[j][i]
+          if (!mins[label] || graph[j][i] < mins[label]) {
+            mins[label] = graph[j][i]
+          }
+          if (!maxes[label] || graph[j][i] > maxes[label]) {
+            maxes[label] = graph[j][i]
+          }
         }
         graphData.push(data)
       }
@@ -163,7 +182,11 @@ export const trainAndTest = (fileId, transforms, algorithmParameters) => {
         type: TRAIN_AND_TEST_SUCCESS,
         payload: {
           metrics: metrics,
-          graph: graphData
+          chart: {
+            data: graphData,
+            mins: mins,
+            maxes: maxes
+          }
         }
       })
     }).catch((err) => {
@@ -187,5 +210,38 @@ export const removeTransform = (transformId) => {
         transformId: transformId
       }
     })
+  }
+}
+
+export const uploadInputData = (file) => {
+  return (dispatch) => {
+    dispatch({
+      type: UPLOADING_INPUT_DATA,
+    })
+
+    const formData = new FormData();
+      formData.append("file", file);
+
+    axios.defaults.baseURL = BaseUrl
+    // axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*'
+    axios
+      .post("/upload-input-data", formData)
+      .then(res => {
+        if (res.status === 200) {
+          dispatch({
+            type: UPLOADING_INPUT_DATA_SUCCESS,
+            payload: {
+              file: file.name,
+              fileId: res.data.file_id,
+              columns: res.data.columns
+            }
+          })
+        } else {
+          dispatch({
+            type: UPLOADING_INPUT_DATA_FAILED,
+          })
+        }
+      })
+      .catch(err => console.log(err));
   }
 }

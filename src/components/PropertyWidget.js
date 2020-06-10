@@ -2,17 +2,15 @@ import React, { useState, useEffect } from 'react'
 import './PropertyWidget.css'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import * as InputDataAction from '../actions/InputDataAction'
 import * as TransformAction from '../actions/TransformAction'
 import { IDS } from './ItemTypes'
-import { TransformParameters, getDefaultParameters } from './TransformParameters'
+import { TransformParameters } from './TransformParameters'
 
-function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, transform, parentTransform, inputDataAction, transformAction}) {
+function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, transform, transformAction}) {
 
   const [file, setFile] = useState(null)
   const [error, setError] = useState(false)
   const [inputFilters, setInputFilters] = useState(transform ? transform.inputFilters || [] : [])
-  const [outputFilters, setOutputFilters] = useState(transform ? transform.outputFilters || [] : [])
   const [filterChanged, setFilterChanged] = useState(1)
   const [parameters, setParameters] = useState(transform ? transform.parameters: {})
   const [parameterTypes, setParameterTypes] = useState([])
@@ -22,7 +20,6 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
   
   useEffect(() => {
     setInputFilters(transform ? transform.inputFilters || [] : [])
-    setOutputFilters(transform ? transform.outputFilters || [] : [])
     setParameters(transform ? transform.parameters: {} )
     setParameterTypes(transform ? TransformParameters[transform.tool.id] : [])
     setAlgorithmType(transform && transform.parameters ? transform.parameters['algorithmType'] || 0 : 0)
@@ -30,35 +27,12 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
     setTestShift(transform && transform.parameters ? transform.parameters['testShift'] || 1 : 1)
   }, [transform])
 
-  // useEffect(() => {
-  //   setParameters([])
-  // }, [algorithmType])
-
   const uploadFile = () => {
     if (file === null) {
       setError(true)
     } else {
-      inputDataAction.uploadInputData(file)
+      transformAction.uploadInputData(file)
     }
-  }
-
-  const changeInputFilter = (idx) => {
-    if (transform.inputParameters[idx] === 'Date' || transform.inputParameters[idx] === 'Time') {
-      return
-    }
-    inputFilters[idx] = !inputFilters[idx]
-    setOutputFilters(transform.inputParameters.filter((p, i) => inputFilters[i]).map((p) => true))
-    setInputFilters(inputFilters)
-    setFilterChanged(filterChanged+1)
-  }
-
-  const changeOutputFilter = (idx) => {
-    if (transform.outputParameters[idx] === 'Date' || transform.outputParameters[idx] === 'Time') {
-      return
-    }
-    outputFilters[idx] = !outputFilters[idx]
-    setOutputFilters(outputFilters)
-    setFilterChanged(filterChanged+1)
   }
 
   const removeNode = () => {
@@ -98,7 +72,6 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
   }
 
   const applyFilters = () => {
-    const outParams = transform.inputParameters.filter((param, idx) => inputFilters[idx])
     const params = parameters
     for (let paramName in parameters) {
       const paramType = parameterTypes.find(p => p.name === paramName)
@@ -108,9 +81,7 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
       setParameters(params)
     }
     const settings = {
-      outputParameters: outParams,
-      inputFilters: inputFilters,
-      outputFilters: outputFilters,
+      outputParameters: transform.outputParameters,
       parameters: params
     }
     transformAction.applySettings(transform.id, settings)
@@ -130,6 +101,20 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
     })
   }
 
+  const changeOutputParam = (inputParam, outputParam) => {
+    transform.outputParameters[inputParam] = outputParam
+    setFilterChanged(filterChanged+1)
+  }
+
+  const addOrRemoveOutputParam = (inputParam) => {
+    if (transform.outputParameters[inputParam] === undefined) {
+      transform.outputParameters[inputParam] = transform.tool.functionName + '(' + inputParam + ')'
+    } else {
+      delete(transform.outputParameters[inputParam]);
+    }
+    setFilterChanged(filterChanged+1)
+  }
+
   const _renderInputData = () => {
     return (
       <div className='Property-Item-Container' key={0}>
@@ -140,16 +125,24 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
     )
   }
 
+  const changeInputFilter = (idx) => {
+    if (transform.inputParameters[idx] === 'Date' || transform.inputParameters[idx] === 'Time') {
+      return
+    }
+    inputFilters[idx] = !inputFilters[idx]
+    setInputFilters(inputFilters)
+    setFilterChanged(filterChanged+1)
+  }
+
   const _renderInputParams = () => {
-    const outputParameters = parentTransform ? parentTransform.outputParameters : null
     const inputParameters = transform.inputParameters
     return (
-      <div className='Property-Item-Container' key={1}>
+      <div className='Property-Item-Container' style={{maxHeight: 600, overflowY: 'scroll'}} key={1}>
         <p className='Property-Item-Header'>
-          <b>Input Parameters</b> 
+          <b>Train & Test Columns</b> 
           {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
         </p>
-        { (inputParameters?inputParameters:outputParameters).map((param, idx) => (
+        { (inputParameters).map((param, idx) => (
           <div><input type='checkbox' checked={filterChanged>0 && inputFilters[idx]} onClick={()=>changeInputFilter(idx)} /> {param} </div>
         ))}
       </div>
@@ -157,15 +150,21 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
   }
 
   const _renderOutputParams = () => {
-    const outputParameters = transform.inputParameters.filter((p, i) => transform.inputFilters[i])
+    const inputParameters = transform.inputParameters.filter((p, i) => p !== 'Date' && p !== 'Time')
     return (
-      <div className='Property-Item-Container' key={5}>
+      <div className='Property-Item-Container' style={{maxHeight: 600, overflowY: 'scroll'}} key={5}>
         <p className='Property-Item-Header'>
-          <b>Output Parameters to apply transform</b> 
-          {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
+          <b>Columns to transform</b>
         </p>
-        { outputParameters.map((param, idx) => (
-          <div><input type='checkbox' checked={filterChanged>0 && outputFilters[idx]} onClick={()=>changeOutputFilter(idx)} /> {param} </div>
+        { inputParameters.map((param, idx) => (
+          <p className='Property-Item-Row' style={param.length > 6 ? {flexDirection: 'column'} : {flexDirection: 'row'}}>
+            <div style={{paddingBottom: 4}}>
+              <input type='checkbox' checked={filterChanged>0 && transform.outputParameters[param] !== undefined} onClick={()=>addOrRemoveOutputParam(param)} /> {param} 
+            </div>
+            { transform.outputParameters[param] !== undefined ? 
+              <input type="text" style={param.length > 6 ? {textAlign: "right", marginLeft: 20} : {width: 120}} value={transform.outputParameters[param]} 
+                onChange={(e)=>changeOutputParam(param, e.target.value)}  /> : null}
+          </p>
         ))}
       </div>
     )
@@ -207,6 +206,14 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
     setFilterChanged(filterChanged+1)
   }
 
+  const setTarget = () => {
+    if (transform.target) {
+      transformAction.removeTransformFromMLA(transform.id)
+    } else {
+      transformAction.addTransformToMLA(transform.id)
+    }
+  }
+
   const _renderTransformParameters = () => {
     return (
       <div className='Property-Item-Container' key={2}>
@@ -231,6 +238,10 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
       <div className='Property-Item-Container' key={3}>
         <p className='Property-Item-Header'>
           <b>ID: #{transform.id}</b> 
+        </p>
+        <p>
+          <b>Is target column ? </b> 
+          <input type="checkbox" checked={transform.target} onClick={() => setTarget()} />
         </p>
       </div>
     )
@@ -273,7 +284,6 @@ function PropertyWidget({hide, setHide, inputFile, inputFileId, transforms, tran
       items = [
         _renderDetails(),
         _renderTransformParameters(),
-        _renderInputParams(),
         _renderOutputParams()
       ]
     }
@@ -318,8 +328,8 @@ const mapStateToProps = (state) => {
   const parentTransform = parentTransforms.length > 0 ? parentTransforms[0] : null
   
   return {
-    inputFileId: state.inputData.fileId,
-    inputFile: state.inputData.file,
+    inputFileId: state.transforms.fileId,
+    inputFile: state.transforms.file,
     parentTransform: parentTransform,
     transform: state.transforms.selectedTransform,
     transforms: state.transforms.transforms
@@ -328,7 +338,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    inputDataAction: bindActionCreators(InputDataAction, dispatch),
     transformAction: bindActionCreators(TransformAction, dispatch),
   }
 }

@@ -7,31 +7,5 @@ const initialState = {
 };
 
 export default function(state = initialState, action) {
-  switch (action.type) {
-    case CLEAR_TRANSFORMS:
-      return initialState
-    case UPLOADING_INPUT_DATA_SUCCESS: {
-      const { file, fileId } = action.payload;
-      return {
-        ...state,
-        uploading: false,
-        file: file,
-        fileId: fileId
-      };
-    }
-    case UPLOADING_INPUT_DATA: {
-      return {
-        ...state,
-        uploading: true,
-      };
-    }
-    case UPLOADING_INPUT_DATA_FAILED: {
-      return {
-        ...state,
-        uploading: true,
-      };
-    }
-    default:
-      return state;
-  }
+  
 }

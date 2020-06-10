@@ -13,7 +13,7 @@ function GraphBoard({transforms, transform, parentTransform, chartTop, chartBott
     }
   }, [transforms, transform, parentTransform, transformAction])
 
-  const inParams = parentTransform ? parentTransform.outputParameters.filter((p, idx) => transform.inputParameters ? transform.inputParameters[idx] : false).slice(2) : []
+  const inParams = []//parentTransform ? parentTransform.outputParameters.filter((p, idx) => transform.inputParameters ? transform.inputParameters[idx] : false).slice(2) : []
 
   const _renderMetrics = () => {
     if (loading || trainMetrics === null) {
@@ -49,14 +49,16 @@ function GraphBoard({transforms, transform, parentTransform, chartTop, chartBott
         <Graph 
           title='Input data graph' 
           inputParameterLabels={inParams}
-          inputData={chartTop}
+          chart={chartTop}
+          hides={(col) => transform.inputParameters.indexOf(col) < 0}
           width={width}></Graph> : null }
 
       { !loading && chartBottom ? 
         <Graph 
           title='Output data graph'
           inputParameterLabels={transform && transform.outputParameters ? transform.outputParameters : inParams}
-          inputData={chartBottom} 
+          chart={chartBottom} 
+          hides={(col) => transform.inputParameters.indexOf(col) >= 0}
           width={width}></Graph> : null }
       { loading ? <div>Loading input and output data</div> : null}
 

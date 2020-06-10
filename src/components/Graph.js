@@ -1,48 +1,62 @@
 import React, { useState, useEffect } from 'react'
 import './GraphBoard.css'
-import { LineChart, XAxis, YAxis, Tooltip, CartesianGrid, Line, ReferenceArea } from 'recharts'
+import { ComposedChart, AreaChart,defs, Area, XAxis, YAxis, Tooltip, CartesianGrid, Line, ReferenceArea } from 'recharts'
 
-const LineColors = ['#3d93ca', '#acfc7f', '#f4a4c1', '#c4a573', '#7a5892', '#009ab2']
+const LineColors = ['#ffa600','#f95d6a', '#a05195', '#ff7c43', '#003f5c', '#665191']
+const AreaColors = LineColors
 
-export default function({title, inputData, width}) {
+const round = x => Math.round((x + Number.EPSILON) * 100) / 100
+
+export default function({title, chart, width, hides}) {
   const [dotHide, setDotHide] = useState(true)
-  const [inputType] = useState(inputData && inputData.length > 0 ? Object.keys(inputData[0]).filter((k) => k!=='undefined' && k!=='Date' && k !== 'Time') : [])
-  const [hideArray] = useState(inputType.map((i) => false))
+  const [columns] = useState(chart.data && chart.data.length > 0 ? Object.keys(chart.data[0]).filter((k) => k!=='undefined' && k!=='Date' && k !== 'Time') : [])
+  const [hideArray] = useState(columns.map((col) => hides(col)))
   const [showZoomOut, setShowZoomOut] = useState(false)
-  const [yAxisName, setYAxisName] = useState(inputType[0] ? inputType[0].startsWith('C-') ? '' : inputType[0] :'')
-  const [yAxisName2, setYAxisName2] = useState(inputType[inputType.length-1] ? inputType[inputType.length-1].startsWith('C-') ? '' : inputType[inputType.length-1] : '')
+  const [yAxisName, setYAxisName] = useState(columns[0] ? columns[0].startsWith('C-') ? '' : columns[0] :'')
+  const [yAxisName2, setYAxisName2] = useState(columns[columns.length-1] ? columns[columns.length-1].startsWith('C-') ? '' : columns[columns.length-1] : '')
 
-  const getAxisYDomain = (from, to, ref, offset) => {
-    const refData = (from === '' && to === '') ? inputData : inputData.slice(from, to);
-    if (refData && refData.length > 0 && (ref === '' || refData[0][ref] !== undefined)) {
-      let [ bottom, top ] = ref !== '' ? [ refData[0][ref], refData[0][ref] ] : [9999999, -9999999];
-      refData.forEach( d => {
-        if (ref !== '') {
-          if ( d[ref] > top ) top = d[ref];
-          if ( d[ref] < bottom ) bottom = d[ref];
-        } else {
-          inputType.forEach( (type) => {
-            if ( d[type] > top ) top = d[type];
-            if ( d[type] < bottom ) bottom = d[type];
-          })
+  const getAxisYDomain = () => {
+    var ranges = [];
+    columns.forEach((col, idx) => {
+      if (!hideArray[idx]) {
+        if (!chart.maxes) {
+          return [0, 0, [ ]]
         }
-      });
-      console.log('bottom >> ' + top)
-      return [ Math.floor((bottom)), Math.ceil(top) ]
+        ranges.push([col, chart.maxes[col] - chart.mins[col]]);
+      }
+    })
+    ranges.sort(function(a, b) {
+      return b[1] - a[1];
+    })
+    let axis = {}
+    for(var i=0; i<ranges.length-1; i++) {
+      const rate = ranges[i][1]/ranges[i+1][1]
+      axis[ranges[i][0]] = 1;
+      if (!columns[0].startsWith('C-') && rate>2) {
+        return [ranges[0][0], ranges[i+1][0], axis]
+      }
     }
-    console.log('bug >> ' + JSON.stringify(refData) + ' f ' + from + ' t  ' + to + ' ref ' + ref)
-    return [0, 0]
+    if (ranges.length > 0) {
+      return [ranges[0][0], ranges[0][0], axis]
+    }
+    console.log('bug ')
+    return [0, 0, []]
   }
 
-  const [ bottom, top ] = getAxisYDomain( '', '', yAxisName, 1 );
-  const [ bottom2, top2 ] = getAxisYDomain( '', '', yAxisName2, 1 );
+  const [firstCol, secondCol, yAxis4Cols] = getAxisYDomain()
+  if (firstCol === 0) { return null }
+  const [ bottom, top ] = [chart.mins[firstCol], chart.maxes[firstCol]]
+  const [ bottom2, top2 ] = [chart.mins[secondCol], chart.maxes[secondCol]]
   
   const initialState = {
-    data: inputData,
+    data: chart.data,
     left: 'dataMin',
     right: 'dataMax',
     refAreaLeft: '',
     refAreaRight: '',
+    firstCol,
+    secondCol,
+    yAxis4Cols,
     bottom, top,
     bottom2, top2,
     animation: true,
@@ -83,26 +97,26 @@ export default function({title, inputData, width}) {
     } ) );
   }
 
-  const zoomOut = (ax1, ax2) => {
-    const [ bottom, top ] = getAxisYDomain( '', '', ax1 || yAxisName, 1 );
-    const [ bottom2, top2 ] = getAxisYDomain( '', '', ax2 || yAxisName2, 1 );
+  const zoomOut = () => {
+    const [ firstCol, secondCol, yAxis4Cols ] = getAxisYDomain()
+    const [ bottom, top ] = [chart.mins[firstCol], chart.maxes[firstCol]]
+    const [ bottom2, top2 ] = [chart.mins[secondCol], chart.maxes[secondCol]] 
     setState({
       ...initialState,
+      yAxis4Cols,
       bottom, top,
-      bottom2, top2
+      bottom2, top2,
+      firstCol, secondCol
     });
     setShowZoomOut(false)
   }
 
   const changeHide = (idx) => {
+    if (hideArray.filter(h => !h).length === 1 && !hideArray[idx]) {
+      return
+    }
     hideArray[idx] = !hideArray[idx]
-    const shown = inputType.filter((p, idx) => !hideArray[idx])
-    const ax1 = shown[0] ? shown[0].startsWith('C-') ? '' : shown[0] :''
-    const ax2 = shown[shown.length-1] ? shown[shown.length-1].startsWith('C-') ? '' : shown[shown.length-1] : ''
-    setYAxisName(ax1)
-    setYAxisName2(ax2)
-
-    zoomOut(ax1, ax2)
+    zoomOut()
   }
 
   return (
@@ -111,16 +125,24 @@ export default function({title, inputData, width}) {
         <b>{title}</b>
         { (showZoomOut) ? <input type='button' onClick={() => zoomOut()} value='Zoom out' /> : null }
       </div>
-      <LineChart
+      <ComposedChart
         width={width || 360}
-        height={360}
+        height={390 - (Math.ceil(columns.length/7))*24}
         data={state.data}
         style={{backgroundColor: 'white'}}
-        onMouseDown={e => e && setState({ ...state, refAreaLeft: e.activeLabel })}
-        onMouseMove={e => e && state.refAreaLeft && setState({ ...state,  refAreaRight: e.activeLabel })}
-        onMouseUp={e => e && zoom()}
+        //onMouseDown={e => e && setState({ ...state, refAreaLeft: e.activeLabel })}
+        //onMouseMove={e => e && state.refAreaLeft && setState({ ...state,  refAreaRight: e.activeLabel })}
+        //onMouseUp={e => e && zoom()}
         margin={{ top: 25, right: 20, left: 5, bottom: 5 }}
       >
+        <defs>
+          { columns.map((col, idx) => (
+            <linearGradient id={col} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={AreaColors[idx%AreaColors.length]} stopOpacity={0.4}/>
+              <stop offset="95%" stopColor={AreaColors[idx%AreaColors.length]} stopOpacity={0}/>
+            </linearGradient>
+          ))}
+        </defs>
         <CartesianGrid stroke="#C5C5f5" />
         <XAxis 
           allowDataOverflow={true}
@@ -130,39 +152,47 @@ export default function({title, inputData, width}) {
         />
         <YAxis
           allowDataOverflow={true}
-          domain={[state.bottom, state.top]}
+          domain={[round(state.bottom), round(state.top)]}
           type="number"
           yAxisId="1"
         />
         <YAxis
           allowDataOverflow={true}
           orientation='right'
-          domain={[state.bottom2, state.top2]}
+          domain={[round(state.bottom2), round(state.top2)]}
           type="number"
           yAxisId="2"
         />
         <Tooltip />
-        { inputType.map((inputValue, idx) => (
+        { columns.map((col, idx) => (
           <Line type="monotone" 
-            dataKey={inputType[idx]} 
+            dataKey={columns[idx]} 
             hide={hideArray[idx]} 
             dot={!dotHide}
-            stroke={LineColors[idx]} 
-            yAxisId={inputType[idx].startsWith('C') ? 1 : (inputType[idx] === 'Vol' || inputType[idx] === 'OI' ? 2: 1)}></Line>
+            fill={'url(#' + col +')'}
+            stroke={LineColors[idx%LineColors.length]}
+            yAxisId={columns[idx].startsWith('C-') ? 1 : (yAxis4Cols[col] ? 1 : 2)}></Line>
         )) }
         { (state.refAreaLeft && state.refAreaRight) ? (
             <ReferenceArea yAxisId="1" x1={state.refAreaLeft} x2={state.refAreaRight} stopColor="blue" strokeOpacity={0.3} /> ) : null
         }
-      </LineChart>
-      <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 8}}>
-        <input type='checkbox' readOnly onClick={() => setDotHide(!dotHide)} checked={!dotHide} />Dot &nbsp;
-        { inputType.map((inputValue, idx) => (
-          <span>
-            <input type='checkbox' readOnly onClick={() => changeHide(idx)} checked={!hideArray[idx]} /> 
-            {inputType[idx]} &nbsp;
-          </span>
-        )) }
-      </div>
+      </ComposedChart>
+      { Array.from(Array(Math.ceil(columns.length/7)).keys()).map((idx) => {
+        const cols = columns.slice(idx*7, (idx+1)*7)
+        return (
+          <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 8}}>
+            {idx === 0 ? <span>
+            <input type='checkbox' readOnly onClick={() => setDotHide(!dotHide)} checked={!dotHide} />Dot </span> : null } &nbsp;
+            { cols.map((col, j) => (
+              <span>
+                <input type='checkbox' readOnly onClick={() => changeHide(idx*7+j)} checked={!hideArray[idx*7+j]} /> 
+                {cols[j]} &nbsp;
+              </span>
+            )) }
+          </div>
+        )
+      })}
+      
     </div>
   )
 }
