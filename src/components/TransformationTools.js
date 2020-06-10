@@ -75,26 +75,26 @@ export const TransformationTools = [{
   transform: true
 },{
   id: 109,
-  shortName: 'Windsorizing',
-  name: 'Windsorizing',
+  shortName: 'Winsorizing',
+  name: 'Winsorizing',
   functionName: 'Wn',
   transform: true
 }, {
   id: 110,
-  shortName: 'Turn C2C',
-  name: 'Turn Column into Categorical Data',
+  shortName: 'Categorical',
+  name: 'Convert to Categorical',
   functionName: 'T2C',
   transform: true
 },{
   id: 111,
-  shortName: 'Turn Rankings',
-  name: 'Turn Rankings',
+  shortName: 'Rankings',
+  name: 'Convert to Rankings',
   functionName: 'TR',
   transform: true
 }, {
   id: 112,
-  shortName: 'Turn Percentiles',
-  name: 'Turn Percentiles',
+  shortName: 'Percentiles',
+  name: 'Convert to Percentiles',
   functionName: 'TP',
   transform: true
 }, {

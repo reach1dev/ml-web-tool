@@ -80,22 +80,26 @@ export const TransformParameters = {
   [TR_IDS.Windsorizing]: [{
     name: 'min',
     type: 'number',
-    default: 0
+    default: -1
   }, {
     name: 'max',
     type: 'number',
-    default: 0
+    default: 1
   }],
 
   [TR_IDS.TurnC2CD]: [],
 
   [TR_IDS.TurnRanking]: [],
 
-  [TR_IDS.TurnPercentiles]: [],
+  [TR_IDS.TurnPercentiles]: [{
+    name: 'rolling',
+    type: 'number',
+    default: 0
+  }],
 
   [TR_IDS.PowerFunctions]: [{
-    name: 'function',
-    type: 'string',
-    default: 'square'
+    name: 'power',
+    type: 'number',
+    default: 2
   }]
 }
