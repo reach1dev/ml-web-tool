@@ -85,6 +85,10 @@ export const TransformParameters = {
     name: 'max',
     type: 'number',
     default: 1
+  }, {
+    name: 'scale',
+    type: 'number',
+    default: 1
   }],
 
   [TR_IDS.TurnC2CD]: [],
