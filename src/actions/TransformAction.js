@@ -212,15 +212,21 @@ export const trainAndTest = (fileId, transforms, algorithmParameters) => {
 
       let time = 0
       const timer = setInterval(async () => {
-        if (time < 120) {
+        if (time < 20) {
           if(await getTrainResult(res.data.res_file_id, algorithmParameters)(dispatch)) {
             clearInterval(timer)
           }
         } else {
           clearInterval(timer)
+          dispatch({
+            type: TRAIN_AND_TEST_FAILED,
+            payload: {
+              errorMessage: 'Something wrong, train label should  be categorized.'
+            }
+          })
         }
         time ++
-      }, 2000)
+      }, 5000)
     }).catch((err) => {
       window.alert('Something wrong, train label should  be categorized.')
       dispatch({
