@@ -150,7 +150,7 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
     return (
       <div className='Property-Item-Container' style={{maxHeight: 600, overflowY: 'scroll'}} key={1}>
         <p className='Property-Item-Header'>
-          <b>Train & Test Columns</b> 
+          <b>Add as features</b> 
           {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
         </p>
         { (inputParameters).map((param, idx) => (
@@ -253,7 +253,7 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
           <b>ID: #{transform.id}</b> 
         </p>
         <p>
-          <b>Is target column ? </b> 
+          <b>Add as target</b> 
           <input type="checkbox" checked={transform.target} onClick={() => setTarget()} />
         </p>
       </div>
