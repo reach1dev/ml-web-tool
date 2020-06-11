@@ -150,6 +150,15 @@ export const getTrainResult = (resFileId, algorithmParameters) => {
     if (res.status !== 200) {
       return false
     }
+    if (res.status === 400) {
+      dispatch({
+        type: TRAIN_AND_TEST_FAILED,
+        payload: {
+          errorMessage: 'Train failed, possible reasons: train label should  be categorized for kNN.'
+        }
+      })
+      return true
+    }
     const [graph, metrics] = res.data
     let graphData = []
     let mins = {}
