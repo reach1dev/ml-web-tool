@@ -147,10 +147,10 @@ export const getTrainResult = (resFileId, algorithmParameters) => {
   return async (dispatch) => {
     axios.defaults.baseURL = BaseUrl
     const res = await axios.post('/get-train-result/' + resFileId)
-    if (res.status !== 200) {
+    if (res.status === 204) {
       return false
     }
-    if (res.status === 400) {
+    if (res.status === 203) {
       dispatch({
         type: TRAIN_AND_TEST_FAILED,
         payload: {
