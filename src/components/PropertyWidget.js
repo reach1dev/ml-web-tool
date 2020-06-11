@@ -23,7 +23,7 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
     setParameters(transform ? transform.parameters: {} )
     setParameterTypes(transform ? TransformParameters[transform.tool.id] : [])
     setAlgorithmType(transform && transform.parameters ? transform.parameters['algorithmType'] || 0 : 0)
-    setTrainLabel(transform && transform.parameters ? transform.parameters['trainLabel'] || '' : '')
+    setTrainLabel(transform && transform.parameters ? transform.parameters['trainLabel'] || transform.inputParameters[0] : '')
     setTestShift(transform && transform.parameters ? transform.parameters['testShift'] || 1 : 1)
   }, [transform])
 
