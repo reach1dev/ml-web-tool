@@ -223,13 +223,15 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
         tool: selectedTool,
         inputParameters: inputParams,
         outputParameters: {},
+        features: {},
         parameters: parameters,
         parentId: transforms[lastItem].id,
         x: newPos.x,
         y: newPos.y,
         visible: true,
         fixed: false,
-        target: false
+        targetColumn: {},
+        target: 'false'
       })
       selectedTool = null
     }

@@ -143,7 +143,7 @@ export const getTransformData = (fileId, allTransforms, transformId) => {
 }
 
 
-export const getTrainResult = (resFileId, algorithmParameters) => {
+export const getTrainResult = (resFileId, transforms, algorithmParameters) => {
   return async (dispatch) => {
     axios.defaults.baseURL = BaseUrl
     const res = await axios.post('/get-train-result/' + resFileId)
@@ -151,43 +151,59 @@ export const getTrainResult = (resFileId, algorithmParameters) => {
       return false
     }
     if (res.status === 203) {
+      window.alert('Error: ' + res.data.err)
       dispatch({
         type: TRAIN_AND_TEST_FAILED,
         payload: {
-          errorMessage: 'Train failed, possible reasons: train label should  be categorized for kNN.'
+          errorMessage: res.data.err
         }
-      })
+      }) 
       return true
     }
     const [graph, metrics] = res.data
     let graphData = []
     let mins = {}
     let maxes = {}
-    for(let i=0; i<graph[0].length; i++) {
-      // if (i%20 !== 0) {
-      //   continue
-      // }
-      let data = {'Time': i} ///20
-
-      for(let j=0; j<graph.length; j++) {
-        let label = 'C-' + (j+1)
-        if (algorithmParameters.algorithmType === 1) {
-          label = (j === 0 ? 'Predict' : 'Target')
+    if (graph !== null) {
+      for(let i=0; i<graph[0].length; i++) {
+        // if (i%20 !== 0) {
+        //   continue
+        // }
+        let data = {'Time': i} ///20
+  
+        for(let j=0; j<graph.length; j++) {
+          let label = 'C-' + (j+1)
+          if (algorithmParameters.algorithmType === 1) {
+            label = (j === 0 ? 'Predict' : 'Target')
+          } else if (algorithmParameters.algorithmType === 5) {
+            label = (j === 0 ? 'explained_variance_ratio' : 'singular_values')
+          } else {
+            label = (j === 0 ? 'Target' : 'Prediction')
+          }
+          data[label] = graph[j][i]
+          if (mins[label] === undefined || graph[j][i] < mins[label]) {
+            mins[label] = graph[j][i]
+          }
+          if (maxes[label] === undefined || graph[j][i] > maxes[label]) {
+            maxes[label] = graph[j][i]
+          }
         }
-        data[label] = graph[j][i]
-        if (mins[label] === undefined || graph[j][i] < mins[label]) {
-          mins[label] = graph[j][i]
-        }
-        if (maxes[label] === undefined || graph[j][i] > maxes[label]) {
-          maxes[label] = graph[j][i]
-        }
+        graphData.push(data)
       }
-      graphData.push(data)
     }
+    let metricMeta = null
+    if (algorithmParameters.algorithmType === 5) {
+      metricMeta = {
+        'rows': transforms[1].inputParameters,
+        'columns': ['explained_variance_ratio', 'singular_values']
+      }
+    }
+    
 
     dispatch({
       type: TRAIN_AND_TEST_SUCCESS,
       payload: {
+        metricMeta: metricMeta,
         metrics: metrics,
         chart: {
           data: graphData,
@@ -222,7 +238,7 @@ export const trainAndTest = (fileId, transforms, algorithmParameters) => {
       let time = 0
       const timer = setInterval(async () => {
         if (time < 20) {
-          if(await getTrainResult(res.data.res_file_id, algorithmParameters)(dispatch)) {
+          if(await getTrainResult(res.data.res_file_id, transforms, algorithmParameters)(dispatch)) {
             clearInterval(timer)
           }
         } else {
@@ -235,7 +251,7 @@ export const trainAndTest = (fileId, transforms, algorithmParameters) => {
           })
         }
         time ++
-      }, 5000)
+      }, 2500)
     }).catch((err) => {
       window.alert('Something wrong, train label should  be categorized.')
       dispatch({

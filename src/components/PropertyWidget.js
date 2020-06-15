@@ -11,6 +11,8 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
   const [file, setFile] = useState(null)
   const [error, setError] = useState(false)
   const [inputFilters, setInputFilters] = useState(transform ? transform.inputFilters || [] : [])
+  const [features, setFeatures] = useState(transform ? transform.features || [] : [])
+  const [targetColumn, setTargetColumn] = useState(transform ? transform.targetColumn || '' : '')
   const [filterChanged, setFilterChanged] = useState(1)
   const [parameters, setParameters] = useState(transform ? transform.parameters: {})
   const [parameterTypes, setParameterTypes] = useState([])
@@ -23,8 +25,9 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
     setParameters(transform ? transform.parameters: {} )
     setParameterTypes(transform ? TransformParameters[transform.tool.id] : [])
     setAlgorithmType(transform && transform.parameters ? transform.parameters['algorithmType'] || 0 : 0)
-    setTrainLabel(transform && transform.parameters ? transform.parameters['trainLabel'] || transform.inputParameters[0] : '')
+    setTrainLabel(transform && transform.parameters ? transform.parameters['trainLabel'] || '' : '')
     setTestShift(transform && transform.parameters ? transform.parameters['testShift'] || 1 : 1)
+    setTargetColumn(transform && transform.targetColumn ? transform.targetColumn : '')
   }, [transform])
 
   const changeAlgorithmType = (type) => {
@@ -53,6 +56,10 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
   }
 
   const trainAndTest = () => {
+    if (trainLabel === '' && (algorithmType !== 0 && algorithmType !== 5)) {
+      window.alert('Please select target.')
+      return
+    }
     if (inputFileId) {
       const params = parameters
       for (let paramName in parameters) {
@@ -82,7 +89,7 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
     }
   }
 
-  const applyFilters = () => {
+  const saveTransformation = () => {
     const params = parameters
     for (let paramName in parameters) {
       const paramType = parameterTypes.find(p => p.name === paramName)
@@ -91,9 +98,13 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
       }
       setParameters(params)
     }
+    const tc = Object.values(transform.outputParameters).indexOf(targetColumn) >= 0 ? targetColumn : ''
     const settings = {
       outputParameters: transform.outputParameters,
-      parameters: params
+      parameters: params,
+      features: features,
+      target: Object.keys(features).filter(p => features[p]).length > 0 || tc !== '',
+      targetColumn: tc
     }
     transformAction.applySettings(transform.id, settings)
   }
@@ -114,16 +125,105 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
 
   const changeOutputParam = (inputParam, outputParam) => {
     transform.outputParameters[inputParam] = outputParam
+    Object.keys(features).forEach(f => {
+      if (Object.values(transform.outputParameters).filter(p => p === f) === 0){
+        delete(features[f])
+      }
+    })
+    features[outputParam] = false
     setFilterChanged(filterChanged+1)
   }
 
   const addOrRemoveOutputParam = (inputParam) => {
     if (transform.outputParameters[inputParam] === undefined) {
-      transform.outputParameters[inputParam] = transform.tool.functionName + '(' + inputParam + ')'
+      transform.outputParameters[inputParam] = transform.tool.functionName + (transform.id-IDS.InputData) + '(' + inputParam + ')'
     } else {
       delete(transform.outputParameters[inputParam]);
     }
     setFilterChanged(filterChanged+1)
+  }
+
+  const changeInputFilter = (idx) => {
+    if (transform.inputParameters[idx] === 'Date' || transform.inputParameters[idx] === 'Time') {
+      return
+    }
+    inputFilters[idx] = !inputFilters[idx]
+    setInputFilters(inputFilters)
+    setFilterChanged(filterChanged+1)
+  }
+
+  const changeFeature = (param) => {
+    if (features[param]) {
+      delete(features[param])
+    } else {
+      features[param] = true
+    }
+    if (Object.keys(features).length > 0) {
+      if (!transform.target) {
+        setTarget()
+      }
+    }
+    setFilterChanged(filterChanged+1)
+  }
+
+  const changeParameter = (name, value, type) => {
+    if (type === 'number') {
+      parameters[name] = value //parseFloat(value)
+    } else {
+      parameters[name] = value
+    }
+    setParameters(parameters)
+    setFilterChanged(filterChanged+1)
+  }
+
+  const setTarget = () => {
+    if (transform.target) {
+      transformAction.removeTransformFromMLA(transform.id)
+      setFeatures({})
+    } else {
+      transformAction.addTransformToMLA(transform.id)
+    }
+    transform.target = !transform.target
+    setFilterChanged(filterChanged+1)
+  }
+
+  const _renderFeatureSelect = () => {
+    const inputParameters = transform.inputParameters
+    return (
+      <div className='Property-Item-Container' style={{maxHeight: 600, overflowY: 'scroll'}} key={1}>
+        <p className='Property-Item-Header'>
+          <b>Select features</b> 
+          {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
+        </p>
+        { (inputParameters).map((param, idx) => (
+          <div key={idx}><input type='checkbox' checked={filterChanged>0 && inputFilters[idx]} onChange={(e) => changeInputFilter(idx)} /> {param} </div>
+        ))}
+      </div>
+    )
+  }
+
+  const _renderFeatures = () => {
+    const params = Object.values(transform.outputParameters)
+    return (
+      <div className='Property-Item-Container' style={{maxHeight: 600, overflowY: 'scroll'}} key={1}>      
+        <p className='Property-Item-Header'>
+          <b>Add as Target</b> 
+          <select value={targetColumn} onChange={e => setTargetColumn(e.target.value)}>
+            <option value=''>No selection</option>
+          { (params).map((param, idx) => (
+            <option key={idx} value={param}>{param}</option>
+          ))}
+          </select>
+        </p>
+        <p className='Property-Item-Header'>
+          <b>Add as Feature</b> 
+          {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
+        </p>
+        { (params).map((param, idx) => (
+          <div key={idx}><input type='checkbox' checked={filterChanged>0 && features[param]} onChange={(e) => changeFeature(param)} /> {param} </div>
+        ))}
+      </div>
+    )
   }
 
   const _renderInputData = () => {
@@ -136,31 +236,7 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
     )
   }
 
-  const changeInputFilter = (idx) => {
-    if (transform.inputParameters[idx] === 'Date' || transform.inputParameters[idx] === 'Time') {
-      return
-    }
-    inputFilters[idx] = !inputFilters[idx]
-    setInputFilters(inputFilters)
-    setFilterChanged(filterChanged+1)
-  }
-
-  const _renderInputParams = () => {
-    const inputParameters = transform.inputParameters
-    return (
-      <div className='Property-Item-Container' style={{maxHeight: 600, overflowY: 'scroll'}} key={1}>
-        <p className='Property-Item-Header'>
-          <b>Add as features</b> 
-          {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
-        </p>
-        { (inputParameters).map((param, idx) => (
-          <div key={idx}><input type='checkbox' checked={filterChanged>0 && inputFilters[idx]} onChange={(e) => changeInputFilter(idx)} /> {param} </div>
-        ))}
-      </div>
-    )
-  }
-
-  const _renderOutputParams = () => {
+  const _renderColumns2Transform = () => {
     const inputParameters = transform.inputParameters.filter((p, i) => p !== 'Date' && p !== 'Time')
     return (
       <div className='Property-Item-Container' style={{maxHeight: 600, overflowY: 'scroll'}} key={5}>
@@ -189,10 +265,11 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
           {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
         </p>
         <p className='Property-Item-Header'>
-          <b>Algorithm Type</b> 
+          <b>Algorithm</b> 
           <select onChange={(e) => changeAlgorithmType(parseInt(e.target.value))} value={algorithmType}>
-            <option value={0}>k-Mean</option>
-            <option value={1}>k-NN</option>
+            { TransformParameters[IDS.MLAlgorithm].map(p => (
+              <option value={p.type}>{p.name}</option>
+            )) }
           </select>
         </p>
         <div style={{display: 'flex', alignItems: 'stretch', flexDirection: 'column'}}>
@@ -205,26 +282,6 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
         </div>
       </div>
     )
-  }
-
-  const changeParameter = (name, value, type) => {
-    if (type === 'number') {
-      parameters[name] = value //parseFloat(value)
-    } else {
-      parameters[name] = value
-    }
-    setParameters(parameters)
-    setFilterChanged(filterChanged+1)
-  }
-
-  const setTarget = () => {
-    if (transform.target) {
-      transformAction.removeTransformFromMLA(transform.id)
-    } else {
-      transformAction.addTransformToMLA(transform.id)
-    }
-    transform.target = !transform.target
-    setFilterChanged(filterChanged+1)
   }
 
   const _renderTransformParameters = () => {
@@ -247,14 +304,11 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
   }
 
   const _renderDetails = () => {
+    const params = Object.values(transform.outputParameters)
     return (
       <div className='Property-Item-Container' key={3}>
         <p className='Property-Item-Header'>
           <b>ID: #{transform.id}</b> 
-        </p>
-        <p>
-          <b>Add as target</b> 
-          <input type="checkbox" checked={transform.target} onClick={() => setTarget()} />
         </p>
       </div>
     )
@@ -264,12 +318,13 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
     return (
       <div className='Property-Item-Container' key={3}>
         <p className='Property-Item-Header'>
-          <b>Select Train Label & Test Shift</b> 
+          <b>Select Target</b> 
         </p>
         <p className='Property-Item-Row'>
-          <span>Train label: </span>
+          <span>Target column: </span>
           <select style={{width: 120}} value={trainLabel} onChange={(e) => setTrainLabel(e.target.value)}>
-            { transform.inputParameters.map((p, idx) => (
+            <option key={0} value=''>No selection</option>
+            { transform.targets && transform.targets.map((p, idx) => (
               <option key={idx} value={p} style={{width: 120}}>&nbsp;{p}&nbsp;</option>
             ))}
           </select>
@@ -290,14 +345,15 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
     } else if (type === IDS.MLAlgorithm) {
       items = [
         _renderMLParameters(),
-        _renderInputParams(),
+        _renderFeatureSelect(),
         _renderTargetParam()
       ]
     } else {
       items = [
         _renderDetails(),
         _renderTransformParameters(),
-        _renderOutputParams()
+        _renderColumns2Transform(),
+        _renderFeatures(),
       ]
     }
     return items
@@ -320,7 +376,7 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
           <div style={{display: 'flex', justifyContent: 'flex-end'}}>
             { transform.id > IDS.InputData && transform.id < IDS.MLAlgorithm && <input type='button' onClick={removeNode} value='Remove' /> }
             <span style={{width: 10}}></span>
-            { transform.id > IDS.InputData && transform.id < IDS.MLAlgorithm && <input type='button' onClick={applyFilters} value='Save' /> }
+            { transform.id > IDS.InputData && transform.id < IDS.MLAlgorithm && <input type='button' onClick={saveTransformation} value='Save' /> }
             { transform.id === IDS.MLAlgorithm && <input type='button' onClick={saveMLAlgorithm} value='Save' /> }
             <span style={{width: 10}}></span>
             { transform.id >= IDS.InputData && transform.id < IDS.MLAlgorithm && <input type='button' onClick={drawGraph} value='Draw' /> }

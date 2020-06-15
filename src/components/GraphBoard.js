@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as TransformAction from '../actions/TransformAction'
 
-function GraphBoard({transforms, transform, parentTransform, chartTop, chartBottom, trainMetrics, loading, width, transformAction}) {
+function GraphBoard({transforms, transform, parentTransform, chartTop, chartBottom, trainMetrics, metricMeta, loading, width, transformAction}) {
 
   useEffect(() => {
     if (transform) {
@@ -26,13 +26,13 @@ function GraphBoard({transforms, transform, parentTransform, chartTop, chartBott
         <div>
           <div className='Table-Row'>
             <span className='Table-Cell'>{trainMetrics.length === 1 ? 'Metric Type' : 'Cluster'}</span>
-            <span className='Table-Cell'>Train</span>
-            <span className='Table-Cell'>Test</span>
+            <span className='Table-Cell'>{ metricMeta !== null ? metricMeta.columns[0] : 'Train' }</span>
+            <span className='Table-Cell'>{ metricMeta !== null ? metricMeta.columns[1] : 'Test' }</span>
           </div>
 
           { trainMetrics.map((tr, idx) => (
             <div key={idx} className='Table-Row'>
-              <span className='Table-Cell'>{trainMetrics.length === 1 ? 'Score' : 'C-' + (idx+1)}</span>
+              <span className='Table-Cell'>{metricMeta !== null ? metricMeta.rows[idx] : trainMetrics.length === 1 ? 'Score' : 'C-' + (idx+1)}</span>
               { Array.isArray(tr) && tr.map((td, j) => (
                 <span key={j} className='Table-Cell'>{td}</span>
               ))}
@@ -73,6 +73,7 @@ const mapStateToProps = (state) => {
     chartTop: state.transforms.inputData || null,
     chartBottom: state.transforms.outputData || null,
     trainMetrics: state.transforms.trainMetrics || null,
+    metricMeta: state.transforms.metricMeta || null,
     loading: state.transforms.getTransformLoading
   }
 }

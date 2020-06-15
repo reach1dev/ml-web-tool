@@ -1,5 +1,4 @@
-import { UPLOADING_INPUT_DATA_SUCCESS, UPLOADING_INPUT_DATA, UPLOADING_INPUT_DATA_FAILED, REMOVE_TRANSFORM_FROM_MLA } from "../redux/ActionTypes"
-import { TRAIN_AND_TEST_STARTED, ADD_TRANSFORM, MOVE_TRANSFORM, ADD_TRANSFORM_TO_MLA, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_FAILED, CLEAR_TRANSFORMS, SELECT_TRANSFORM, APPLY_TRANSFORM_SETTINGS, REMOVE_TRANSFORM, TRAIN_AND_TEST_SUCCESS } from "../redux/ActionTypes"
+import * as types from "../redux/ActionTypes"
 import { IDS } from "../components/ItemTypes";
 
 const initialState = {
@@ -11,7 +10,7 @@ const initialState = {
     y: 5,
     inputParameters: [],
     outputParameters: {},
-    inputFilters: [true, true, true, true, true, true, true, true],
+    inputFilters: [],
     visible: true,
     inputData: null,
     outputData: null,
@@ -22,21 +21,22 @@ const initialState = {
     tool: {shortName: 'ML Algorithm', plusIcon: false, id: IDS.MLAlgorithm},
     x: 6,
     y: 5,
-    inputParameters: ['Date', 'Time'],
+    inputParameters: [],
     outputParameters: ['Date', 'Time', 'Label'],
-    inputFilters: [true, true],
+    inputFilters: [],
     trainLabel: '',
     algorithmType: 'kmean',
     parameters: {n_clusters: 8},
     visible: true,
     inputData: null,
     outputData: null,
-    target: false
+    targets: []
   }],
   selectedTransform: null,
   inputData: null,
   outputData: null,
   trainMetrics: null,
+  metricMeta: null,
   fileId: null,
   file: null,
   uploading: false,  
@@ -44,9 +44,9 @@ const initialState = {
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case CLEAR_TRANSFORMS:
+    case types.CLEAR_TRANSFORMS:
       return initialState
-    case UPLOADING_INPUT_DATA_SUCCESS: {
+    case types.UPLOADING_INPUT_DATA_SUCCESS: {
       const { file, fileId, columns } = action.payload;
       return {
         ...state,
@@ -69,19 +69,19 @@ export default function(state = initialState, action) {
         })
       };
     }
-    case UPLOADING_INPUT_DATA: {
+    case types.UPLOADING_INPUT_DATA: {
       return {
         ...state,
         uploading: true,
       };
     }
-    case UPLOADING_INPUT_DATA_FAILED: {
+    case types.UPLOADING_INPUT_DATA_FAILED: {
       return {
         ...state,
         uploading: true,
       };
     }
-    case ADD_TRANSFORM: {
+    case types.ADD_TRANSFORM: {
       return {
         ...state,
         transforms: [
@@ -90,7 +90,7 @@ export default function(state = initialState, action) {
         ]
       };
     }
-    case MOVE_TRANSFORM: {
+    case types.MOVE_TRANSFORM: {
       const {id, x, y} = action.payload
       return {
         ...state,
@@ -106,7 +106,7 @@ export default function(state = initialState, action) {
         })
       };
     }
-    case REMOVE_TRANSFORM_FROM_MLA: {
+    case types.REMOVE_TRANSFORM_FROM_MLA: {
       const {id} = action.payload
       return {
         ...state,
@@ -121,7 +121,7 @@ export default function(state = initialState, action) {
         })
       }
     }
-    case ADD_TRANSFORM_TO_MLA: {
+    case types.ADD_TRANSFORM_TO_MLA: {
       const {id} = action.payload
       const tr = state.transforms.filter(t => t.id === id)[0]
       return {
@@ -138,7 +138,7 @@ export default function(state = initialState, action) {
               if (t.target || t.id === id) {
                 params = [
                   ...params,
-                  ...Object.values(t.outputParameters)
+                  ...Object.values(t.outputParameters).filter(p => t.features[p])
                 ]
               }
             })
@@ -152,36 +152,37 @@ export default function(state = initialState, action) {
         })
       };
     }
-    case SELECT_TRANSFORM: {
+    case types.SELECT_TRANSFORM: {
       const transforms = state.transforms.filter((t) => t.id === action.payload.id)
       return {
         ...state,
         selectedTransform: transforms.length>0?transforms[0]:null
       }
     }
-    case GET_TRANSFORM_DATA_START: {
+    case types.GET_TRANSFORM_DATA_START: {
       return {
         ...state,
         getTransformLoading: true
       }
     }
-    case TRAIN_AND_TEST_STARTED: {
+    case types.TRAIN_AND_TEST_STARTED: {
       return {
         ...state,
         resFileId: action.payload.resFileId
       }
     }
-    case TRAIN_AND_TEST_SUCCESS: {
-      const {chart, metrics} = action.payload
+    case types.TRAIN_AND_TEST_SUCCESS: {
+      const {chart, metrics, metricMeta} = action.payload
       return {
         ...state,
         trainMetrics: metrics,
+        metricMeta: metricMeta,
         inputData: null,
         outputData: chart,
         getTransformLoading: false
       }
     }
-    case GET_TRANSFORM_DATA_SUCCESS: {
+    case types.GET_TRANSFORM_DATA_SUCCESS: {
       const {chart} = action.payload
       return {
         ...state,
@@ -191,13 +192,19 @@ export default function(state = initialState, action) {
         getTransformLoading: false
       };
     }
-    case GET_TRANSFORM_DATA_FAILED: {
+    case types.GET_TRANSFORM_DATA_FAILED: {
       return {
         ...state,
         getTransformLoading: false
       }
     }
-    case APPLY_TRANSFORM_SETTINGS: {
+    case types.TRAIN_AND_TEST_FAILED: {
+      return {
+        ...state,
+        getTransformLoading: false
+      }
+    }
+    case types.APPLY_TRANSFORM_SETTINGS: {
       const {id, settings} = action.payload
       let parentTransform = {...state.transforms.filter(t => t.id===id)[0], ...settings}
       let transform = state.transforms.filter(t => t.parentId === parentTransform.id)[0]
@@ -227,26 +234,35 @@ export default function(state = initialState, action) {
           if (transforms[t.id]) {
             return transforms[t.id]
           } else if (t.id === IDS.MLAlgorithm) {
-            let params = []
+            let features = []
+            let targets = []
             state.transforms.forEach(t => {
+              const t1 = transforms[t.id] ? transforms[t.id] : t
               if (t.target) {
-                params = [
-                  ...params,
-                  ...Object.values((transforms[t.id] ? transforms[t.id] : t).outputParameters)
+                features = [
+                  ...features,
+                  ...Object.values((t1).outputParameters).filter(p => t1.features[p])
                 ]
+                if (t1.targetColumn !== '') {
+                  targets = [
+                    ...targets,
+                    t1.targetColumn
+                  ]
+                }
               }
             })
             return {
               ...t,
-              inputParameters: params,
-              inputFilters: params.map(t => true)
+              inputParameters: features,
+              inputFilters: features.map(t => true),
+              targets: targets
             }
           }
           return t
         })
       }
     }
-    case REMOVE_TRANSFORM: {
+    case types.REMOVE_TRANSFORM: {
       const {transformId} = action.payload
       return {
         ...state,
