@@ -7,7 +7,7 @@ const LineColors = ['#ffa600','#f95d6a', '#a05195', '#ff7c43', '#003f5c', '#6651
 const AreaColors = LineColors
 
 const round = x => Math.round((x + Number.EPSILON) * 100) / 100
-const GRAPH_COL = 7
+const GRAPH_COL = 6
 
 export default function({title, chart, width, hides}) {
   const [dotHide, setDotHide] = useState(true)
