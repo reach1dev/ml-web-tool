@@ -181,7 +181,7 @@ export const getTrainResult = (resFileId, transforms, algorithmParameters) => {
             label = (j === 0 ? 'explained_variance_ratio' : 'singular_values')
           } else {
             if (algorithmParameters.algorithmType === 2 && algorithmParameters['multiple']) {
-              label = (j %2 === 0 ? 'Tar of ' + transforms[1].inputParameters[j/2] : 'Pre of ' + transforms[1].inputParameters[Math.floor(j/2)])
+              label = (j %2 === 0 ? transforms[1].inputParameters[j/2] + '-T' : transforms[1].inputParameters[Math.floor(j/2)] + '-P')
             } else {
               label = (j === 0 ? 'Target' : 'Prediction')
             }

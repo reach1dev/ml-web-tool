@@ -7,6 +7,7 @@ const LineColors = ['#ffa600','#f95d6a', '#a05195', '#ff7c43', '#003f5c', '#6651
 const AreaColors = LineColors
 
 const round = x => Math.round((x + Number.EPSILON) * 100) / 100
+const GRAPH_COL = 7
 
 export default function({title, chart, width, hides}) {
   const [dotHide, setDotHide] = useState(true)
@@ -133,7 +134,7 @@ export default function({title, chart, width, hides}) {
       </div>
       <ComposedChart
         width={width || 360}
-        height={390 - (Math.ceil(columns.length/7))*24}
+        height={390 - (Math.ceil(columns.length/GRAPH_COL))*24}
         data={state.data}
         style={{backgroundColor: 'white'}}
         //onMouseDown={e => e && setState({ ...state, refAreaLeft: e.activeLabel })}
@@ -184,8 +185,8 @@ export default function({title, chart, width, hides}) {
             <ReferenceArea yAxisId="1" x1={state.refAreaLeft} x2={state.refAreaRight} stopColor="blue" strokeOpacity={0.3} /> ) : null
         }
       </ComposedChart>
-      { Array.from(Array(Math.ceil(columns.length/7)).keys()).map((idx) => {
-        const cols = columns.slice(idx*7, (idx+1)*7)
+      { Array.from(Array(Math.ceil(columns.length/GRAPH_COL)).keys()).map((idx) => {
+        const cols = columns.slice(idx*GRAPH_COL, (idx+1)*GRAPH_COL)
         return (
           <div key={idx} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 8}}>
             {idx === 0 && columns[0] === 'Date'? <span>
