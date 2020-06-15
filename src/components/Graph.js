@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import './GraphBoard.css'
 import { ComposedChart, AreaChart,defs, Area, XAxis, YAxis, Tooltip, CartesianGrid, Line, ReferenceArea } from 'recharts'
+import moment from 'moment'
 
 const LineColors = ['#ffa600','#f95d6a', '#a05195', '#ff7c43', '#003f5c', '#665191']
 const AreaColors = LineColors
@@ -10,6 +11,7 @@ const round = x => Math.round((x + Number.EPSILON) * 100) / 100
 export default function({title, chart, width, hides}) {
   const [dotHide, setDotHide] = useState(true)
   const [columns] = useState(chart.data && chart.data.length > 0 ? Object.keys(chart.data[0]).filter((k) => k!=='undefined' && k!=='Date' && k !== 'Time') : [])
+  const [showDate, setShowDate] = useState(columns[0] === 'Date' ? true : false)
   const [hideArray] = useState(columns.map((col) => hides(col)))
   const [showZoomOut, setShowZoomOut] = useState(false)
   const [yAxisName, setYAxisName] = useState(columns[0] ? columns[0].startsWith('C-') ? '' : columns[0] :'')
@@ -119,6 +121,10 @@ export default function({title, chart, width, hides}) {
     zoomOut()
   }
 
+  const formatXAxis = (time) => {
+    return moment(time).format('MM/DD/YYYY')
+  }
+
   return (
     <div className='Graph' style={{marginBottom: 4, height: 'fit-content', alignItems: 'stretch'}}>
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12}}>
@@ -146,7 +152,8 @@ export default function({title, chart, width, hides}) {
         <CartesianGrid stroke="#C5C5f5" />
         <XAxis 
           allowDataOverflow={true}
-          dataKey="Time"
+          dataKey={showDate ? "Date" : "Time"}
+          tickFormatter={showDate ? formatXAxis : null}
           domain={[state.left, state.right]}
           type="number"
         />
@@ -181,6 +188,8 @@ export default function({title, chart, width, hides}) {
         const cols = columns.slice(idx*7, (idx+1)*7)
         return (
           <div key={idx} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 8}}>
+            {idx === 0 && columns[0] === 'Date'? <span>
+            <input type='checkbox' readOnly onClick={() => setShowDate(!showDate)} checked={showDate} />Show Date </span> : null } &nbsp;
             {idx === 0 ? <span>
             <input type='checkbox' readOnly onClick={() => setDotHide(!dotHide)} checked={!dotHide} />Dot </span> : null } &nbsp;
             { cols.map((col, j) => (

@@ -1,5 +1,11 @@
 import { TR_IDS } from "./TransformationTools";
 
+export const Clustering = 0
+export const Classification = 1
+export const Regression = 2
+export const Analyse = 3
+
+export const AlgorithmTypes = [Clustering, Classification, Regression, Regression, Classification, Classification, Analyse]
 
 export const TransformParameters = {
   [TR_IDS.MLAlgorithm]: [{
@@ -21,7 +27,12 @@ export const TransformParameters = {
   }, {
     type: 2,
     name: 'Linear Regression',
-    parameters: []
+    parameters: [{
+      name: 'multiple',
+      desc: 'use all features as targets',
+      type: 'boolean',
+      default: false
+    }]
   }, {
     type: 3,
     name: 'Logistic Regression',
@@ -38,6 +49,10 @@ export const TransformParameters = {
     type: 4,
     name: 'SVM',
     parameters: [{
+      name: 'useSVR',
+      type: 'boolean',
+      default: false
+    }, {
       name: 'gamma',
       type: 'string',
       default: 'auto'

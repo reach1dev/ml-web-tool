@@ -2,6 +2,7 @@ import { TRAIN_AND_TEST_STARTED, UPLOADING_INPUT_DATA, UPLOADING_INPUT_DATA_SUCC
 import axios from 'axios'
 import { BaseUrl } from "./Constants"
 import { REMOVE_TRANSFORM_FROM_MLA, TRAIN_AND_TEST_SUCCESS, TRAIN_AND_TEST_FAILED, REMOVE_TRANSFORM, APPLY_TRANSFORM_SETTINGS, SELECT_TRANSFORM, CLEAR_TRANSFORMS, ADD_TRANSFORM, ADD_TRANSFORM_TO_MLA, MOVE_TRANSFORM, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_FAILED } from "../redux/ActionTypes";
+import { AlgorithmTypes, Classification } from "../components/TransformParameters";
 
 
 export const clearTransforms = () => {
@@ -73,12 +74,13 @@ function getChartData(data, columns) {
   let k = 0
   for(let i=0; i<data.length; i++) {
     const obj = {
-      Date: data[i][0],
       Time: k++
     }
     columns.map((param, idx) => {
       if (param !== 'Date' && param !== 'Time') {
         obj[param] = data[i][idx]
+      } else if (param === 'Date') {
+        obj['Date'] = Date.parse(data[i][idx])
       }
     })
     chartData.push(obj)
@@ -174,11 +176,15 @@ export const getTrainResult = (resFileId, transforms, algorithmParameters) => {
         for(let j=0; j<graph.length; j++) {
           let label = 'C-' + (j+1)
           if (algorithmParameters.algorithmType === 1) {
-            label = (j === 0 ? 'Predict' : 'Target')
+            label = (j === 0 ? 'Target' : 'Prediction')
           } else if (algorithmParameters.algorithmType === 5) {
             label = (j === 0 ? 'explained_variance_ratio' : 'singular_values')
           } else {
-            label = (j === 0 ? 'Target' : 'Prediction')
+            if (algorithmParameters.algorithmType === 2 && algorithmParameters['multiple']) {
+              label = (j %2 === 0 ? 'Tar of ' + transforms[1].inputParameters[j/2] : 'Pre of ' + transforms[1].inputParameters[Math.floor(j/2)])
+            } else {
+              label = (j === 0 ? 'Target' : 'Prediction')
+            }
           }
           data[label] = graph[j][i]
           if (mins[label] === undefined || graph[j][i] < mins[label]) {
@@ -194,8 +200,16 @@ export const getTrainResult = (resFileId, transforms, algorithmParameters) => {
     let metricMeta = null
     if (algorithmParameters.algorithmType === 5) {
       metricMeta = {
+        'main': 'Features',
         'rows': transforms[1].inputParameters,
         'columns': ['explained_variance_ratio', 'singular_values']
+      }
+    } else if (algorithmParameters.algorithmType > 0) {
+      const mainType = AlgorithmTypes[algorithmParameters.algorithmType]
+      metricMeta = {
+        'columns': ['Train', 'Test'],
+        'rows': mainType !== Classification || algorithmParameters['useSVR'] ? ['R2', 'MSE', 'MAE', 'Explained variance'] : ['Accuracy', 'Precision', 'Recall', 'F1'], 
+        'main': 'Metric type'
       }
     }
     

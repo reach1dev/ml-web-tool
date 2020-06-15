@@ -57,7 +57,7 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
   }
 
   const trainAndTest = () => {
-    if (trainLabel === '' && (algorithmType !== 0 && algorithmType !== 5)) {
+    if (trainLabel === '' && (algorithmType !== 0 && algorithmType !== 5 && (algorithmType === 2 && !parameters['multiple']))) {
       window.alert('Please select target.')
       return
     }
@@ -276,8 +276,8 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
         <div style={{display: 'flex', alignItems: 'stretch', flexDirection: 'column'}}>
           { parameters && parameterTypes && parameterTypes[algorithmType] && parameterTypes[algorithmType].parameters? parameterTypes[algorithmType].parameters.map((param, idx) => (
             <div key={idx} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
-              <label style={{marginRight: 10}}>{param.name}</label>
-              <input style={{width: '100%', maxWidth: 180}} value={parameters[param.name]} onChange={(e)=> changeParameter(param.name, e.target.value, param.type)}></input>
+              <label style={{marginRight: 10}}>{param.name}{param.desc ? ' (' + param.desc + ')' : ''}</label>
+              <input type={param.type==='boolean' ? 'checkbox' : 'text'} style={param.type==='boolean' ? {} : {width: '100%', maxWidth: 180}} value={parameters[param.name]} onChange={(e)=> changeParameter(param.name, param.type==='boolean' ? e.target.checked : e.target.value, param.type)}></input>
             </div>
           )) : null }
         </div>

@@ -25,7 +25,7 @@ function GraphBoard({transforms, transform, parentTransform, chartTop, chartBott
         <p><b>Train Metrics</b></p>
         <div>
           <div className='Table-Row'>
-            <span className='Table-Cell'>{ metricMeta !== null ? 'Features' : (trainMetrics.length === 1 ? 'Metric Type' : 'Cluster')}</span>
+            <span className='Table-Cell'>{ metricMeta !== null ? metricMeta.main : (trainMetrics.length === 1 ? 'Metric Type' : 'Cluster')}</span>
             <span className='Table-Cell'>{ metricMeta !== null ? metricMeta.columns[0] : 'Train' }</span>
             <span className='Table-Cell'>{ metricMeta !== null ? metricMeta.columns[1] : 'Test' }</span>
           </div>
@@ -34,7 +34,7 @@ function GraphBoard({transforms, transform, parentTransform, chartTop, chartBott
             <div key={idx} className='Table-Row'>
               <span className='Table-Cell'>{metricMeta !== null ? metricMeta.rows[idx] : trainMetrics.length === 1 ? 'Score' : 'C-' + (idx+1)}</span>
               { Array.isArray(tr) && tr.map((td, j) => (
-                <span key={j} className='Table-Cell'>{td}</span>
+                <span key={j} className='Table-Cell'>{parseFloat(td).toFixed(4)}</span>
               ))}
             </div>
           ))}
