@@ -25,7 +25,7 @@ function GraphBoard({transforms, transform, parentTransform, chartTop, chartBott
         <p><b>Train Metrics</b></p>
         <div>
           <div className='Table-Row'>
-            <span className='Table-Cell'>{trainMetrics.length === 1 ? 'Metric Type' : 'Cluster'}</span>
+            <span className='Table-Cell'>{ metricMeta !== null ? 'Features' : (trainMetrics.length === 1 ? 'Metric Type' : 'Cluster')}</span>
             <span className='Table-Cell'>{ metricMeta !== null ? metricMeta.columns[0] : 'Train' }</span>
             <span className='Table-Cell'>{ metricMeta !== null ? metricMeta.columns[1] : 'Test' }</span>
           </div>

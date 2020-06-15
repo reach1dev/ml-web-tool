@@ -47,13 +47,13 @@ export const TransformationTools = [{
   id: 104,
   shortName: 'SR Median',
   name: 'Subtract Rolling Median',
-  functionName: 'SRM',
+  functionName: 'SM',
   transform: true
 },{
   id: 105,
   shortName: 'SR Average',
   name: 'Subtract Rolling Average',
-  functionName: 'SRA',
+  functionName: 'SA',
   transform: true
 }, {
   id: 106,
@@ -83,19 +83,19 @@ export const TransformationTools = [{
   id: 110,
   shortName: 'Categorical',
   name: 'Convert to Categorical',
-  functionName: 'T2C',
+  functionName: 'CC',
   transform: true
 },{
   id: 111,
   shortName: 'Rankings',
   name: 'Convert to Rankings',
-  functionName: 'TR',
+  functionName: 'CR',
   transform: true
 }, {
   id: 112,
   shortName: 'Percentiles',
   name: 'Convert to Percentiles',
-  functionName: 'TP',
+  functionName: 'CP',
   transform: true
 }, {
   id: 113,

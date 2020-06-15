@@ -11,7 +11,7 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
   const [file, setFile] = useState(null)
   const [error, setError] = useState(false)
   const [inputFilters, setInputFilters] = useState(transform ? transform.inputFilters || [] : [])
-  const [features, setFeatures] = useState(transform ? transform.features || [] : [])
+  const [features, setFeatures] = useState(transform ? transform.features || {} : {})
   const [targetColumn, setTargetColumn] = useState(transform ? transform.targetColumn || '' : '')
   const [filterChanged, setFilterChanged] = useState(1)
   const [parameters, setParameters] = useState(transform ? transform.parameters: {})
@@ -28,6 +28,7 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
     setTrainLabel(transform && transform.parameters ? transform.parameters['trainLabel'] || '' : '')
     setTestShift(transform && transform.parameters ? transform.parameters['testShift'] || 1 : 1)
     setTargetColumn(transform && transform.targetColumn ? transform.targetColumn : '')
+    setFeatures(transform && transform.features ? transform.features || {} : {})
   }, [transform])
 
   const changeAlgorithmType = (type) => {

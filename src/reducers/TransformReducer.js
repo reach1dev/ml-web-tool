@@ -255,7 +255,11 @@ export default function(state = initialState, action) {
               ...t,
               inputParameters: features,
               inputFilters: features.map(t => true),
-              targets: targets
+              targets: targets,
+              parameters: {
+                ...t.parameters,
+                trainLabel: targets.indexOf(t.parameters.trainLabel).length > 0 ? t.parameters.trainLabel : ''
+              }
             }
           }
           return t
