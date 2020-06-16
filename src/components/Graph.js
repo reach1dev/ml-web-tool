@@ -126,6 +126,20 @@ export default function({title, chart, width, hides}) {
     return moment(time).format('MM/DD/YYYY')
   }
 
+  let alignedCols = []
+  let length = 4
+  let cols = []
+  columns.forEach((col, idx) => {
+    cols.push({name: col, idx: idx})
+    length += col.length + 4
+    if (length > 60) {
+      alignedCols.push(cols)
+      cols = []
+      length = 0
+    }
+  })
+  alignedCols.push(cols)
+
   return (
     <div className='Graph' style={{marginBottom: 4, height: 'fit-content', alignItems: 'stretch'}}>
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12}}>
@@ -185,8 +199,7 @@ export default function({title, chart, width, hides}) {
             <ReferenceArea yAxisId="1" x1={state.refAreaLeft} x2={state.refAreaRight} stopColor="blue" strokeOpacity={0.3} /> ) : null
         }
       </ComposedChart>
-      { Array.from(Array(Math.ceil(columns.length/GRAPH_COL)).keys()).map((idx) => {
-        const cols = columns.slice(idx*GRAPH_COL, (idx+1)*GRAPH_COL)
+      { alignedCols.map((cols, idx) => {
         return (
           <div key={idx} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 8}}>
             {idx === 0 && columns[0] === 'Date'? <span>
@@ -195,8 +208,8 @@ export default function({title, chart, width, hides}) {
             <input type='checkbox' readOnly onClick={() => setDotHide(!dotHide)} checked={!dotHide} />Dot </span> : null } &nbsp;
             { cols.map((col, j) => (
               <span key={j}>
-                <input type='checkbox' readOnly onClick={() => changeHide(idx*7+j)} checked={!hideArray[idx*7+j]} /> 
-                {cols[j]} &nbsp;
+                <input type='checkbox' readOnly onClick={() => changeHide(col.idx)} checked={!hideArray[col.idx]} /> 
+                {col.name} &nbsp;
               </span>
             )) }
           </div>

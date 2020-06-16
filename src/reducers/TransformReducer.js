@@ -42,6 +42,46 @@ const initialState = {
   uploading: false,  
 };
 
+
+const updateTransforms = (state, transforms) => {
+  return {
+    ...state,
+    transforms: state.transforms.map((t) => {
+      if (transforms[t.id]) {
+        return transforms[t.id]
+      } else if (t.id === IDS.MLAlgorithm) {
+        let features = []
+        let targets = []
+        state.transforms.forEach(t => {
+          const t1 = transforms[t.id] ? transforms[t.id] : t
+          if (t.target) {
+            features = [
+              ...features,
+              ...Object.values((t1).outputParameters).filter(p => t1.features[p])
+            ]
+            if (t1.targetColumn !== '') {
+              targets = [
+                ...targets,
+                t1.targetColumn
+              ]
+            }
+          }
+        })
+        return {
+          ...t,
+          inputParameters: features,
+          inputFilters: features.map(t => true),
+          targets: targets,
+          parameters: {
+            ...t.parameters,
+            trainLabel: targets.indexOf(t.parameters.trainLabel).length > 0 ? t.parameters.trainLabel : ''
+          }
+        }
+      }
+      return t
+    })
+  }
+}
 export default function(state = initialState, action) {
   switch (action.type) {
     case types.CLEAR_TRANSFORMS:
@@ -228,58 +268,22 @@ export default function(state = initialState, action) {
         parentTransform = trNew
         transform = state.transforms.filter(t => t.parentId === tr.id)[0]
       }
-      return {
-        ...state,
-        transforms: state.transforms.map((t) => {
-          if (transforms[t.id]) {
-            return transforms[t.id]
-          } else if (t.id === IDS.MLAlgorithm) {
-            let features = []
-            let targets = []
-            state.transforms.forEach(t => {
-              const t1 = transforms[t.id] ? transforms[t.id] : t
-              if (t.target) {
-                features = [
-                  ...features,
-                  ...Object.values((t1).outputParameters).filter(p => t1.features[p])
-                ]
-                if (t1.targetColumn !== '') {
-                  targets = [
-                    ...targets,
-                    t1.targetColumn
-                  ]
-                }
-              }
-            })
-            return {
-              ...t,
-              inputParameters: features,
-              inputFilters: features.map(t => true),
-              targets: targets,
-              parameters: {
-                ...t.parameters,
-                trainLabel: targets.indexOf(t.parameters.trainLabel).length > 0 ? t.parameters.trainLabel : ''
-              }
-            }
-          }
-          return t
-        })
-      }
+      return updateTransforms(state, transforms)
     }
     case types.REMOVE_TRANSFORM: {
       const {transformId} = action.payload
+      const children = state.transforms.filter((t) => t.id !== transformId).filter(t => t.parentId === transformId)
+      const transforms = {}
+      children.forEach(c => transforms[c.id] = {
+        ...c,
+        parentId: -1
+      })
+      const newState = state
+      newState.transforms = state.transforms.filter(t => t.id !== transformId)
+
       return {
-        ...state,
+        ...updateTransforms(newState, transforms),
         selectedTransform: state.transforms[0],
-        transforms: state.transforms.filter((t) => t.id !== transformId).map(t => {
-          if (t.parentId === transformId) {
-            return {
-              ...t,
-              parentId: -1
-            }
-          }
-          return t
-        })
       }
     }
     default:

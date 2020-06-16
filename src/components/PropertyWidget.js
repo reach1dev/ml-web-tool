@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as TransformAction from '../actions/TransformAction'
 import { IDS } from './ItemTypes'
-import { TransformParameters } from './TransformParameters'
+import { TransformParameters, AlgorithmTypes, Classification, Regression } from './TransformParameters'
 
 function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, transforms, transform, transformAction}) {
 
@@ -207,7 +207,7 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
     const params = Object.values(transform.outputParameters)
     return (
       <div className='Property-Item-Container' style={{maxHeight: 600, overflowY: 'scroll'}} key={1}>      
-        <p className='Property-Item-Header'>
+        {/* <p className='Property-Item-Header'>
           <b>Add as Target</b> 
           <select value={targetColumn} onChange={e => setTargetColumn(e.target.value)}>
             <option value=''>No selection</option>
@@ -215,14 +215,16 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
             <option key={idx} value={param}>{param}</option>
           ))}
           </select>
-        </p>
+        </p> */}
         <p className='Property-Item-Header'>
-          <b>Add as Feature</b> 
+          <b>Add as feature or target</b> 
           {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
         </p>
+        <div style={{overflowY: 'scroll', maxHeight: 200}}>
         { (params).map((param, idx) => (
           <div key={idx}><input type='checkbox' checked={filterChanged>0 && features[param]} onChange={(e) => changeFeature(param)} /> {param} </div>
         ))}
+        </div>
       </div>
     )
   }
@@ -240,7 +242,7 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
   const _renderColumns2Transform = () => {
     const inputParameters = transform.inputParameters.filter((p, i) => p !== 'Date' && p !== 'Time')
     return (
-      <div className='Property-Item-Container' style={{maxHeight: 600, overflowY: 'scroll'}} key={5}>
+      <div className='Property-Item-Container' style={{maxHeight: 350, overflowY: 'scroll'}} key={5}>
         <p className='Property-Item-Header'>
           <b>Columns to transform</b>
         </p>
@@ -325,7 +327,7 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
           <span>Target column: </span>
           <select style={{width: 120}} value={trainLabel} onChange={(e) => setTrainLabel(e.target.value)}>
             <option key={0} value=''>No selection</option>
-            { transform.targets && transform.targets.map((p, idx) => (
+            { transform.inputParameters && transform.inputParameters.map((p, idx) => (
               <option key={idx} value={p} style={{width: 120}}>&nbsp;{p}&nbsp;</option>
             ))}
           </select>
@@ -344,10 +346,12 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
     if (type === IDS.InputData) {
       items = [_renderInputData()]
     } else if (type === IDS.MLAlgorithm) {
+      const type = AlgorithmTypes[algorithmType]
+      const showTarget = (type === Classification || (type === Regression && !parameters['multiple']))
       items = [
         _renderMLParameters(),
         _renderFeatureSelect(),
-        _renderTargetParam()
+        showTarget ? _renderTargetParam() : null
       ]
     } else {
       items = [
