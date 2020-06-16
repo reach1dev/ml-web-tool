@@ -12,7 +12,7 @@ const GRAPH_COL = 6
 export default function({title, chart, width, hides}) {
   const [dotHide, setDotHide] = useState(true)
   const [columns] = useState(chart.data && chart.data.length > 0 ? Object.keys(chart.data[0]).filter((k) => k!=='undefined' && k!=='Date' && k !== 'Time') : [])
-  const [showDate, setShowDate] = useState(columns[0] === 'Date' ? true : false)
+  const [showDate, setShowDate] = useState(Object.keys(chart.data[0]).indexOf('Date') >= 0 ? true : false)
   const [hideArray] = useState(columns.map((col) => hides(col)))
   const [showZoomOut, setShowZoomOut] = useState(false)
   const [yAxisName, setYAxisName] = useState(columns[0] ? columns[0].startsWith('C-') ? '' : columns[0] :'')
@@ -202,7 +202,7 @@ export default function({title, chart, width, hides}) {
       { alignedCols.map((cols, idx) => {
         return (
           <div key={idx} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 8}}>
-            {idx === 0 && columns[0] === 'Date'? <span>
+            {idx === 0 && Object.keys(chart.data[0]).indexOf('Date') >= 0? <span>
             <input type='checkbox' readOnly onClick={() => setShowDate(!showDate)} checked={showDate} />Show Date </span> : null } &nbsp;
             {idx === 0 ? <span>
             <input type='checkbox' readOnly onClick={() => setDotHide(!dotHide)} checked={!dotHide} />Dot </span> : null } &nbsp;
