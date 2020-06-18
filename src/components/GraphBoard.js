@@ -30,7 +30,7 @@ function GraphBoard({transforms, transform, parentTransform, chartTop, chartBott
             <span className='Table-Cell'>{ metricMeta !== null ? metricMeta.columns[1] : 'Test' }</span>
           </div>
 
-          { trainMetrics.map((tr, idx) => (
+          { Array.isArray(trainMetrics) && trainMetrics.map((tr, idx) => (
             <div key={idx} className='Table-Row'>
               <span className='Table-Cell'>{metricMeta !== null ? metricMeta.rows[idx] : trainMetrics.length === 1 ? 'Score' : 'C-' + (idx+1)}</span>
               { Array.isArray(tr) && tr.map((td, j) => (

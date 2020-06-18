@@ -310,6 +310,7 @@ export const uploadInputData = (file) => {
             payload: {
               file: file.name,
               fileId: res.data.file_id,
+              sampleCount: res.data.sample_count,
               columns: res.data.columns
             }
           })

@@ -140,6 +140,9 @@ export default function({title, chart, width, hides}) {
   })
   alignedCols.push(cols)
 
+  const delta = (state.top - state.bottom) * 0.1
+  const delta2 = (state.top2 - state.bottom2) * 0.1
+
   return (
     <div className='Graph' style={{marginBottom: 4, height: 'fit-content', alignItems: 'stretch'}}>
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12}}>
@@ -174,14 +177,14 @@ export default function({title, chart, width, hides}) {
         />
         <YAxis
           allowDataOverflow={true}
-          domain={[round(state.bottom), round(state.top)]}
+          domain={[round(state.bottom-delta), round(state.top+delta)]}
           type="number"
           yAxisId="1"
         />
         <YAxis
           allowDataOverflow={true}
           orientation='right'
-          domain={[round(state.bottom2), round(state.top2)]}
+          domain={[round(state.bottom2-delta2), round(state.top2+delta2)]}
           type="number"
           yAxisId="2"
         />

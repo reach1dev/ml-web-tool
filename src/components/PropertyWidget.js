@@ -6,7 +6,7 @@ import * as TransformAction from '../actions/TransformAction'
 import { IDS } from './ItemTypes'
 import { TransformParameters, AlgorithmTypes, Classification, Regression } from './TransformParameters'
 
-function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, transforms, transform, transformAction}) {
+function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, inputFileId, transforms, transform, transformAction}) {
 
   const [file, setFile] = useState(null)
   const [error, setError] = useState(false)
@@ -19,6 +19,7 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
   const [algorithmType, setAlgorithmType] = useState(0)
   const [trainLabel, setTrainLabel] = useState('')
   const [testShift, setTestShift] = useState(1)
+  const [trainSampleCount, setTrainSampleCount] = useState(1)
   
   useEffect(() => {
     setInputFilters(transform ? transform.inputFilters || [] : [])
@@ -27,6 +28,7 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
     setAlgorithmType(transform && transform.parameters ? transform.parameters['algorithmType'] || 0 : 0)
     setTrainLabel(transform && transform.parameters ? transform.parameters['trainLabel'] || '' : '')
     setTestShift(transform && transform.parameters ? transform.parameters['testShift'] || 1 : 1)
+    setTrainSampleCount(transform && transform.parameters ? transform.parameters['trainSampleCount'] || Math.floor(sampleCount*0.7) : 1)
     setTargetColumn(transform && transform.targetColumn ? transform.targetColumn : '')
     setFeatures(transform && transform.features ? transform.features || {} : {})
   }, [transform])
@@ -73,7 +75,8 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
         ...params,
         algorithmType: algorithmType,
         trainLabel: trainLabel,
-        testShift: testShift
+        testShift: testShift,
+        trainSampleCount: trainSampleCount
       }
       setParameters(allParams)
       transformAction.trainAndTest(inputFileId, transforms, allParams)
@@ -317,6 +320,28 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
     )
   }
 
+  const _renderTrainTargetSplit = () => {
+    return (
+      <div className='Property-Item-Container' key={6}>
+        <p className='Property-Item-Header'>
+          <b>Train/target split</b> 
+        </p>
+        <p className='Property-Item-Row'>
+          <span>Sample count: </span><b>{sampleCount}</b>
+        </p>
+        <p className='Property-Item-Row'>
+          <span>Train sample count: </span>
+          <input style={{width: 50}} value={trainSampleCount} onChange={(e) => {
+            const val = parseInt(e.target.value)
+            if (val > 0 && val < sampleCount) {
+              setTrainSampleCount(val)
+            }
+          }} />
+        </p>
+      </div>
+    )
+  }
+
   const _renderTargetParam = () => {
     return (
       <div className='Property-Item-Container' key={3}>
@@ -351,6 +376,7 @@ function PropertyWidget({hide, setHide, uploading, inputFile, inputFileId, trans
       items = [
         _renderMLParameters(),
         _renderFeatureSelect(),
+        _renderTrainTargetSplit(),
         showTarget ? _renderTargetParam() : null
       ]
     } else {
@@ -407,7 +433,8 @@ const mapStateToProps = (state) => {
     uploading: state.transforms.uploading,
     parentTransform: parentTransform,
     transform: state.transforms.selectedTransform,
-    transforms: state.transforms.transforms
+    transforms: state.transforms.transforms,
+    sampleCount: state.transforms.sampleCount
   }
 }
 
