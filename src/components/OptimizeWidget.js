@@ -3,6 +3,7 @@ import './PropertyWidget.css'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as OptimizerAction from '../actions/OptimizerAction'
+import { AlgorithmTypes, Classification } from './TransformParameters'
 
 const OptimizeWidget = ({OptimizerAction, inputFileId, transforms, algorithmType, algParams, parameters, optimizeOpened}) => {
   const [optParams, setOptParams] = useState({})
@@ -58,6 +59,10 @@ const OptimizeWidget = ({OptimizerAction, inputFileId, transforms, algorithmType
   const startOptimizer = () => {
     const params = {...algParams, ...resParams, type: algorithmType}
     console.log(JSON.stringify(params))
+    if (params['trainLabel'] === '' && AlgorithmTypes[params['type']] === Classification)  {
+      window.alert('Please select train label')
+      return
+    }
     OptimizerAction.startOptimizer(inputFileId, transforms, params)
   }
 
