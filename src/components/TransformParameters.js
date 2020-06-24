@@ -113,13 +113,17 @@ export const TransformParameters = {
       defaultRange: '1'
     }]
   }, {
-    type: 6,
-    name: 'LDA',
-    parameters: []
-  }, {
     type: 5,
     name: 'PCA',
     parameters: []
+  }, {
+    type: 6,
+    name: 'LDA',
+    parameters: [{
+      name: 'n_components',
+      type: 'number',
+      default: 2
+    }]
   }],
 
   [TR_IDS.Normalization]: [{

@@ -46,6 +46,8 @@ export const getColumns = (algType, featureColumns, colIdx, extra = false) => {
     return (colIdx === 0 ? 'Target' : 'Prediction')
   } else if (algType === 5) {
     return (colIdx === 0 ? 'explained_variance_ratio' : 'singular_values')
+  } else if (algType === 6) {
+    return 'F-' + colIdx
   } else if(algType !== 0) {
     if (algType === 2 && extra['multiple']) {
       return (colIdx %2 === 0 ? featureColumns[colIdx/2] + '-T' : featureColumns[Math.floor(colIdx/2)] + '-P')

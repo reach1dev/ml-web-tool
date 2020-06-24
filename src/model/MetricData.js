@@ -9,6 +9,12 @@ export const getMetricMeta = (algType, featureColumns, extra = {}) => {
       'rows': featureColumns,
       'columns': ['explained_variance_ratio', 'singular_values']
     }
+  } else if (algType === 6) {
+    metricMeta = {
+      'main': 'New features',
+      'rows': [...Array(extra['n_components']).keys()].map((k) => 'F-' + k),
+      'columns': ['explained_variance_ratio', '']
+    }
   } else if (algType > 0) {
     const mainType = AlgorithmTypes[algType]
     metricMeta = {
