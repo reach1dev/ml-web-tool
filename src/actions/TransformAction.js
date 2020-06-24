@@ -1,14 +1,15 @@
-import { TRAIN_AND_TEST_STARTED, UPLOADING_INPUT_DATA, UPLOADING_INPUT_DATA_SUCCESS, UPLOADING_INPUT_DATA_FAILED } from "../redux/ActionTypes"
+import { UPLOADING_INPUT_DATA, UPLOADING_INPUT_DATA_SUCCESS, UPLOADING_INPUT_DATA_FAILED } from "../redux/ActionTypes"
 import axios from 'axios'
 import { BaseUrl } from "./Constants"
-import { REMOVE_TRANSFORM_FROM_MLA, TRAIN_AND_TEST_SUCCESS, TRAIN_AND_TEST_FAILED, REMOVE_TRANSFORM, APPLY_TRANSFORM_SETTINGS, SELECT_TRANSFORM, CLEAR_TRANSFORMS, ADD_TRANSFORM, ADD_TRANSFORM_TO_MLA, MOVE_TRANSFORM, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_FAILED } from "../redux/ActionTypes";
-import { AlgorithmTypes, Classification } from "../components/TransformParameters";
+import { REMOVE_TRANSFORM_FROM_MLA, REMOVE_TRANSFORM, APPLY_TRANSFORM_SETTINGS, SELECT_TRANSFORM, CLEAR_ALL, ADD_TRANSFORM, ADD_TRANSFORM_TO_MLA, MOVE_TRANSFORM, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_FAILED } from "../redux/ActionTypes";
+import { IDS } from "../components/ItemTypes";
+import { Env } from "../config";
 
 
 export const clearTransforms = () => {
   return (dispatch) => {
     dispatch({
-      type: CLEAR_TRANSFORMS
+      type: CLEAR_ALL
     })
   }
 }
@@ -66,22 +67,22 @@ export const selectTransform = (id) => {
   }
 }
 
-function getChartData(data, columns) {
+function getChartData(data, columns, offset) {
   if (data === null) {
     return []
   }
   const chartData = []
   let k = 0
   for(let i=0; i<data.length; i++) {
-    const obj = {
-      Time: k++
+    if (Env.mode === 'debug' && i%20 !== 0) {
+      continue
     }
-    columns.map((param, idx) => {
-      if (param !== 'Date' && param !== 'Time') {
-        obj[param] = data[i][idx]
-      } else if (param === 'Date') {
-        obj['Date'] = Date.parse(data[i][idx])
-      }
+    const obj = {
+      Time: k++,
+      Date: Date.parse(data[i][0])
+    }
+    columns.forEach((param, j) => {
+      obj[param] = data[i][j+offset]
     })
     chartData.push(obj)
   }
@@ -115,20 +116,42 @@ export const getTransformData = (fileId, allTransforms, transformId) => {
     axios.post('/get-transform-data/' + fileId, {
       transforms: transforms.reverse()
     }).then(res=>{
-      const mins = {}, maxes = {}
+      let charts = []
+      const outCols = Object.values(lastTransform.outputParameters).filter(c => c !== 'Date' && c !== 'Time')
+      const inCols = lastTransform.inputParameters.filter(c => c !== 'Date' && c !== 'Time')
+      const mins1 = {}, maxes1 = {}, mins2 = {}, maxes2 = {}
       res.data.columns[0].forEach((col, idx) => {
         if (col === 'Date' || col === 'Time') return
-        mins[col] = res.data.columns[1][idx]
-        maxes[col] = res.data.columns[2][idx]
+        if (outCols.includes(col)) {
+          mins2[col] = res.data.columns[1][idx]
+          maxes2[col] = res.data.columns[2][idx]
+        } else {
+          mins1[col] = res.data.columns[1][idx]
+          maxes1[col] = res.data.columns[2][idx]
+        }
       })
+      if (lastTransform.id === IDS.InputData) {
+        charts.push({
+          data: getChartData(res.data.data, outCols, 2),
+          mins: mins2,
+          maxes: maxes2
+        })
+      } else {
+        charts.push({
+          data: getChartData(res.data.data, inCols, 2),
+          mins: mins1,
+          maxes: maxes1
+        }, {
+          data: getChartData(res.data.data, outCols, 2 + inCols.length),
+          mins: mins2,
+          maxes: maxes2
+        })
+      }
+
       dispatch({
         type: GET_TRANSFORM_DATA_SUCCESS,
         payload: {
-          chart: {
-            data: getChartData(res.data.data, res.data.columns[0]),
-            mins: mins,
-            maxes: maxes
-          },
+          charts: charts
         }
       })
     }).catch((err) => {
@@ -136,140 +159,6 @@ export const getTransformData = (fileId, allTransforms, transformId) => {
       console.log(err)
       dispatch({
         type: GET_TRANSFORM_DATA_FAILED,
-        payload: {
-          errorMessage: err
-        }
-      })
-    })
-  }
-}
-
-
-export const getTrainResult = (resFileId, transforms, algorithmParameters) => {
-  return async (dispatch) => {
-    axios.defaults.baseURL = BaseUrl
-    const res = await axios.post('/get-train-result/' + resFileId)
-    if (res.status === 204) {
-      return false
-    }
-    if (res.status === 203) {
-      window.alert('Error: ' + res.data.err)
-      dispatch({
-        type: TRAIN_AND_TEST_FAILED,
-        payload: {
-          errorMessage: res.data.err
-        }
-      }) 
-      return true
-    }
-    const [graph, metrics] = res.data
-    let graphData = []
-    let mins = {}
-    let maxes = {}
-    if (graph !== null) {
-      for(let i=0; i<graph[0].length; i++) {
-        // if (i%20 !== 0) {
-        //   continue
-        // }
-        let data = {'Time': i} ///20
-  
-        for(let j=0; j<graph.length; j++) {
-          let label = 'C-' + (j+1)
-          if (algorithmParameters.algorithmType === 1) {
-            label = (j === 0 ? 'Target' : 'Prediction')
-          } else if (algorithmParameters.algorithmType === 5) {
-            label = (j === 0 ? 'explained_variance_ratio' : 'singular_values')
-          } else {
-            if (algorithmParameters.algorithmType === 2 && algorithmParameters['multiple']) {
-              label = (j %2 === 0 ? transforms[1].inputParameters[j/2] + '-T' : transforms[1].inputParameters[Math.floor(j/2)] + '-P')
-            } else {
-              label = (j === 0 ? 'Target' : 'Prediction')
-            }
-          }
-          data[label] = graph[j][i]
-          if (mins[label] === undefined || graph[j][i] < mins[label]) {
-            mins[label] = graph[j][i]
-          }
-          if (maxes[label] === undefined || graph[j][i] > maxes[label]) {
-            maxes[label] = graph[j][i]
-          }
-        }
-        graphData.push(data)
-      }
-    }
-    let metricMeta = null
-    if (algorithmParameters.algorithmType === 5) {
-      metricMeta = {
-        'main': 'Features',
-        'rows': transforms[1].inputParameters,
-        'columns': ['explained_variance_ratio', 'singular_values']
-      }
-    } else if (algorithmParameters.algorithmType > 0) {
-      const mainType = AlgorithmTypes[algorithmParameters.algorithmType]
-      metricMeta = {
-        'columns': ['Train', 'Test'],
-        'rows': mainType !== Classification || algorithmParameters['useSVR'] ? ['R2', 'MSE', 'MAE', 'Explained variance'] : ['Accuracy', 'Precision', 'Recall', 'F1'], 
-        'main': 'Metric type'
-      }
-    }
-    
-
-    dispatch({
-      type: TRAIN_AND_TEST_SUCCESS,
-      payload: {
-        metricMeta: metricMeta,
-        metrics: metrics,
-        chart: {
-          data: graphData,
-          mins: mins,
-          maxes: maxes
-        }
-      }
-    })
-    return true
-  }
-}
-
-export const trainAndTest = (fileId, transforms, algorithmParameters) => {
-  return (dispatch) => {
-    dispatch({
-      type: GET_TRANSFORM_DATA_START,
-    })
-    
-    axios.defaults.baseURL = BaseUrl
-    //  axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*'
-    axios.post('/train-and-test/' + fileId, {
-      transforms: transforms,
-      parameters: algorithmParameters
-    }).then(res=>{
-      dispatch({
-        type: TRAIN_AND_TEST_STARTED,
-        payload: {
-          resFileId: res.data.res_file_id
-        }
-      })
-
-      let time = 0
-      const timer = setInterval(async () => {
-        if (time < 20) {
-          if(await getTrainResult(res.data.res_file_id, transforms, algorithmParameters)(dispatch)) {
-            clearInterval(timer)
-          }
-        } else {
-          clearInterval(timer)
-          dispatch({
-            type: TRAIN_AND_TEST_FAILED,
-            payload: {
-              errorMessage: 'Something wrong, train label should  be categorized.'
-            }
-          })
-        }
-        time ++
-      }, 2500)
-    }).catch((err) => {
-      window.alert('Something wrong, train label should  be categorized.')
-      dispatch({
-        type: TRAIN_AND_TEST_FAILED,
         payload: {
           errorMessage: err
         }

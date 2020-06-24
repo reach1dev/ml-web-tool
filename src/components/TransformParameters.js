@@ -14,7 +14,18 @@ export const TransformParameters = {
     parameters: [{
       name: 'n_clusters',
       type: 'number',
-      default: 8
+      default: 8,
+      defaultRange: '3~8'
+    }, {
+      name: 'random_state',
+      type: 'number',
+      default: 1,
+      defaultRange: '1'
+    }, {
+      name: 'init',
+      type: 'string',
+      default: 'k-means++',
+      defaultRange: 'k-means++'
     }
   ]}, {
     type: 1,
@@ -22,7 +33,18 @@ export const TransformParameters = {
     parameters: [{
       name: 'n_neighbors',
       type: 'number',
-      default: 8
+      default: 8,
+      defaultRange: '3~12'
+    }, {
+      name: 'P',
+      type: 'number',
+      default: 1,
+      defaultRange: '2'
+    }, {
+      name: 'metric',
+      type: 'string',
+      default: 'minkowski',
+      defaultRange: 'minkowski'
     }]
   }, {
     type: 2,
@@ -37,13 +59,25 @@ export const TransformParameters = {
     type: 3,
     name: 'Logistic Regression',
     parameters: [{
+      name: 'C',
+      type: 'number',
+      default: 1,
+      defaultRange: '0.1,0.5,1,2,4,10'
+    }, {
       name: 'solver',
       type: 'string',
-      default: 'lbfgs'
+      default: 'lbfgs',
+      defaultRange: 'newton-cg,lbfgs,liblinear,sag,saga'
     }, {
       name: 'penalty',
       type: 'string',
-      default: 'l2'
+      default: 'l2',
+      defaultRange: 'l1,l2,elasticnet,none'
+    }, {
+      name: 'random_state',
+      type: 'number',
+      default: 1,
+      defaultRange: '1'
     }]
   }, {
     type: 4,
@@ -51,19 +85,32 @@ export const TransformParameters = {
     parameters: [{
       name: 'useSVR',
       type: 'boolean',
-      default: false
+      default: false,
+    },{
+      name: 'C',
+      type: 'number',
+      default: 1,
+      defaultRange: '0.1,1,2,4,10'
     }, {
       name: 'gamma',
       type: 'string',
-      default: 'auto'
+      default: 'auto',
+      defaultRange: 'auto,scale'
     }, {
       name: 'kernel',
       type: 'string',
-      default: 'rbf'
+      default: 'rbf',
+      defaultRange: 'linear,poly,rbf,sigmoid'
     }, {
       name: 'degree',
       type: 'number',
-      default: 3
+      default: 3,
+      defaultRange: '3'
+    }, {
+      name: 'random_state',
+      type: 'number',
+      default: 1,
+      defaultRange: '1'
     }]
   }, {
     type: 6,

@@ -3,10 +3,16 @@ import './PropertyWidget.css'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as TransformAction from '../actions/TransformAction'
+import * as TrainerAction from '../actions/TrainerAction'
+import * as OptimizerAction from '../actions/OptimizerAction'
 import { IDS } from './ItemTypes'
 import { TransformParameters, AlgorithmTypes, Classification, Regression } from './TransformParameters'
+import OptimizeWidget from './OptimizeWidget'
+import Spinner from './Spinner'
 
-function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, inputFileId, transforms, transform, transformAction}) {
+function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, inputFileId, transforms, transform, 
+  algParams, 
+  TransformAction, TrainerAction, OptimizerAction}) {
 
   const [file, setFile] = useState(null)
   const [error, setError] = useState(false)
@@ -14,24 +20,37 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
   const [features, setFeatures] = useState(transform ? transform.features || {} : {})
   const [targetColumn, setTargetColumn] = useState(transform ? transform.targetColumn || '' : '')
   const [filterChanged, setFilterChanged] = useState(1)
-  const [parameters, setParameters] = useState(transform ? transform.parameters: {})
+  const [parameters, setParameters] = useState({})
   const [parameterTypes, setParameterTypes] = useState([])
   const [algorithmType, setAlgorithmType] = useState(0)
   const [trainLabel, setTrainLabel] = useState('')
   const [testShift, setTestShift] = useState(1)
   const [trainSampleCount, setTrainSampleCount] = useState(1)
+  const [randomSelect, setRandomSelect] = useState(false)
+  const [optimizeStatus, setOptimizeStatus] = useState(0)
   
   useEffect(() => {
-    setInputFilters(transform ? transform.inputFilters || [] : [])
-    setParameters(transform ? transform.parameters: {} )
-    setParameterTypes(transform ? TransformParameters[transform.tool.id] : [])
-    setAlgorithmType(transform && transform.parameters ? transform.parameters['algorithmType'] || 0 : 0)
-    setTrainLabel(transform && transform.parameters ? transform.parameters['trainLabel'] || '' : '')
-    setTestShift(transform && transform.parameters ? transform.parameters['testShift'] || 1 : 1)
-    setTrainSampleCount(transform && transform.parameters ? transform.parameters['trainSampleCount'] || Math.floor(sampleCount*0.7) : 1)
-    setTargetColumn(transform && transform.targetColumn ? transform.targetColumn : '')
-    setFeatures(transform && transform.features ? transform.features || {} : {})
+    if (transform && transform.id !== IDS.MLAlgorithm) {
+      setParameters(transform ? transform.parameters: {} )
+      setParameterTypes(transform ? TransformParameters[transform.tool.id] : [])
+      setTargetColumn(transform && transform.targetColumn ? transform.targetColumn : '')
+    }
   }, [transform])
+
+  useEffect(() => {
+    if (transform && transform.id === IDS.MLAlgorithm) {
+      setAlgorithmType(algParams.type)
+      setInputFilters(transform.inputFilters || [])
+      setTrainLabel(algParams.trainLabel || '')
+      setTestShift(algParams.testShift || 1)
+      setTrainSampleCount(algParams.trainSampleCount || Math.floor(sampleCount*0.7))
+      setFeatures(algParams.features || {})
+
+      setParameters(algParams.parameters || {} )
+      setParameterTypes(TransformParameters[transform.tool.id] || [])
+    }
+  }, [transform, algParams, sampleCount])
+
 
   const changeAlgorithmType = (type) => {
     setAlgorithmType(type)
@@ -41,25 +60,49 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
         params[p.name] = p.default
       })
       setParameters(params)
-    }
+    }    
   }
 
   const uploadFile = () => {
     if (file === null) {
       setError(true)
     } else {
-      transformAction.uploadInputData(file)
+      TransformAction.uploadInputData(file)
     }
   }
 
   const removeNode = () => {
     if (window.confirm('Are you sure to remove this transform?')) {
-      transformAction.removeTransform(transform.id)      
+      TransformAction.removeTransform(transform.id)      
+    }
+  }
+
+  const startOptimize = (optParams) => {
+    if (trainLabel === '' && 
+      (AlgorithmTypes[algorithmType] === Classification || 
+        (AlgorithmTypes[algorithmType] === Regression && parameters['multiple']))) {
+      window.alert('Please select target.')
+      return
+    }
+    if (inputFileId) {
+      const params = optParams
+      const allParams = {
+        ...params,
+        algorithmType: algorithmType,
+        trainLabel: trainLabel,
+        testShift: testShift,
+        trainSampleCount: trainSampleCount,
+        randomSelect: randomSelect
+      }
+      setParameters(allParams)
+      TransformAction.trainAndTest(inputFileId, transforms, allParams, true)
+    } else {
+      window.alert('Please upload input file.')
     }
   }
 
   const trainAndTest = () => {
-    if (trainLabel === '' && (algorithmType !== 0 && algorithmType !== 5 && (algorithmType === 2 && !parameters['multiple']))) {
+    if (trainLabel === '' && (algorithmType !== 0 && algorithmType !== 5 && (algorithmType !== 2 || !parameters['multiple']))) {
       window.alert('Please select target.')
       return
     }
@@ -73,13 +116,17 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
       }
       const allParams = {
         ...params,
-        algorithmType: algorithmType,
+        type: algorithmType,
         trainLabel: trainLabel,
         testShift: testShift,
-        trainSampleCount: trainSampleCount
+        trainSampleCount: trainSampleCount,
+        randomSelect: randomSelect,
+        inputFilters: transform.inputFilters,
+        features: transform.inputParameters
       }
+
       setParameters(allParams)
-      transformAction.trainAndTest(inputFileId, transforms, allParams)
+      TrainerAction.startTrainer(inputFileId, transforms, allParams)
     } else {
       window.alert('Please upload input file.')
     }
@@ -87,7 +134,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
 
   const drawGraph = () => {
     if (inputFileId) {
-      transformAction.getTransformData(inputFileId, transforms, transform.id)
+      TransformAction.getTransformData(inputFileId, transforms, transform.id)
     } else{
       window.alert('Please upload input file')
     }
@@ -110,20 +157,19 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
       target: Object.keys(features).filter(p => features[p]).length > 0 || tc !== '',
       targetColumn: tc
     }
-    transformAction.applySettings(transform.id, settings)
+    TransformAction.applySettings(transform.id, settings)
   }
 
   const saveMLAlgorithm = () => {
-    transformAction.applySettings(transform.id, {
-      algorithmType: algorithmType,
+    TrainerAction.saveTrainerSettings({
+      type: algorithmType,
       inputFilters: inputFilters,
+      features: transform.inputParameters,
       trainLabel: trainLabel,
-      parameters: {
-        ...parameters,
-        algorithmType: algorithmType,
-        trainLabel: trainLabel,
-        testShift: testShift
-      }
+      testShift: testShift,
+      trainSampleCount: trainSampleCount,
+      randomSelect: randomSelect,
+      parameters: parameters
     })
   }
 
@@ -182,10 +228,10 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
 
   const setTarget = () => {
     if (transform.target) {
-      transformAction.removeTransformFromMLA(transform.id)
+      TransformAction.removeTransformFromMLA(transform.id)
       setFeatures({})
     } else {
-      transformAction.addTransformToMLA(transform.id)
+      TransformAction.addTransformToMLA(transform.id)
     }
     transform.target = !transform.target
     setFilterChanged(filterChanged+1)
@@ -263,6 +309,19 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
     )
   }
 
+  const getMLParams = () => {
+    if (parameters && parameterTypes && parameterTypes[algorithmType] && parameterTypes[algorithmType].parameters) {
+      const params = parameterTypes[algorithmType].parameters
+      return params.map((param, idx) => (
+        <div key={idx} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
+          <label style={{marginRight: 10}}>{param.name}{param.desc ? ' (' + param.desc + ')' : ''}</label>
+          <input type={param.type==='boolean' ? 'checkbox' : 'text'} style={param.type==='boolean' ? {} : {width: '100%', maxWidth: 180}} value={parameters[param.name]} onChange={(e)=> changeParameter(param.name, param.type==='boolean' ? e.target.checked : e.target.value, param.type)}></input>
+        </div>
+      ))
+    }
+    return null
+  }
+
   const _renderMLParameters = () => {
     return (
       <div className='Property-Item-Container' key={2}>
@@ -279,13 +338,19 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
           </select>
         </p>
         <div style={{display: 'flex', alignItems: 'stretch', flexDirection: 'column'}}>
-          { parameters && parameterTypes && parameterTypes[algorithmType] && parameterTypes[algorithmType].parameters? parameterTypes[algorithmType].parameters.map((param, idx) => (
-            <div key={idx} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
-              <label style={{marginRight: 10}}>{param.name}{param.desc ? ' (' + param.desc + ')' : ''}</label>
-              <input type={param.type==='boolean' ? 'checkbox' : 'text'} style={param.type==='boolean' ? {} : {width: '100%', maxWidth: 180}} value={parameters[param.name]} onChange={(e)=> changeParameter(param.name, param.type==='boolean' ? e.target.checked : e.target.value, param.type)}></input>
-            </div>
-          )) : null }
+          { getMLParams() }
         </div>
+        { algorithmType !== 2 && algorithmType < 5 && 
+        <OptimizeWidget 
+          algorithmType={algorithmType}
+          parameters={parameters && parameterTypes && parameterTypes[algorithmType] && 
+            parameterTypes[algorithmType].parameters? parameterTypes[algorithmType].parameters : []} 
+          openOptimizer={() => setOptimizeStatus(1)}
+          optimizeStatus={optimizeStatus}
+          startOptimize={(optParams) => {
+            saveMLAlgorithm()
+            startOptimize(optParams)
+          }}  /> }
       </div>
     )
   }
@@ -310,7 +375,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
   }
 
   const _renderDetails = () => {
-    const params = Object.values(transform.outputParameters)
+    
     return (
       <div className='Property-Item-Container' key={3}>
         <p className='Property-Item-Header'>
@@ -337,6 +402,10 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
               setTrainSampleCount(val)
             }
           }} />
+        </p>
+        <p className='Property-Item-Row'>
+          <span>Is random selection / from first: </span>
+          <input type="checkbox" checked={randomSelect} onChange={(e) => setRandomSelect(e.target.checked)} />
         </p>
       </div>
     )
@@ -411,7 +480,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
             { transform.id === IDS.MLAlgorithm && <input type='button' onClick={saveMLAlgorithm} value='Save' /> }
             <span style={{width: 10}}></span>
             { transform.id >= IDS.InputData && transform.id < IDS.MLAlgorithm && <input type='button' onClick={drawGraph} value='Draw' /> }
-            { transform.id === IDS.MLAlgorithm && <input type='button' onClick={trainAndTest} value='Train & Test' /> }
+            { transform.id === IDS.MLAlgorithm && <input type='button' onClick={() => trainAndTest(false)} value='Train & Test' /> }
           </div> : null
         }
         
@@ -434,13 +503,16 @@ const mapStateToProps = (state) => {
     parentTransform: parentTransform,
     transform: state.transforms.selectedTransform,
     transforms: state.transforms.transforms,
-    sampleCount: state.transforms.sampleCount
+    sampleCount: state.transforms.sampleCount,
+    algParams: state.trainer.options
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    transformAction: bindActionCreators(TransformAction, dispatch),
+    TransformAction: bindActionCreators(TransformAction, dispatch),
+    TrainerAction: bindActionCreators(TrainerAction, dispatch),
+    OptimizerAction: bindActionCreators(OptimizerAction, dispatch)
   }
 }
 

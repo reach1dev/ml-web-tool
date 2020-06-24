@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import './GraphBoard.css'
-import { ComposedChart, AreaChart,defs, Area, XAxis, YAxis, Tooltip, CartesianGrid, Line, ReferenceArea } from 'recharts'
+import { ComposedChart, Scatter, XAxis, YAxis, Tooltip, CartesianGrid, Line, ReferenceArea, ScatterChart } from 'recharts'
 import moment from 'moment'
 
 const LineColors = ['#ffa600','#f95d6a', '#a05195', '#ff7c43', '#003f5c', '#665191']
@@ -9,15 +9,17 @@ const AreaColors = LineColors
 const round = x => Math.round((x + Number.EPSILON) * 100) / 100
 const GRAPH_COL = 6
 
-export default function({title, chart, width, hides}) {
+export default function({title, chart, width}) {
   const [dotHide, setDotHide] = useState(true)
+  const [showScatter, setShowScatter] = useState(false)
   const [columns] = useState(chart.data && chart.data.length > 0 ? Object.keys(chart.data[0]).filter((k) => k!=='undefined' && k!=='Date' && k !== 'Time') : [])
   const [showDate, setShowDate] = useState(Object.keys(chart.data[0]).indexOf('Date') >= 0 ? true : false)
-  const [hideArray] = useState(columns.map((col) => hides(col)))
+  const [hideArray] = useState(columns.map((col) => false))
   const [showZoomOut, setShowZoomOut] = useState(false)
   const [yAxisName, setYAxisName] = useState(columns[0] ? columns[0].startsWith('C-') ? '' : columns[0] :'')
   const [yAxisName2, setYAxisName2] = useState(columns[columns.length-1] ? columns[columns.length-1].startsWith('C-') ? '' : columns[columns.length-1] : '')
 
+  console.log(JSON.stringify(columns))
   const getAxisYDomain = () => {
     var ranges = [];
     columns.forEach((col, idx) => {
@@ -35,7 +37,7 @@ export default function({title, chart, width, hides}) {
     for(var i=0; i<ranges.length-1; i++) {
       const rate = ranges[i][1]/ranges[i+1][1]
       axis[ranges[i][0]] = 1;
-      if (!columns[0].startsWith('C-') && rate>2) {
+      if (columns[0].startsWith('C-') || rate>2) {
         return [ranges[0][0], ranges[i+1][0], axis]
       }
     }
@@ -142,14 +144,16 @@ export default function({title, chart, width, hides}) {
 
   const delta = (state.top - state.bottom) * 0.1
   const delta2 = (state.top2 - state.bottom2) * 0.1
+  const shCols = columns.filter((c, idx) => !hideArray[idx])
+  console.log(JSON.stringify(shCols))
 
   return (
     <div className='Graph' style={{marginBottom: 4, height: 'fit-content', alignItems: 'stretch'}}>
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12}}>
-        <b>{title}</b>
+        <b>{chart.title || title}</b>
         { (showZoomOut) ? <input type='button' onClick={() => zoomOut()} value='Zoom out' /> : null }
       </div>
-      <ComposedChart
+      { <ComposedChart
         width={width || 360}
         height={390 - (Math.ceil(columns.length/GRAPH_COL))*24}
         data={state.data}
@@ -201,12 +205,37 @@ export default function({title, chart, width, hides}) {
         { (state.refAreaLeft && state.refAreaRight) ? (
             <ReferenceArea yAxisId="1" x1={state.refAreaLeft} x2={state.refAreaRight} stopColor="blue" strokeOpacity={0.3} /> ) : null
         }
-      </ComposedChart>
+      </ComposedChart> }
+      {/* { chart.type===1 && 
+        <ScatterChart
+          width={width || 360}
+          height={390 - (Math.ceil(columns.length/GRAPH_COL))*24}
+          style={{backgroundColor: 'white'}}
+        >
+          <XAxis 
+            allowDataOverflow={true}
+            dataKey={columns[0]}
+            domain={[round(state.bottom2-delta2), round(state.top2+delta2)]}
+            type="number"
+          />
+          <YAxis
+            allowDataOverflow={true}
+            dataKey={columns[1]}
+            domain={[round(state.bottom-delta), round(state.top+delta)]}
+            type="number"
+          />
+          { [...Array(chart.meta.n_clusters).keys()].map((col, idx) => (
+            <Scatter key={idx} name={'C-' + (idx+1)} data={state.data.filter(d => d['Tar'] === idx)} fill={LineColors[idx%chart.meta.n_clusters]} />
+          )) }          
+        </ScatterChart>
+      } */}
       { alignedCols.map((cols, idx) => {
         return (
           <div key={idx} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 8}}>
             {idx === 0 && Object.keys(chart.data[0]).indexOf('Date') >= 0? <span>
             <input type='checkbox' readOnly onClick={() => setShowDate(!showDate)} checked={showDate} />Show Date </span> : null } &nbsp;
+            {/* {idx === 0  ? <span>
+            <input type='checkbox' readOnly onClick={() => setShowScatter(!showScatter)} checked={showScatter} />Show Scatter </span> : null } &nbsp; */}
             {idx === 0 ? <span>
             <input type='checkbox' readOnly onClick={() => setDotHide(!dotHide)} checked={!dotHide} />Dot </span> : null } &nbsp;
             { cols.map((col, j) => (

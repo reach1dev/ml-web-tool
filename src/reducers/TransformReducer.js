@@ -85,7 +85,7 @@ const updateTransforms = (state, transforms) => {
 }
 export default function(state = initialState, action) {
   switch (action.type) {
-    case types.CLEAR_TRANSFORMS:
+    case types.CLEAR_ALL:
       return initialState
     case types.UPLOADING_INPUT_DATA_SUCCESS: {
       const { file, fileId, columns, sampleCount } = action.payload;
@@ -201,21 +201,22 @@ export default function(state = initialState, action) {
         selectedTransform: transforms.length>0?transforms[0]:null
       }
     }
-    case types.GET_TRANSFORM_DATA_START: {
-      return {
-        ...state,
-        getTransformLoading: true
-      }
-    }
     case types.TRAIN_AND_TEST_STARTED: {
+      const {optimized, resFileId} = action.payload
+      if (optimized) {
+        return {
+          ...state,
+          resFileId: resFileId
+        }
+      }
       return {
         ...state,
         resFileId: action.payload.resFileId
       }
     }
     case types.TRAIN_AND_TEST_SUCCESS: {
-      const {chart, metrics, metricMeta} = action.payload
-      return {
+      const {chart, metrics, metricMeta, params, optimized} = action.payload
+      const res = {
         ...state,
         trainMetrics: metrics,
         metricMeta: metricMeta,
@@ -223,16 +224,23 @@ export default function(state = initialState, action) {
         outputData: chart,
         getTransformLoading: false
       }
-    }
-    case types.GET_TRANSFORM_DATA_SUCCESS: {
-      const {chart} = action.payload
-      return {
-        ...state,
-        inputData: chart,
-        outputData: chart,
-        trainMetrics: null,
-        getTransformLoading: false
-      };
+      if (optimized) {
+        return {
+          ...res,
+          parameters: params,
+          optimizeFinished: false,
+          transforms: state.transforms.map(t => {
+            if (t.id === IDS.MLAlgorithm) {
+              return {
+                ...t,
+                parameters: params
+              }
+            }
+            return t
+          })
+        }
+      }
+      return res
     }
     case types.GET_TRANSFORM_DATA_FAILED: {
       return {
