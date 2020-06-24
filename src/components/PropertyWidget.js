@@ -34,6 +34,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
       setParameters(transform ? transform.parameters: {} )
       setParameterTypes(transform ? TransformParameters[transform.tool.id] : [])
       setTargetColumn(transform && transform.targetColumn ? transform.targetColumn : '')
+      setFeatures(transform && transform.features ? transform.features : {})
     }
   }, [transform])
 
@@ -44,8 +45,6 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
       setTrainLabel(algParams.trainLabel || '')
       setTestShift(algParams.testShift || 1)
       setTrainSampleCount(algParams.trainSampleCount || Math.floor(sampleCount*0.7))
-      setFeatures(algParams.features || {})
-
       setParameters(algParams.parameters || {} )
       setParameterTypes(TransformParameters[transform.tool.id] || [])
     }

@@ -15,7 +15,7 @@ export const TransformParameters = {
       name: 'n_clusters',
       type: 'number',
       default: 8,
-      defaultRange: '3~8'
+      defaultRange: '2~12'
     }, {
       name: 'random_state',
       type: 'number',
