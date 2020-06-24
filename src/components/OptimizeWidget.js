@@ -60,7 +60,7 @@ const OptimizeWidget = ({OptimizerAction, inputFileId, transforms, algorithmType
     const params = {...algParams, ...resParams, type: algorithmType}
     console.log(JSON.stringify(params))
     if (params['trainLabel'] === '' && AlgorithmTypes[params['type']] === Classification)  {
-      window.alert('Please select train label')
+      window.alert('Please save before optimizing')
       return
     }
     OptimizerAction.startOptimizer(inputFileId, transforms, params)

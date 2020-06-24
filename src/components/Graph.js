@@ -192,7 +192,7 @@ export default function({title, chart, width}) {
           type="number"
           yAxisId="2"
         />
-        <Tooltip />
+        <Tooltip labelFormatter={showDate ? formatXAxis : null} />
         { columns.map((col, idx) => (
           <Line key={idx} type="monotone" 
             dataKey={columns[idx]} 

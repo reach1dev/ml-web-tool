@@ -403,7 +403,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
           }} />
         </p>
         <p className='Property-Item-Row'>
-          <span>Is random selection / from first: </span>
+          <span>Choose samples randomly: </span>
           <input type="checkbox" checked={randomSelect} onChange={(e) => setRandomSelect(e.target.checked)} />
         </p>
       </div>
