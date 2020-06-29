@@ -30,6 +30,10 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
   const [kFoldCV, setKFoldCV] = useState(false)
   const [kFold, setKFold] = useState(2)
   const [optimizeStatus, setOptimizeStatus] = useState(0)
+
+  const [tripleUp, setTripleUp] = useState(10)
+  const [tripleDown, setTripleDown] = useState(10)
+  const [tripleMaxHold, setTripleMaxHold] = useState(10)
   
   useEffect(() => {
     if (transform && transform.id !== IDS.MLAlgorithm) {
@@ -115,16 +119,12 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
           params[paramName] = parseFloat(parameters[paramName])
         }
       }
+      
+      let curParams = getCurrentParams()
+      delete(curParams['parameters'])
       const allParams = {
         ...params,
-        type: algorithmType,
-        trainLabel: trainLabel,
-        testShift: testShift,
-        trainSampleCount: trainSampleCount,
-        randomSelect: randomSelect,
-        inputFilters: transform.inputFilters,
-        features: transform.inputParameters,
-        kFold: kFoldCV ? kFold : 0
+        ...curParams
       }
 
       setParameters(allParams)
@@ -162,18 +162,27 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
     TransformAction.applySettings(transform.id, settings)
   }
 
-  const saveMLAlgorithm = () => {
-    TrainerAction.saveTrainerSettings({
+  const getCurrentParams = () => {
+    return {
       type: algorithmType,
       inputFilters: inputFilters,
       features: transform.inputParameters,
       trainLabel: trainLabel,
+      tripleOptions: {
+        up: tripleUp,
+        down: tripleDown,
+        maxHold: tripleMaxHold
+      },
       testShift: testShift,
       trainSampleCount: trainSampleCount,
       randomSelect: randomSelect,
       parameters: parameters,
       kFold: kFoldCV ? kFold : 0
-    })
+    }
+  }
+
+  const saveMLAlgorithm = () => {
+    TrainerAction.saveTrainerSettings(getCurrentParams())
   }
 
   const changeOutputParam = (inputParam, outputParam) => {
@@ -432,6 +441,16 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
     )
   }
 
+  const _renderTripleBarrierOptions = () => {
+    return (
+      <div style={{marginLeft: 10}}>
+        <p className='Property-Item-Row'><span>up: </span> <input style={{width: 110}} value={tripleUp} onChange={(e) => setTripleUp(parseInt(e.target.value))} /></p>
+        <p className='Property-Item-Row'><span>down: </span> <input style={{width: 110}} value={tripleDown} onChange={(e) => setTripleDown(parseInt(e.target.value))} /></p>
+        <p className='Property-Item-Row'><span>maxhold: </span><input style={{width: 110}} value={tripleMaxHold} onChange={(e) => setTripleMaxHold(parseInt(e.target.value))} /></p>
+      </div>
+    )
+  }
+
   const _renderTargetParam = () => {
     return (
       <div className='Property-Item-Container' key={3}>
@@ -447,6 +466,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
             ))}
           </select>
         </p>
+        { trainLabel === 'triple_barrier' ? _renderTripleBarrierOptions() : null}
         <p className='Property-Item-Row'>
           <span>Test shift: </span>
           <input style={{width: 110}} value={testShift} onChange={(e) => setTestShift(parseInt(e.target.value))} />
