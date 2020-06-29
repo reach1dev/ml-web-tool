@@ -192,6 +192,12 @@ export const TransformParameters = {
     default: 1
   }],
 
+  [TR_IDS.MathOperators]: [{
+    name: 'expression',
+    type: 'string',
+    default: ''
+  }],
+
   [TR_IDS.TurnC2CD]: [],
 
   [TR_IDS.TurnRanking]: [],

@@ -27,6 +27,8 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
   const [testShift, setTestShift] = useState(1)
   const [trainSampleCount, setTrainSampleCount] = useState(1)
   const [randomSelect, setRandomSelect] = useState(false)
+  const [kFoldCV, setKFoldCV] = useState(false)
+  const [kFold, setKFold] = useState(2)
   const [optimizeStatus, setOptimizeStatus] = useState(0)
   
   useEffect(() => {
@@ -121,7 +123,8 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
         trainSampleCount: trainSampleCount,
         randomSelect: randomSelect,
         inputFilters: transform.inputFilters,
-        features: transform.inputParameters
+        features: transform.inputParameters,
+        kFold: kFoldCV ? kFold : 0
       }
 
       setParameters(allParams)
@@ -168,7 +171,8 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
       testShift: testShift,
       trainSampleCount: trainSampleCount,
       randomSelect: randomSelect,
-      parameters: parameters
+      parameters: parameters,
+      kFold: kFoldCV ? kFold : 0
     })
   }
 
@@ -346,9 +350,11 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
             parameterTypes[algorithmType].parameters? parameterTypes[algorithmType].parameters : []} 
           openOptimizer={() => setOptimizeStatus(1)}
           optimizeStatus={optimizeStatus}
-          startOptimize={(optParams) => {
+          getParams={()=> {
             saveMLAlgorithm()
-            startOptimize(optParams)
+            return {
+              kFold: kFoldCV ? kFold : 0
+            }
           }}  /> }
       </div>
     )
@@ -404,8 +410,24 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
         </p>
         <p className='Property-Item-Row'>
           <span>Choose samples randomly: </span>
-          <input type="checkbox" checked={randomSelect} onChange={(e) => setRandomSelect(e.target.checked)} />
+          <input type="checkbox" checked={randomSelect} onChange={(e) => {
+            setKFoldCV(e.target.checked ? false: kFoldCV)
+            setRandomSelect(e.target.checked)
+          }} />
         </p>
+        <p className='Property-Item-Row'>
+          <span>kFold CV: </span>
+          <input type="checkbox" checked={kFoldCV} onChange={(e) => {
+            setRandomSelect(e.target.checked ? false : randomSelect)
+            setKFoldCV(e.target.checked)
+          }} />
+        </p>
+        { kFoldCV && 
+          <p className='Property-Item-Row'>
+            <span>kFold CV n_splits: </span>
+            <input style={{width: 50}} value={kFold} onChange={(e) => setKFold(e.target.value)} />
+          </p>
+        }
       </div>
     )
   }
@@ -419,7 +441,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
         <p className='Property-Item-Row'>
           <span>Target column: </span>
           <select style={{width: 120}} value={trainLabel} onChange={(e) => setTrainLabel(e.target.value)}>
-            <option key={0} value=''>No selection</option>
+            <option key={0} value='triple_barrier'>Triple Barrier</option>
             { transform.inputParameters && transform.inputParameters.map((p, idx) => (
               <option key={idx} value={p} style={{width: 120}}>&nbsp;{p}&nbsp;</option>
             ))}
@@ -440,7 +462,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
       items = [_renderInputData()]
     } else if (type === IDS.MLAlgorithm) {
       const type = AlgorithmTypes[algorithmType]
-      const showTarget = (type === Classification || (type === Regression && !parameters['multiple']))
+      const showTarget = (type === Classification || (type === Regression && parameters && !parameters['multiple']))
       items = [
         _renderMLParameters(),
         _renderFeatureSelect(),

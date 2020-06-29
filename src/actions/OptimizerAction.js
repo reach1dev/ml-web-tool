@@ -76,19 +76,39 @@ export const getOptimizeResult = async ({fileId, transforms, algParams}) => {
     }
   }
 
-  const [graph, params] = res.data
-  
-  const chart = parseSimpleGraph(graph, [algParams.type === 0 ? 'inertia' : 'score'])
+  let charts = []
+  let params = []
+  let metrics = []
+  let metricsData = []
+  let firstGraph = []
+  res.data.forEach((data) => {
+    const [graph, param] = data
+    charts.push(parseSimpleGraph(graph, [algParams.type === 0 ? 'inertia' : 'score']))
+    params.push(param)
+    metricsData.push(graph.map(d => d[1]))
+    firstGraph = graph
+  })
+  metrics = charts.map((c, idx) => {
+    return {
+      data: metricsData,
+      meta: {
+        title: 'Optimization result',
+        main: 'Main parameter',
+        rows: charts.length === 1 ? ['Scores'] : charts.map((c, idx) => 'Scores for fold-' + idx),
+        columns: firstGraph.map((d, idx) => '' + d[0])
+      }
+    }
+  })
   
   return {
     status: SUCCESS,
     data: {
       params: {
         type: algParams.type,
-        ...params
+        ...params[0]
       },
-      charts: [chart],
-      metrics: []
+      charts: charts,
+      metrics: metrics
     }
   }
 }

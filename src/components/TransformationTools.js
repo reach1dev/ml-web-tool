@@ -12,6 +12,7 @@ export const TR_IDS = {
   TurnRanking: 111,
   TurnPercentiles: 112,
   PowerFunctions: 113,
+  MathOperators: 114,
   MLAlgorithm: 10000
 }
 
@@ -102,5 +103,11 @@ export const TransformationTools = [{
   shortName: 'Power',
   name: 'Power Functions',
   functionName: 'Pw',
+  transform: true
+}, {
+  id: 114,
+  shortName: 'Math Operators',
+  name: 'Math Operators',
+  functionName: 'Ma',
   transform: true
 }]

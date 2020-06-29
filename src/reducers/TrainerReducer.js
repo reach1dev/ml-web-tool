@@ -7,7 +7,7 @@ const initialState = {
   training: false,
   options: {
     type: 0,
-    trainLabel: '',
+    trainLabel: 'triple_barrier',
     testShift: 1,
     trainSampleCount: 0,
     randomSelect: false,

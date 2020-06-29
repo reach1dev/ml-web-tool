@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import './GraphBoard.css'
 import { ComposedChart, Scatter, XAxis, YAxis, Tooltip, CartesianGrid, Line, ReferenceArea, ScatterChart } from 'recharts'
 import moment from 'moment'
+import DataView from './DataView'
 
 const LineColors = ['#ffa600','#f95d6a', '#a05195', '#ff7c43', '#003f5c', '#665191']
 const AreaColors = LineColors
@@ -18,6 +19,8 @@ export default function({title, chart, width}) {
   const [showZoomOut, setShowZoomOut] = useState(false)
   const [yAxisName, setYAxisName] = useState(columns[0] ? columns[0].startsWith('C-') ? '' : columns[0] :'')
   const [yAxisName2, setYAxisName2] = useState(columns[columns.length-1] ? columns[columns.length-1].startsWith('C-') ? '' : columns[columns.length-1] : '')
+
+  const [showData, setShowData] = useState(false)
 
   console.log(JSON.stringify(columns))
   const getAxisYDomain = () => {
@@ -128,6 +131,10 @@ export default function({title, chart, width}) {
     return moment(time).format('MM/DD/YYYY')
   }
 
+  const showValues = () => {
+    setShowData(true)
+  }
+
   let alignedCols = []
   let length = 4
   let cols = []
@@ -147,11 +154,25 @@ export default function({title, chart, width}) {
   const shCols = columns.filter((c, idx) => !hideArray[idx])
   console.log(JSON.stringify(shCols))
 
+  if (showData) {
+    return (
+      <div className='Graph' style={{marginBottom: 4, height: 'fit-content', alignItems: 'stretch'}}>
+        <DataView 
+          title={title}
+          data={chart.data}
+          columns={columns}
+          showGraph={() => setShowData(false)}
+        ></DataView>
+      </div>
+    )
+  }
+
   return (
     <div className='Graph' style={{marginBottom: 4, height: 'fit-content', alignItems: 'stretch'}}>
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12}}>
         <b>{chart.title || title}</b>
         { (showZoomOut) ? <input type='button' onClick={() => zoomOut()} value='Zoom out' /> : null }
+        <input type='button' onClick={() => showValues()} value='Show values' />
       </div>
       { <ComposedChart
         width={width || 360}

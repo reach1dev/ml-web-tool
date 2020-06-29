@@ -67,23 +67,28 @@ export const getTrainResult = async ({fileId, transforms, algParams}) => {
     }
   }
 
-  const [graph, metrics] = res.data
-  let columns = graph.map((g, idx) => getColumns(
-    algParams.type, 
-    transforms[1].inputParameters, idx, 
-    algParams
-  ))
-  const chart = parseGraphList(algParams.type, graph, columns, algParams)
-  const metricMeta = getMetricMeta(algParams.type, algParams.features.filter((_,idx) => algParams.inputFilters[idx]), algParams)
+  let charts = [], metrics = []
+  res.data.forEach((res_data) => {
+    const [graph, metric] = res_data
+    let columns = graph.map((g, idx) => getColumns(
+      algParams.type, 
+      transforms[1].inputParameters, idx, 
+      algParams
+    ))
+    charts.push(parseGraphList(algParams.type, graph, columns, algParams))
+    const meta = getMetricMeta(algParams.type, algParams.features.filter((_,idx) => algParams.inputFilters[idx]), algParams)
+    metrics.push({
+      data: metric,
+      meta: meta
+    })
+  })
+  
   
   return {
     status: SUCCESS,
     data: {
-      metrics: [{
-        data: metrics,
-        meta: metricMeta
-      }],
-      charts: [chart]
+      metrics: metrics,
+      charts: charts
     }
   }
 }

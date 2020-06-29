@@ -151,7 +151,8 @@ export const getTransformData = (fileId, allTransforms, transformId) => {
       dispatch({
         type: GET_TRANSFORM_DATA_SUCCESS,
         payload: {
-          charts: charts
+          charts: charts,
+          metrics: []
         }
       })
     }).catch((err) => {

@@ -21,6 +21,7 @@
   flex-direction: row;
   justify-content: space-between;
   background-color: gray;
+  width: fit-content;
 }
 
 .Table-Cell {
@@ -28,7 +29,15 @@
   font-size: 15px;
   margin: 8px;
   text-align: left;
-  width: 30%;
+  width: 50px;
+}
+
+.Table-Head {
+  color: white;
+  font-size: 15px;
+  margin: 8px;
+  text-align: left;
+  width: 150px;
 }
 
 .Table-Row:nth-child(even) {

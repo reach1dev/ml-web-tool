@@ -13,7 +13,7 @@ export const getMetricMeta = (algType, featureColumns, extra = {}) => {
     metricMeta = {
       'main': 'New features',
       'rows': [...Array(extra['n_components']).keys()].map((k) => 'F-' + k),
-      'columns': ['explained_variance_ratio', '']
+      'columns': ['explained_variance_ratio']
     }
   } else if (algType > 0) {
     const mainType = AlgorithmTypes[algType]

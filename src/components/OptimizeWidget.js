@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux'
 import * as OptimizerAction from '../actions/OptimizerAction'
 import { AlgorithmTypes, Classification } from './TransformParameters'
 
-const OptimizeWidget = ({OptimizerAction, inputFileId, transforms, algorithmType, algParams, parameters, optimizeOpened}) => {
+const OptimizeWidget = ({OptimizerAction, inputFileId, transforms, algorithmType, algParams, parameters, optimizeOpened, getParams}) => {
   const [optParams, setOptParams] = useState({})
   const [resParams, setResParams] = useState({})
   const [status, setStatus] = useState(0)
@@ -57,7 +57,13 @@ const OptimizeWidget = ({OptimizerAction, inputFileId, transforms, algorithmType
   }
 
   const startOptimizer = () => {
-    const params = {...algParams, ...resParams, type: algorithmType}
+    let params = {...algParams, ...resParams, type: algorithmType}
+    if (getParams) {
+      params = {
+        ...params,
+        ...getParams()
+      }
+    }
     console.log(JSON.stringify(params))
     if (params['trainLabel'] === '' && AlgorithmTypes[params['type']] === Classification)  {
       window.alert('Please save before optimizing')

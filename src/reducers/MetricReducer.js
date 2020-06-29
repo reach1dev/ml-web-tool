@@ -1,4 +1,4 @@
-import { SET_METRIC_DATA, GET_METRIC_DATA, CLEAR_ALL, TRAINER_FINISHED, OPTIMIZER_FINISHED } from '../redux/ActionTypes'
+import { SET_METRIC_DATA, GET_METRIC_DATA, CLEAR_ALL, TRAINER_FINISHED, OPTIMIZER_FINISHED, GET_TRANSFORM_DATA_SUCCESS } from '../redux/ActionTypes'
 
 
 const initialState = {
@@ -15,6 +15,12 @@ export default function(state = initialState, action) {
       }
     }
     case SET_METRIC_DATA: {
+      return {
+        ...state,
+        metrics: action.payload.metrics
+      }
+    }
+    case GET_TRANSFORM_DATA_SUCCESS: {
       return {
         ...state,
         metrics: action.payload.metrics
