@@ -1,14 +1,22 @@
 import React from 'react'
 import './DataView.css'
 import { CSVLink, CSVDownload } from "react-csv";
+import moment from 'moment'
 
 export default function DataView({title, data, columns, showGraph}) {
+  const newData = data.map((d, idx) => {
+    let k = {...d}
+    if (typeof d['Date'] !== 'undefined') {
+      k['Date'] = moment(d['Date']).format('MM/DD/YYYY')
+    }
+    return k
+  })
   return (
     <div>
       <div style={{display: 'flex', justifyContent: 'space-between'}}>
         <b>{title}</b>
         <span>
-          <CSVLink data={data} filename={title + ".csv"} className="button">Download CSV</CSVLink>
+          <CSVLink data={newData} filename={title + ".csv"} className="button">Download CSV</CSVLink>
           &nbsp;
           <input type='button' onClick={() => showGraph()} value='Show graph' />
         </span>
@@ -22,7 +30,7 @@ export default function DataView({title, data, columns, showGraph}) {
           </thead>
           <tbody>
           {
-            data.map(row => (
+            newData.map(row => (
               <tr className='row'>
                 {
                   columns.map(c => (
