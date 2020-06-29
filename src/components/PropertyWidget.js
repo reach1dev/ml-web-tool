@@ -466,11 +466,12 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
             ))}
           </select>
         </p>
-        { trainLabel === 'triple_barrier' ? _renderTripleBarrierOptions() : null}
-        <p className='Property-Item-Row'>
-          <span>Test shift: </span>
-          <input style={{width: 110}} value={testShift} onChange={(e) => setTestShift(parseInt(e.target.value))} />
-        </p>
+        { trainLabel === 'triple_barrier' ? _renderTripleBarrierOptions() : (
+          <p className='Property-Item-Row'>
+            <span>Test shift: </span>
+            <input style={{width: 110}} value={testShift} onChange={(e) => setTestShift(parseInt(e.target.value))} />
+          </p>
+        )}
       </div>
     )
   }
