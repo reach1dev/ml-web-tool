@@ -1,3 +1,3 @@
 export const Env = {
-  mode: 'debug'
+  mode: 'release'
 }
