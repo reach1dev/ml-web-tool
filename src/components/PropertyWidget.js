@@ -121,6 +121,10 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
       }
       
       let curParams = getCurrentParams()
+      if (transform.inputParameters.length === 0) {
+        alert('No features selected, please confirm to save in transformations.')
+        return
+      }
       delete(curParams['parameters'])
       const allParams = {
         ...params,
