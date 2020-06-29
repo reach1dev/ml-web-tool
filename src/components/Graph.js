@@ -160,7 +160,7 @@ export default function({title, chart, width}) {
         <DataView 
           title={title}
           data={chart.data}
-          columns={columns}
+          columns={Object.keys(chart.data[0]).indexOf('Date') >= 0 ? ['Date', ...columns] : columns}
           showGraph={() => setShowData(false)}
         ></DataView>
       </div>

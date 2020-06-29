@@ -68,15 +68,16 @@ function GraphBoard({charts, metrics, loading, width}) {
             chart={selectedGraph >= 0 && charts[selectedGraph]}
             width={width}
           />
-          <div style={{display: 'flex', justifyContent: 'center', padding: 5}}>
-            <input type='button' 
-              disabled={selectedGraph <= 0}
-              onClick={() => setSelectedGraph((selectedGraph-1)%charts.length)} value='Show previous' />
-            <span style={{width: 20}}></span>
-            <input type='button' 
-              disabled={selectedGraph >= charts.length-1}
-              onClick={() => setSelectedGraph((selectedGraph+1)%charts.length)} value='Show next' />
+          { charts.length > 1 ? (
+            <div style={{display: 'flex', justifyContent: 'center', padding: 5, overflowX: 'scroll' }}>
+            <div style={{display: 'flex',  width: 'fit-content', paddingLeft: 20, paddingRight: 10}}>{
+              charts.map((c, idx) => (
+                <input type='button' style={{marginLeft: 10, marginRight: 10}} 
+                  onClick={() => setSelectedGraph(idx%charts.length)} value={'kFold-' + (idx+1)} />
+              ))
+            }</div>
           </div>
+          ) : null}
         </div>
       )
     }

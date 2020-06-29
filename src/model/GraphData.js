@@ -15,6 +15,10 @@ export const parseGraphList = (algType, list, columns, extra = {}) => {
 
       for(let j=0; j<list.length; j++) {
         let label =  columns[j]
+        if (columns[j] === 'Date') {
+          row[label] = Date.parse(list[j][i])
+          continue
+        }
         row[label] = list[j][i]
         if (mins[label] === undefined || list[j][i] < mins[label]) {
           mins[label] = list[j][i]

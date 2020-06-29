@@ -4,6 +4,7 @@ import { createTask, FAILED, PROCESSING, SUCCESS } from './TaskAction'
 import { getColumns, parseGraphList } from '../model/GraphData'
 import { getMetricMeta } from '../model/MetricData'
 import { BaseUrl } from './Constants'
+import { AlgorithmTypes, Classification, Clustering } from '../components/TransformParameters'
 
 
 export const loadTrainerSettings = () => {
@@ -75,7 +76,11 @@ export const getTrainResult = async ({fileId, transforms, algParams}) => {
       transforms[1].inputParameters, idx, 
       algParams
     ))
-    charts.push(parseGraphList(algParams.type, graph, columns, algParams))
+    let columns1 = columns
+    if (AlgorithmTypes[algParams.type] === Classification || AlgorithmTypes[algParams.type] === Clustering) {
+      columns1 = ['Date', ...columns]
+    }
+    charts.push(parseGraphList(algParams.type, graph, columns1, algParams))
     const meta = getMetricMeta(algParams.type, algParams.features.filter((_,idx) => algParams.inputFilters[idx]), algParams)
     metrics.push({
       data: metric,
