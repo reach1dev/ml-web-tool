@@ -90,7 +90,7 @@ export const TransformParameters = {
       name: 'C',
       type: 'number',
       default: 1,
-      defaultRange: '0.1,1,2,4,10'
+      defaultRange: '0.1,1,2,4'
     }, {
       name: 'gamma',
       type: 'string',
@@ -100,7 +100,7 @@ export const TransformParameters = {
       name: 'kernel',
       type: 'string',
       default: 'rbf',
-      defaultRange: 'linear,poly,rbf,sigmoid'
+      defaultRange: 'linear,poly,rbf'
     }, {
       name: 'degree',
       type: 'number',
