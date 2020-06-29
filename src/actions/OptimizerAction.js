@@ -52,7 +52,7 @@ export const startOptimizer = (fileId, transforms, algParams) => {
         failedType: OPTIMIZER_FAILED,
         params: {fileId, transforms, algParams},
         interval: 5000,
-        retry: 150
+        retry: 200
       })
 
     }).catch((err) => {
