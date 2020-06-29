@@ -167,6 +167,24 @@ export default function({title, chart, width}) {
     )
   }
 
+  const _showTargetValues = () => {
+    if (columns[0] === 'Target') {
+      let counts = {}
+      state.data.forEach(d => {
+        const t = d['Target']
+        if (typeof counts[t] === 'undefined') {
+          counts[t] = 1
+        } else {
+          counts[t] = counts[t] + 1
+        }
+      })
+      return Object.keys(counts).map((val, idx) => (
+        <span style={{marginRight: 20, marginLeft: 20}}>{val} - {(counts[val] / state.data.length * 100).toFixed(2)}%</span>
+      ))
+    }
+    return null
+  }
+
   return (
     <div className='Graph' style={{marginBottom: 4, height: 'fit-content', alignItems: 'stretch'}}>
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12}}>
@@ -174,6 +192,11 @@ export default function({title, chart, width}) {
         { (showZoomOut) ? <input type='button' onClick={() => zoomOut()} value='Zoom out' /> : null }
         <input type='button' onClick={() => showValues()} value='Show values' />
       </div>
+      <div style={{paddingBottom: 10}}>
+        <b>Target values :</b>
+        { _showTargetValues() }
+      </div>
+
       { <ComposedChart
         width={width || 360}
         height={390 - (Math.ceil(columns.length/GRAPH_COL))*24}
