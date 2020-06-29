@@ -34,8 +34,8 @@ function GraphBoard({charts, metrics, loading, width}) {
     }
     return (
       <div className='Graph' key={charts ? (charts.length + 1) : 0}>
-        <p><b>{ meta.title ? meta.title : 'Train Metrics'}</b></p>
-        <div style={{overflowX: 'scroll', width: 560}}>
+        <p><b>{ meta && meta.title ? meta.title : 'Train Metrics'}</b></p>
+        <div style={{overflowX: 'scroll', minWidth: 560, backgroundColor: 'gray'}}>
           <div className='Table-Row'>
             <span className='Table-Head'>{ meta ? meta.main : (data.length === 1 ? 'Metric Type' : 'Cluster')}</span>
             { _renderMetricRow(meta) }
