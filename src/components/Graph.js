@@ -184,6 +184,9 @@ export default function({title, chart, width}) {
           counts[t] = counts[t] + 1
         }
       })
+      if (Object.keys(counts).length > 4) {
+        return null
+      }
       return Object.keys(counts).map((val, idx) => (
         <span style={{marginRight: 20, marginLeft: 20}}>{val} - {(counts[val] / state.data.length * 100).toFixed(2)}%</span>
       ))
