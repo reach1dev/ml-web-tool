@@ -70,7 +70,7 @@ export const parseSimpleGraph = (graph, columns) => {
   let maxes = {}
   for (let i=0; i<graph.length; i++) {
     let row = {'Time': graph[i][0]}
-    let k = 1
+    let k = 0
     columns.forEach(c => {
       if (mins[c] === undefined || graph[i][k] < mins[c]) {
         mins[c] = graph[i][k]

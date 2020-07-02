@@ -193,9 +193,20 @@ export const TransformParameters = {
   }],
 
   [TR_IDS.MathOperators]: [{
+    name: 'name',
+    type: 'string',
+    placeholder: 'click save to see in target',
+    default: ''
+  } , {
     name: 'expression',
     type: 'string',
     default: ''
+  }],
+
+  [TR_IDS.RollingMean]: [{
+    name: 'rolling',
+    type: 'number',
+    default: 20
   }],
 
   [TR_IDS.TurnC2CD]: [],

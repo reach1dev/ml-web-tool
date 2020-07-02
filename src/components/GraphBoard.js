@@ -17,7 +17,7 @@ function GraphBoard({charts, metrics, loading, width}) {
 
   const _renderMetricRow = (meta, idx) => {
     if (meta) {
-      if (meta.columns.length > 1) {
+      if (meta.columns.length >= 1) {
         return meta.columns.map(c => <span className='Table-Cell'>{c}</span>)
       }
     }
@@ -73,7 +73,7 @@ function GraphBoard({charts, metrics, loading, width}) {
             <div style={{display: 'flex',  width: 'fit-content', paddingLeft: 20, paddingRight: 10}}>{
               charts.map((c, idx) => (
                 <input type='button' style={{marginLeft: 10, marginRight: 10}} 
-                  onClick={() => setSelectedGraph(idx%charts.length)} value={'kFold-' + (idx+1)} />
+                  onClick={() => setSelectedGraph(idx%charts.length)} value={idx === 0 ? 'Overview' : ('kFold-' + (idx))} />
               ))
             }</div>
           </div>

@@ -9,6 +9,7 @@ import { IDS } from './ItemTypes'
 import { TransformParameters, AlgorithmTypes, Classification, Regression } from './TransformParameters'
 import OptimizeWidget from './OptimizeWidget'
 import Spinner from './Spinner'
+import { TR_IDS } from './TransformationTools'
 
 function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, inputFileId, transforms, transform, 
   algParams, 
@@ -202,7 +203,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
 
   const addOrRemoveOutputParam = (inputParam) => {
     if (transform.outputParameters[inputParam] === undefined) {
-      transform.outputParameters[inputParam] = transform.tool.functionName + (transform.id-IDS.InputData) + '(' + inputParam + ')'
+      transform.outputParameters[inputParam] = transform.tool.functionName + (transform.id-IDS.InputData) + '_' + inputParam
     } else {
       delete(transform.outputParameters[inputParam]);
     }
@@ -240,6 +241,14 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
     }
     setParameters(parameters)
     setFilterChanged(filterChanged+1)
+
+    if (transform.tool.id === TR_IDS.MathOperators && (name === 'name' || name === 'expression')) {
+      if (parameters['name'] !== '' && parameters['expression'] !== '') {
+        transform.outputParameters = {[parameters['expression']]: parameters['name']}
+      } else {
+        transform.outputParameters = {}
+      }
+    }
   }
 
   const setTarget = () => {
@@ -384,7 +393,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
           { parameters && parameterTypes ? parameterTypes.map((param) => (
             <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
               <label style={{marginRight: 10}}>{param.name}</label>
-              <input style={{width: '100%', maxWidth: 180}} value={parameters[param.name]} onChange={(e)=> changeParameter(param.name, e.target.value, param.type)}></input>
+              <input style={{width: '100%', maxWidth: 180}} value={parameters[param.name]} placeholder={param.placeholder} onChange={(e)=> changeParameter(param.name, e.target.value, param.type)}></input>
             </div>
           )) : null }
         </div>

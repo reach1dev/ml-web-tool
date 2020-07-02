@@ -13,7 +13,7 @@ const GRAPH_COL = 6
 export default function({title, chart, width}) {
   const [dotHide, setDotHide] = useState(true)
   const [showScatter, setShowScatter] = useState(false)
-  const [columns] = useState(chart.data && chart.data.length > 0 ? Object.keys(chart.data[0]).filter((k) => k!=='undefined' && k!=='Date' && k !== 'Time') : [])
+  const [columns] = useState(chart.data && chart.data.length > 0 ? Object.keys(chart.data[0]).filter((k) => k!=='undefined' && k!=='Date' && k !== 'Time' && k !== 'Main Parameter') : [])
   const [showDate, setShowDate] = useState(Object.keys(chart.data[0]).indexOf('Date') >= 0 ? true : false)
   const [hideArray] = useState(columns.map((col) => false))
   const [showZoomOut, setShowZoomOut] = useState(false)
@@ -155,12 +155,18 @@ export default function({title, chart, width}) {
   console.log(JSON.stringify(shCols))
 
   if (showData) {
+    let newCols = columns
+    if (Object.keys(chart.data[0]).indexOf('Date') >= 0) {
+      newCols = ['Date', ...columns]
+    } else if (Object.keys(chart.data[0]).indexOf('Main Parameter') >= 0) {
+      newCols = ['Main Parameter', ...columns]
+    }
     return (
       <div className='Graph' style={{marginBottom: 4, height: 'fit-content', alignItems: 'stretch'}}>
         <DataView 
           title={title}
           data={chart.data}
-          columns={Object.keys(chart.data[0]).indexOf('Date') >= 0 ? ['Date', ...columns] : columns}
+          columns={newCols}
           showGraph={() => setShowData(false)}
         ></DataView>
       </div>

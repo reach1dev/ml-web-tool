@@ -116,11 +116,25 @@ export const getTransformData = (fileId, allTransforms, transformId) => {
     axios.post('/get-transform-data/' + fileId, {
       transforms: transforms.reverse()
     }).then(res=>{
+      if (res.status === 203) {
+        window.alert('Server error: ' + res.data)
+        dispatch({
+          type: GET_TRANSFORM_DATA_FAILED,
+          payload: {
+            errorMessage: res.data
+          }
+        })
+        return
+      }
       let charts = []
       const outCols = Object.values(lastTransform.outputParameters).filter(c => c !== 'Date' && c !== 'Time')
       const inCols = lastTransform.inputParameters.filter(c => c !== 'Date' && c !== 'Time')
       const mins1 = {}, maxes1 = {}, mins2 = {}, maxes2 = {}
-      res.data.columns[0].forEach((col, idx) => {
+      let data = res.data
+      if (typeof res.data === 'string') {
+        data = JSON.parse(res.data)
+      }
+      data.columns[0].forEach((col, idx) => {
         if (col === 'Date' || col === 'Time') return
         if (outCols.includes(col)) {
           mins2[col] = res.data.columns[1][idx]
@@ -156,7 +170,7 @@ export const getTransformData = (fileId, allTransforms, transformId) => {
         }
       })
     }).catch((err) => {
-      window.alert('Server is busy or you may set wrong input data for any transforms.')
+      window.alert('Server error: ' + err)
       console.log(err)
       dispatch({
         type: GET_TRANSFORM_DATA_FAILED,

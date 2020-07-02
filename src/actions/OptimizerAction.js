@@ -83,7 +83,7 @@ export const getOptimizeResult = async ({fileId, transforms, algParams}) => {
   let firstGraph = []
   res.data.forEach((data) => {
     const [graph, param] = data
-    charts.push(parseSimpleGraph(graph, [algParams.type === 0 ? 'inertia' : 'score']))
+    charts.push(parseSimpleGraph(graph, ['Main Parameter', algParams.type === 0 ? 'inertia' : 'score']))
     params.push(param)
     metricsData.push(graph.map(d => d[1]))
     firstGraph = graph

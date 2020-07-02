@@ -69,7 +69,13 @@ export const getTrainResult = async ({fileId, transforms, algParams}) => {
   }
 
   let charts = [], metrics = []
-  res.data.forEach((res_data) => {
+  let overviewChart = null
+  let overviewMetric = null
+  let data = res.data
+  if (algParams.type === 6) {
+    data = data.reverse()
+  }
+  data.forEach((res_data) => {
     const [graph, metric] = res_data
     let columns = graph.map((g, idx) => getColumns(
       algParams.type, 
@@ -80,14 +86,53 @@ export const getTrainResult = async ({fileId, transforms, algParams}) => {
     if (AlgorithmTypes[algParams.type] === Classification || AlgorithmTypes[algParams.type] === Clustering || AlgorithmTypes[algParams.type] === Regression) {
       columns1 = ['Date', ...columns]
     }
-    charts.push(parseGraphList(algParams.type, graph, columns1, algParams))
+
+    const chart = parseGraphList(algParams.type, graph, columns1, algParams)
+    charts.push(chart)
+
+    if (overviewChart === null) {
+      overviewChart = JSON.parse(JSON.stringify(chart))
+    } else {
+      Object.keys(chart.mins).forEach(c => {
+        if (chart.mins[c] < overviewChart.mins[c]) {
+          overviewChart.mins[c] = chart.mins[c]
+        }
+        if (chart.maxes[c] < overviewChart.maxes[c]) {
+          overviewChart.maxes[c] = chart.maxes[c]
+        }
+      })
+      overviewChart.data = overviewChart.data.concat(chart.data)
+    }
+
     const meta = getMetricMeta(algParams.type, algParams.features.filter((_,idx) => algParams.inputFilters[idx]), algParams)
     metrics.push({
       data: metric,
       meta: meta
     })
+
+    if (overviewMetric === null) {
+      overviewMetric = JSON.parse(JSON.stringify(metrics[0]))
+    } else {
+      metric.forEach((r, i) => {
+        r.forEach((c, j) => {
+          let a = overviewMetric.data[i][j]
+          let b = metric[i][j]
+          if (typeof a !== 'number') {
+            a = a[0]
+          }
+          if (typeof b !== 'number') {
+            b = b[0]
+          }
+          overviewMetric.data[i][j] = (a * (metrics.length-1) + b) / metrics.length
+        })
+      })
+    }
   })
   
+  if (charts.length > 1) {
+    charts = [overviewChart, ...charts]
+    metrics = [overviewMetric, ...metrics]
+  }
   
   return {
     status: SUCCESS,

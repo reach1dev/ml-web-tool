@@ -13,6 +13,7 @@ export const TR_IDS = {
   TurnPercentiles: 112,
   PowerFunctions: 113,
   MathOperators: 114,
+  RollingMean: 115,
   MLAlgorithm: 10000
 }
 
@@ -109,5 +110,11 @@ export const TransformationTools = [{
   shortName: 'Math Operators',
   name: 'Math Operators',
   functionName: 'Ma',
+  transform: true
+}, {
+  id: 115,
+  shortName: 'Rolling Mean',
+  name: 'Rolling Mean',
+  functionName: 'RM',
   transform: true
 }]
