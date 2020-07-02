@@ -69,7 +69,7 @@ function GraphBoard({charts, metrics, loading, width}) {
             width={width}
           />
           { charts.length > 1 ? (
-            <div style={{display: 'flex', padding: 5, overflowX: 'scroll' }}>
+            <div style={{display: 'flex', padding: 5, overflowX: 'scroll', maxWidth: width }}>
             <div style={{display: 'flex',  width: 'fit-content'}}>{
               charts.map((c, idx) => (
                 <input type='button' style={{marginLeft: 10, marginRight: 10}}
