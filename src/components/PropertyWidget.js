@@ -466,7 +466,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
 
   const _renderTargetParam = () => {
     return (
-      <div className='Property-Item-Container columns' key={3}>
+      <div className='Property-Item-Container' key={3}>
         <p className='Property-Item-Header'>
           <b>Select Target</b> 
         </p>
