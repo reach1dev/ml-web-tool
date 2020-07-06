@@ -16,9 +16,15 @@ html, body {
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1250px) {
   html {
-    font-size: 9px;
+    font-size: 7px;
+  }
+}
+
+@media (max-width: 1050px) {
+  html {
+    font-size: 7px;
   }
 }
 

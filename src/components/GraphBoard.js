@@ -101,6 +101,7 @@ function GraphBoard({charts, metrics, loading, width, height}) {
         title={idx === 0 ? 'Input data' : 'Transformed data'}
         chart={chart}
         width={width}
+        height={height}
       />
     ))
   }

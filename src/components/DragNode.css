@@ -3,7 +3,7 @@
   border-width: 1px;
   background-color: grey;
   width: fit-content;
-  padding: 4px;
+  padding: 0.5rem;
   font-size: 1rem;
   color: white;
   z-index: 10;
@@ -12,4 +12,5 @@
 
 .Drag span {
   font-size: 1rem;
+  white-space: nowrap;
 }

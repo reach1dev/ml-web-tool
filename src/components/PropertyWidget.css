@@ -63,7 +63,7 @@
   margin-left: 1.5rem
 }
 
-input {
+input, select {
   font: 400 1rem Arial;
 }
 
