@@ -6,7 +6,7 @@ import * as TransformAction from '../actions/TransformAction'
 import * as TrainerAction from '../actions/TrainerAction'
 import * as OptimizerAction from '../actions/OptimizerAction'
 import { IDS } from './ItemTypes'
-import { TransformParameters, AlgorithmTypes, Classification, Regression } from './TransformParameters'
+import { TransformParameters, AlgorithmTypes, Classification, Regression, Clustering } from './TransformParameters'
 import OptimizeWidget from './OptimizeWidget'
 import Spinner from './Spinner'
 import { TR_IDS } from './TransformationTools'
@@ -172,7 +172,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
       type: algorithmType,
       inputFilters: inputFilters,
       features: transform.inputParameters,
-      trainLabel: trainLabel,
+      trainLabel: AlgorithmTypes[algorithmType] !== Clustering ? trainLabel : '',
       tripleOptions: {
         up: tripleUp,
         down: tripleDown,
