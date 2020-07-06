@@ -11,7 +11,7 @@ const AreaColors = LineColors
 const round = x => Math.round((x + Number.EPSILON) * 100) / 100
 const GRAPH_COL = 6
 
-export default function({title, chart, width}) {
+export default function({title, chart, width, height}) {
   const [dotHide, setDotHide] = useState(true)
   const [showScatter, setShowScatter] = useState(false)
   const [columns] = useState(chart.data && chart.data.length > 0 ? Object.keys(chart.data[0]).filter((k) => k!=='undefined' && k!=='Date' && k !== 'Time' && k !== 'Main Parameter') : [])
@@ -204,8 +204,8 @@ export default function({title, chart, width}) {
           { _showTargetValues() }
         </div>
         <ContoursGraph
-          width={width}
-          height={300}
+          width={width-10}
+          height={height*1.2}
           contours={chart.contours}
           features={chart.features}
           showGraph={() => setShowContours(false)}
@@ -232,9 +232,9 @@ export default function({title, chart, width}) {
 
       { <ComposedChart
         width={width || 360}
-        height={390 - (Math.ceil(columns.length/GRAPH_COL))*24}
+        height={height+90 - (Math.ceil(columns.length/GRAPH_COL))*24}
         data={state.data}
-        style={{backgroundColor: 'white'}}
+        style={{backgroundColor: 'white', margin: 'auto'}}
         //onMouseDown={e => e && setState({ ...state, refAreaLeft: e.activeLabel })}
         //onMouseMove={e => e && state.refAreaLeft && setState({ ...state,  refAreaRight: e.activeLabel })}
         //onMouseUp={e => e && zoom()}

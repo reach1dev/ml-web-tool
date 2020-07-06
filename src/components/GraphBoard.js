@@ -8,7 +8,7 @@ import Spinner from './Spinner'
 import Graph from './Graph'
 import ConfusionMatrix from './ConfusionMatrix'
 
-function GraphBoard({charts, metrics, loading, width}) {
+function GraphBoard({charts, metrics, loading, width, height}) {
 
   const [selectedGraph, setSelectedGraph] = useState(0)
 
@@ -45,7 +45,7 @@ function GraphBoard({charts, metrics, loading, width}) {
     }
 
     return (
-      <div className='Graph' key={charts ? (charts.length + 1) : 0}>
+      <div className='Graph' style={{height: '100%', minHeight: 300, overflowY: 'scroll'}} key={charts ? (charts.length + 1) : 0}>
         <p style={{marginBottom: 6}}><b>{ meta && meta.title ? meta.title : 'Train Metrics'}</b></p>
         <div style={{overflowX: 'scroll', maxWidth: 560, backgroundColor: 'gray'}}>
           <div className='Table-Row'>
@@ -80,6 +80,7 @@ function GraphBoard({charts, metrics, loading, width}) {
             title={'Train & test comparison'}
             chart={selectedGraph >= 0 && charts[selectedGraph]}
             width={width}
+            height={height}
           />
           { charts.length > 1 ? (
             <div style={{display: 'flex', padding: 5, overflowX: 'scroll', maxWidth: width }}>

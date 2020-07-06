@@ -4,8 +4,12 @@
   background-color: grey;
   width: fit-content;
   padding: 4px;
-  font-size: 12px;
+  font-size: 1rem;
   color: white;
   z-index: 10;
   cursor: pointer;
+}
+
+.Drag span {
+  font-size: 1rem;
 }

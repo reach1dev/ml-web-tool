@@ -265,7 +265,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
   const _renderFeatureSelect = () => {
     const inputParameters = transform.inputParameters
     return (
-      <div className='Property-Item-Container' style={{maxHeight: 600, overflowY: 'scroll'}} key={1}>
+      <div className='Property-Item-Container columns' key={1}>
         <p className='Property-Item-Header'>
           <b>Select features</b> 
           {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
@@ -280,7 +280,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
   const _renderFeatures = () => {
     const params = Object.values(transform.outputParameters)
     return (
-      <div className='Property-Item-Container' style={{maxHeight: 600, overflowY: 'scroll'}} key={1}>      
+      <div className='Property-Item-Container columns' key={1}>      
         {/* <p className='Property-Item-Header'>
           <b>Add as Target</b> 
           <select value={targetColumn} onChange={e => setTargetColumn(e.target.value)}>
@@ -294,7 +294,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
           <b>Add as feature or target</b> 
           {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
         </p>
-        <div style={{overflowY: 'scroll', maxHeight: 200}}>
+        <div>
         { (params).map((param, idx) => (
           <div key={idx}><input type='checkbox' checked={filterChanged>0 && features[param]} onChange={(e) => changeFeature(param)} /> {param} </div>
         ))}
@@ -316,7 +316,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
   const _renderColumns2Transform = () => {
     const inputParameters = transform.inputParameters.filter((p, i) => p !== 'Date' && p !== 'Time')
     return (
-      <div className='Property-Item-Container' style={{maxHeight: 350, overflowY: 'scroll'}} key={5}>
+      <div className='Property-Item-Container columns' key={5}>
         <p className='Property-Item-Header'>
           <b>Columns to transform</b>
         </p>
@@ -326,7 +326,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
               <input type='checkbox' checked={filterChanged>0 && transform.outputParameters[param] !== undefined} onClick={()=>addOrRemoveOutputParam(param)} /> {param} 
             </div>
             { transform.outputParameters[param] !== undefined ? 
-              <input type="text" style={param.length > 6 ? {textAlign: "right", marginLeft: 20} : {width: 120}} value={transform.outputParameters[param]} 
+              <input type="text" className={param.length > 6 ? 'input-right' : 'input-normal'} value={transform.outputParameters[param]} 
                 onChange={(e)=>changeOutputParam(param, e.target.value)}  /> : null}
           </p>
         ))}
@@ -466,7 +466,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
 
   const _renderTargetParam = () => {
     return (
-      <div className='Property-Item-Container' key={3}>
+      <div className='Property-Item-Container columns' key={3}>
         <p className='Property-Item-Header'>
           <b>Select Target</b> 
         </p>

@@ -9,7 +9,7 @@
 
 .Board-Left {
   max-width: 1024px;
-  min-width: 768px;
+  min-width: 72rem;
   display: flex;
   flex-direction: column;
 }
@@ -17,7 +17,6 @@
 .Board-Scroll {
   background-color: lightgray;
   height: 100%;
-  overflow-x: scroll;
 }
 
 .Board-Col {
@@ -38,4 +37,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 8rem;
+}
+
+.Component .comp_start {
+  margin-top: 0.6rem;
+  margin-left: 0.2rem;
+}
+
+.Component .comp_end {
+  display: flex;
+  margin-top: 0.6rem;
+  margin-left: 0.3rem;
 }

@@ -21,7 +21,7 @@ export default function DataView({title, data, columns, showGraph}) {
           <input type='button' onClick={() => showGraph()} value='Show graph' />
         </span>
       </div>
-      <div style={{height: 400, maxWidth: 550, overflow: 'scroll'}}>
+      <div style={{height: 400, maxWidth: 550, overflow: 'scroll', margin: 'auto'}}>
         <table style={{backgroundColor: '#eee', width: '99%', marginTop: 10}}>
           <thead>
             {columns.map(c => (

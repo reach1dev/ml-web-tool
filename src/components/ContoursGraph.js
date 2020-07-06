@@ -23,7 +23,7 @@ export default function({contours, features, showGraph, width, height}) {
   const colors = ['red', 'blue', 'green']
   const points = contours.map((c) => {
     return c.map((xy) => {
-      return [xy[1]*(width-60)/100+65, -xy[0]*(height-30)/100+265]
+      return [xy[1]*(width-60)/100+65, -xy[0]*(height-30)/100+height-35]
     })
   })
 

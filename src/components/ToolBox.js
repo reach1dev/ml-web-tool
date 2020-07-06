@@ -9,7 +9,7 @@ export default function renderToolBox({tools, toolSelector, showProperties}) {
         <b>ToolBox</b>
         { showProperties !== null && <b style={{cursor: 'pointer'}} onClick={()=>showProperties()}>Show Properties</b> }
       </div>
-      <div className='ToolBox-ScrollView'>
+      <div>
         <div className='ToolBox-Container'>
           { tools.map((tool, idx) => idx<=9 && tool.transform && (
             <DragNode
@@ -19,7 +19,7 @@ export default function renderToolBox({tools, toolSelector, showProperties}) {
               fixed={false}
               dragHandler={(id) => toolSelector(tool)}
             >
-              <span style={{fontSize: 12}}>{tool.name}</span>
+              <span>{tool.name}</span>
             </DragNode>
           ))}
         </div>
@@ -33,7 +33,7 @@ export default function renderToolBox({tools, toolSelector, showProperties}) {
               fixed={false}
               dragHandler={(id) => toolSelector(tool)}
             >
-              <span style={{fontSize: 12}}>{tool.name}</span>
+              <span>{tool.name}</span>
             </DragNode>
           ))}
         </div>

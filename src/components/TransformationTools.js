@@ -23,7 +23,7 @@ export const TransformationTools = [{
   transform: false
 }, {
   id: TR_IDS.MLAlgorithm,
-  shortName: 'ML Algorithm',
+  shortName: 'Trainer',
   functionName: 'MLA',
   transform: false,
   plusIcon: false,

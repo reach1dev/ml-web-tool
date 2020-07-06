@@ -18,7 +18,7 @@ const initialState = {
   }, {
     id: IDS.MLAlgorithm,
     index: 1,
-    tool: {shortName: 'ML Algorithm', plusIcon: false, id: IDS.MLAlgorithm},
+    tool: {shortName: 'Trainer', plusIcon: false, id: IDS.MLAlgorithm},
     x: 6,
     y: 5,
     inputParameters: [],

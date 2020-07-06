@@ -5,9 +5,9 @@
 
 .confusion-matrix th, .confusion-matrix td {
   text-align: center; 
-  font-size: 14px;
+  font-size: 1.2rem;
   color: white;
-  padding: 4px;
+  padding: 0.3rem;
   border-left: solid #eee 1px;
   border-top: solid #eee 1px;
 }

@@ -16,7 +16,7 @@ import { bindActionCreators } from 'redux'
 import * as TransformAction from '../actions/TransformAction'
 import { TransformParameters } from './TransformParameters'
 
-let width = 12
+let width = 9
 let height = Math.floor((window.innerHeight-200)/50)
 
 
@@ -53,15 +53,15 @@ function renderGridItem(i, dragItems, moveDragNode, setDragNode, checkDraggable,
 
 function getComponent({shortName, plusIcon}, id) {
   return () => (
-    <div className={'Component'} style={{width: 108}}>
-      <span className={'comp_start_' + id} style={{marginTop: 12, marginLeft: 4}}>
+    <div className={'Component'}>
+      <span className={'comp_start comp_start_' + id}>
       </span>
       { (plusIcon!==undefined ? !plusIcon:false) && 
-        <span style={{marginTop: 4, marginRight: 4}}><MaterialIcon icon='add_circle_outline' size={14} color='white' ></MaterialIcon></span>
+        <span style={{marginTop: 4, marginRight: 4}}><MaterialIcon icon='add_circle_outline' size={11} color='white' ></MaterialIcon></span>
       }
       <span>{shortName}</span>
-      <span className={'comp_end_' + id} style={{display: 'flex', marginTop: 8, marginLeft: 4}}>
-        { (plusIcon!==undefined ? plusIcon:true) && <MaterialIcon icon='add_circle_outline' size={15} color='white' ></MaterialIcon> }
+      <span className={'comp_end comp_end_' + id}>
+        { (plusIcon!==undefined ? plusIcon:true) && <MaterialIcon icon='add_circle_outline' size={12} color='white' ></MaterialIcon> }
       </span>
     </div>
   )
@@ -72,7 +72,18 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
   let dragNodeId = -1
   let selectedTool = null
   const [propertiesHide, setPropertiesHide] = useState(false)
-  const [graphWidth, setGraphWidth] = useState(550)
+  const [graphWidth, setGraphWidth] = useState(window.innerWidth * 0.28)
+  const [graphHeight, setGraphHeight] = useState(window.innerHeight * 0.24)
+
+  function handleResize() {
+    setGraphWidth(window.innerWidth*(propertiesHide ? 0.5 : 0.28 ))
+    setGraphHeight(window.innerHeight*0.24)
+  }
+
+  useEffect(() => {    
+    window.addEventListener('resize', handleResize)
+  }, [])
+  
 
   const forceUpdate = () => {
     setStatus(status+1)
@@ -238,7 +249,7 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
   }
 
   const hideProperties = (hide) => {
-    setGraphWidth(hide ? 810 : 550)
+    setGraphWidth(hide ? 600 : 400)
     setPropertiesHide(hide)
   }
 
@@ -265,7 +276,7 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
   const tools = TransformationTools
   
   useEffect(() => {
-    // transformAction.clearTransforms()
+    //transformAction.clearTransforms()
     forceUpdate()
   }, [transforms])
 
@@ -286,7 +297,7 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
   const selParentTransform = selParentTransforms.length > 0 ? selParentTransforms[0] : null
 
   return (
-    <div className='Board'>
+    <div className='Board' >
       <DndProvider backend={Backend}>
         <div className='Board-Left'>
           <ToolBox tools={tools} toolSelector={selectTool} showProperties={() => hideProperties(!propertiesHide)}></ToolBox>
@@ -317,10 +328,11 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
         </div>
       </DndProvider>
       <PropertyWidget hide={propertiesHide} setHide={hideProperties}></PropertyWidget>
-      <GraphBoard 
+      <GraphBoard
         transform={selectedTransform}
         parentTransform={selParentTransform}
         loading={getTransformLoading} 
+        height={graphHeight}
         width={graphWidth}></GraphBoard>
     </div>
   )

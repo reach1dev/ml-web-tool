@@ -1,5 +1,25 @@
 html, body {
   height: 100%;
+  font-size: 12px;
+  overflow: hidden;
+}
+
+@media (max-width: 1750px) {
+  html {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 1560px) {
+  html {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 1024px) {
+  html {
+    font-size: 9px;
+  }
 }
 
 body {
