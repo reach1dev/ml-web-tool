@@ -67,6 +67,11 @@ input, select, button {
   font: 400 1rem Arial;
 }
 
+input[type='checkbox'] {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
 p {
   margin-top: 0.3rem;
 }
