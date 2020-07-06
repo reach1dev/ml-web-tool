@@ -76,7 +76,7 @@ export const getTrainResult = async ({fileId, transforms, algParams}) => {
     data = data.reverse()
   }
   data.forEach((res_data) => {
-    const [graph, metric] = res_data
+    const [graph, metric, confusionMatrix, contours, features] = res_data
     let columns = graph.map((g, idx) => getColumns(
       algParams.type, 
       transforms[1].inputParameters, idx, 
@@ -88,7 +88,11 @@ export const getTrainResult = async ({fileId, transforms, algParams}) => {
     }
 
     const chart = parseGraphList(algParams.type, graph, columns1, algParams)
-    charts.push(chart)
+    charts.push({
+      ...chart,
+      contours: contours,
+      features: features
+    })
 
     if (overviewChart === null) {
       overviewChart = JSON.parse(JSON.stringify(chart))
@@ -107,12 +111,20 @@ export const getTrainResult = async ({fileId, transforms, algParams}) => {
     const meta = getMetricMeta(algParams.type, algParams.features.filter((_,idx) => algParams.inputFilters[idx]), algParams)
     metrics.push({
       data: metric,
+      confusion: confusionMatrix.length > 0 ? confusionMatrix : null,
       meta: meta
     })
 
     if (overviewMetric === null) {
       overviewMetric = JSON.parse(JSON.stringify(metrics[0]))
     } else {
+      confusionMatrix.forEach((r, i) => {
+        r.forEach((c, j) => {
+          let a = overviewMetric.confusion[i][j]
+          let b = confusionMatrix[i][j]
+          overviewMetric.confusion[i][j] = a + b
+        })
+      })
       metric.forEach((r, i) => {
         r.forEach((c, j) => {
           let a = overviewMetric.data[i][j]

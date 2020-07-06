@@ -6,6 +6,7 @@ import { bindActionCreators } from 'redux'
 import * as TransformAction from '../actions/TransformAction'
 import Spinner from './Spinner'
 import Graph from './Graph'
+import ConfusionMatrix from './ConfusionMatrix'
 
 function GraphBoard({charts, metrics, loading, width}) {
 
@@ -28,13 +29,24 @@ function GraphBoard({charts, metrics, loading, width}) {
     if (metrics === undefined || metrics.length === 0) {
       return null
     }
-    const {data, meta} = metrics[selectedGraph]
+    const {data, meta, confusion} = metrics[selectedGraph]
     if (data === undefined || meta === undefined) {
       return null
     }
+    const labels = []
+    if (confusion !== null) {
+      charts[selectedGraph].data.forEach(d => {
+        const t = d['Target']
+        if (labels.indexOf(t) < 0) {
+          labels.push(t)
+        }
+      })
+      labels.sort()
+    }
+
     return (
       <div className='Graph' key={charts ? (charts.length + 1) : 0}>
-        <p><b>{ meta && meta.title ? meta.title : 'Train Metrics'}</b></p>
+        <p style={{marginBottom: 6}}><b>{ meta && meta.title ? meta.title : 'Train Metrics'}</b></p>
         <div style={{overflowX: 'scroll', maxWidth: 560, backgroundColor: 'gray'}}>
           <div className='Table-Row'>
             <span className='Table-Head'>{ meta ? meta.main : (data.length === 1 ? 'Metric Type' : 'Cluster')}</span>
@@ -51,6 +63,7 @@ function GraphBoard({charts, metrics, loading, width}) {
             </div>
           ))}
         </div>
+        { confusion ? <ConfusionMatrix confusion={confusion} labels={labels}></ConfusionMatrix> : null}
       </div>
     )
   }

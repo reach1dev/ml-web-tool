@@ -1,0 +1,13 @@
+.confusion-matrix table {
+  width: 100%;
+  background-color: gray;
+}
+
+.confusion-matrix th, .confusion-matrix td {
+  text-align: center; 
+  font-size: 14px;
+  color: white;
+  padding: 4px;
+  border-left: solid #eee 1px;
+  border-top: solid #eee 1px;
+}

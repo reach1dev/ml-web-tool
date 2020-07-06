@@ -3,6 +3,7 @@ import './GraphBoard.css'
 import { ComposedChart, Scatter, XAxis, YAxis, Tooltip, CartesianGrid, Line, ReferenceArea, ScatterChart } from 'recharts'
 import moment from 'moment'
 import DataView from './DataView'
+import ContoursGraph from './ContoursGraph'
 
 const LineColors = ['#ffa600','#f95d6a', '#a05195', '#ff7c43', '#003f5c', '#665191']
 const AreaColors = LineColors
@@ -21,6 +22,7 @@ export default function({title, chart, width}) {
   const [yAxisName2, setYAxisName2] = useState(columns[columns.length-1] ? columns[columns.length-1].startsWith('C-') ? '' : columns[columns.length-1] : '')
 
   const [showData, setShowData] = useState(false)
+  const [showContours, setShowContours] = useState(false)
 
   console.log(JSON.stringify(columns))
   const getAxisYDomain = () => {
@@ -194,12 +196,34 @@ export default function({title, chart, width}) {
     return null
   }
 
+  if (showContours) {
+    return (
+      <div className='Graph' style={{marginBottom: 4, height: 'fit-content', alignItems: 'stretch'}}>
+        <div style={{paddingBottom: 10}}>
+          <b>Target values :</b>
+          { _showTargetValues() }
+        </div>
+        <ContoursGraph
+          width={width}
+          height={300}
+          contours={chart.contours}
+          features={chart.features}
+          showGraph={() => setShowContours(false)}
+        ></ContoursGraph>
+      </div>
+    )
+  }
+
   return (
     <div className='Graph' style={{marginBottom: 4, height: 'fit-content', alignItems: 'stretch'}}>
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12}}>
         <b>{chart.title || title}</b>
         { (showZoomOut) ? <input type='button' onClick={() => zoomOut()} value='Zoom out' /> : null }
-        <input type='button' onClick={() => showValues()} value='Show values' />
+        <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+          <input type='button' onClick={() => showValues()} value='Show values' />
+          { chart.contours && chart.contours.length > 0 &&
+            <input style={{marginLeft: 10}} type='button' onClick={() => setShowContours(true)} value='Show decision boundaries' /> }
+        </div>
       </div>
       <div style={{paddingBottom: 10}}>
         <b>Target values :</b>
