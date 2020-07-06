@@ -59,7 +59,7 @@ export const getColumns = (algType, featureColumns, colIdx, extra = false) => {
       return (colIdx === 0 ? 'Target' : 'Prediction')
     }
   } else if (algType === 0) {
-    return 'C-' + colIdx
+    return 'C-' + (colIdx+1)
   }
 }
 
