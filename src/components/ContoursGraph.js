@@ -1,7 +1,7 @@
 import React from 'react'
 import { ComposedChart, Scatter, XAxis, YAxis, ZAxis, ReferenceArea, Legend, Rectangle } from 'recharts'
 
-export default function({contours, features, showGraph, width, height}) {
+export default function({contours, features, showGraph, width, height, targets}) {
 
   const labels = ['x', 'y']
   const data = features.map((feature) => {
@@ -72,7 +72,7 @@ export default function({contours, features, showGraph, width, height}) {
 
         { data.map((features, idx) => (
           <Scatter
-            name={'' + (data.length === 3 ? (idx-1) : (idx===0? -1 : 1))}
+            name={'' + Object.keys(targets)[idx]}
             fill={colors[idx%colors.length]}
             data={features}
           ></Scatter>

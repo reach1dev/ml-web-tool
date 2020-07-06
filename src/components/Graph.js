@@ -175,6 +175,25 @@ export default function({title, chart, width, height}) {
     )
   }
 
+  const getTargets = () => {
+    if (columns[0] === 'Target') {
+      let counts = {}
+      state.data.forEach(d => {
+        const t = d['Target']
+        if (typeof counts[t] === 'undefined') {
+          counts[t] = 1
+        } else {
+          counts[t] = counts[t] + 1
+        }
+      })
+      if (Object.keys(counts).length > 4) {
+        return null
+      }
+      return counts
+    }
+    return null
+  }
+
   const _showTargetValues = () => {
     if (columns[0] === 'Target') {
       let counts = {}
@@ -197,13 +216,17 @@ export default function({title, chart, width, height}) {
   }
 
   if (showContours) {
+    const targets = getTargets()
     return (
       <div className='Graph' style={{marginBottom: 4, height: 'fit-content', alignItems: 'stretch'}}>
         <div style={{paddingBottom: 10}}>
           <b>Target values :</b>
-          { _showTargetValues() }
+          { Object.keys(targets).map((val, idx) => (
+            <span style={{marginRight: 20, marginLeft: 20}}>{val} - {(targets[val] / state.data.length * 100).toFixed(2)}%</span>
+          )) }
         </div>
         <ContoursGraph
+          targets={targets}
           width={width-10}
           height={height*1.4}
           contours={chart.contours}
