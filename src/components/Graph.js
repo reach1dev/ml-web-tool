@@ -221,7 +221,7 @@ export default function({title, chart, width, height}) {
       <div className='Graph' style={{marginBottom: 4, height: 'fit-content', alignItems: 'stretch'}}>
         <div style={{paddingBottom: 10}}>
           <b>Target values :</b>
-          { Object.keys(targets).map((val, idx) => (
+          { targets && Object.keys(targets).map((val, idx) => (
             <span style={{marginRight: 20, marginLeft: 20}}>{val} - {(targets[val] / state.data.length * 100).toFixed(2)}%</span>
           )) }
         </div>
@@ -244,8 +244,8 @@ export default function({title, chart, width, height}) {
         { (showZoomOut) ? <input type='button' onClick={() => zoomOut()} value='Zoom out' /> : null }
         <div style={{display: 'flex', justifyContent: 'flex-end'}}>
           <input type='button' onClick={() => showValues()} value='Show values' />
-          { chart.contours && chart.contours.length > 0 &&
-            <input style={{marginLeft: 10}} type='button' onClick={() => setShowContours(true)} value='Show decision boundaries' /> }
+          { chart.features && chart.features.length > 0 &&
+            <input style={{marginLeft: 10}} type='button' onClick={() => setShowContours(true)} value={chart.contours.length > 0 ? 'Show decision boundaries' : 'Show scatters'}  /> }
         </div>
       </div>
       <div style={{paddingBottom: 10}}>

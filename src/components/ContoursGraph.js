@@ -20,7 +20,7 @@ export default function({contours, features, showGraph, width, height, targets})
   //     }
   //   })
   // })
-  const colors = ['red', 'blue', 'green']
+  const colors = ['red', 'blue', 'green', 'yellow', 'gray', 'pink', 'black']
   const points = contours.map((c) => {
     return c.map((xy) => {
       return [xy[1]*(width-60)/100+65, -xy[0]*(height-30)/100+height-50]
@@ -72,7 +72,7 @@ export default function({contours, features, showGraph, width, height, targets})
 
         { data.map((features, idx) => (
           <Scatter
-            name={'' + Object.keys(targets)[idx]}
+            name={targets ? ('' + Object.keys(targets)[idx]) : ('' + (idx+1))}
             fill={colors[idx%colors.length]}
             data={features}
           ></Scatter>
