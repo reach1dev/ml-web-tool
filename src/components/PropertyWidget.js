@@ -172,7 +172,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
       type: algorithmType,
       inputFilters: inputFilters,
       features: transform.inputParameters,
-      trainLabel: AlgorithmTypes[algorithmType] !== Clustering ? trainLabel : '',
+      trainLabel: trainLabel,//AlgorithmTypes[algorithmType] !== Clustering ? trainLabel : '',
       tripleOptions: {
         up: tripleUp,
         down: tripleDown,
