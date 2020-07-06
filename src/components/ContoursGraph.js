@@ -38,7 +38,7 @@ export default function({contours, features, showGraph, width, height}) {
         style={{backgroundColor: '#eee', paddingTop: 20, paddingRight: 20}}
          width={width} height={height}
       >
-        <ReferenceArea x1={0} x2={1} y1={0} y2={1} style={{backgroundColor: 'blue'}} />
+        {/* <ReferenceArea x1={0} x2={1} y1={0} y2={1} style={{backgroundColor: 'blue'}} /> */}
         <XAxis 
           dataKey={labels[0]} 
           type='number'
