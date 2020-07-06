@@ -205,7 +205,7 @@ export default function({title, chart, width, height}) {
         </div>
         <ContoursGraph
           width={width-10}
-          height={height*1.2}
+          height={height*1.4}
           contours={chart.contours}
           features={chart.features}
           showGraph={() => setShowContours(false)}
