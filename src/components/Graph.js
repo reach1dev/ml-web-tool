@@ -12,6 +12,11 @@ const round = x => Math.round((x + Number.EPSILON) * 100) / 100
 const GRAPH_COL = 6
 
 export default function({title, chart, width, height}) {
+
+  if (chart === null) {
+    return null
+  }
+
   const [dotHide, setDotHide] = useState(true)
   const [showScatter, setShowScatter] = useState(false)
   const [columns] = useState(chart.data && chart.data.length > 0 ? Object.keys(chart.data[0]).filter((k) => k!=='undefined' && k!=='Date' && k !== 'Time' && k !== 'Main Parameter') : [])

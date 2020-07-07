@@ -95,18 +95,20 @@ export const getTrainResult = async ({fileId, transforms, algParams}) => {
       columns: algParams.features.filter((i, j) => algParams.inputFilters[j])
     })
 
-    if (overviewChart === null) {
-      overviewChart = JSON.parse(JSON.stringify(chart))
-    } else {
-      Object.keys(chart.mins).forEach(c => {
-        if (chart.mins[c] < overviewChart.mins[c]) {
-          overviewChart.mins[c] = chart.mins[c]
-        }
-        if (chart.maxes[c] < overviewChart.maxes[c]) {
-          overviewChart.maxes[c] = chart.maxes[c]
-        }
-      })
-      overviewChart.data = overviewChart.data.concat(chart.data)
+    if (algParams.type > 0) {
+      if (overviewChart === null) {
+        overviewChart = JSON.parse(JSON.stringify(chart))
+      } else {
+        Object.keys(chart.mins).forEach(c => {
+          if (chart.mins[c] < overviewChart.mins[c]) {
+            overviewChart.mins[c] = chart.mins[c]
+          }
+          if (chart.maxes[c] < overviewChart.maxes[c]) {
+            overviewChart.maxes[c] = chart.maxes[c]
+          }
+        })
+        overviewChart.data = overviewChart.data.concat(chart.data)
+      }
     }
 
     const meta = getMetricMeta(algParams.type, algParams.features.filter((_,idx) => algParams.inputFilters[idx]), algParams)

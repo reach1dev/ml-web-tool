@@ -10,10 +10,10 @@ import ConfusionMatrix from './ConfusionMatrix'
 
 function GraphBoard({charts, metrics, loading, width, height}) {
 
-  const [selectedGraph, setSelectedGraph] = useState(0)
+  const [selectedGraph, setSelectedGraph] = useState(charts.length > 1 && charts[0] === null ? 1 : 0)
 
   useEffect(() => {
-    setSelectedGraph(0)
+    setSelectedGraph(charts.length > 1 && charts[0] === null ? 1 : 0)
   }, [loading])
 
   const [selClass, setSelClass] = useState(0)
@@ -100,7 +100,7 @@ function GraphBoard({charts, metrics, loading, width, height}) {
             <div style={{display: 'flex', padding: 5, overflowX: 'scroll', maxWidth: width }}>
             <div style={{display: 'flex',  width: 'fit-content'}}>{
               charts.map((c, idx) => (
-                <input type='button' style={{marginLeft: 10, marginRight: 10}}
+                <input type='button' style={charts[idx] === null ? {display: 'none'} : { marginLeft: 10, marginRight: 10}}
                   onClick={() => setSelectedGraph(idx%charts.length)} value={idx === 0 ? 'Overview' : ('kFold-' + (idx))} />
               ))
             }</div>
