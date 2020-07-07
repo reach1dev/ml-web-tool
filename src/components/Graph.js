@@ -28,7 +28,7 @@ export default function({title, chart, width, height}) {
     if (columns.length === 0) {
       return ['', '', []]
     }
-    if (columns[0].startsWith('C-')) {
+    if (columns[0].startsWith('C-') || columns[0].startsWith('Target')) {
       return ['', '' , []]
     }
     var ranges = [];
@@ -267,7 +267,7 @@ export default function({title, chart, width, height}) {
           type="number"
           yAxisId="1"
         />
-        { (state.bottom2 !== state.top2) && <YAxis
+        {state.bottom2 !== state.top2 && <YAxis
           allowDataOverflow={true}
           orientation='right'
           domain={[round(state.bottom2-delta2), round(state.top2+delta2)]}
@@ -282,7 +282,7 @@ export default function({title, chart, width, height}) {
             dot={!dotHide}
             fill={'url(#' + col +')'}
             stroke={LineColors[idx%LineColors.length]}
-            yAxisId={columns[idx].startsWith('C-') ? 1 : (yAxis4Cols[col] ? 1 : 2)}></Line>
+            yAxisId={columns[idx].startsWith('C-') || columns[0].startsWith('Target')  ? 1 : (yAxis4Cols[col] ? 1 : 2)}></Line>
         )) }
         { (state.refAreaLeft && state.refAreaRight) ? (
             <ReferenceArea yAxisId="1" x1={state.refAreaLeft} x2={state.refAreaRight} stopColor="blue" strokeOpacity={0.3} /> ) : null
