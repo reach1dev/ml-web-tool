@@ -1,7 +1,7 @@
 import React from 'react'
-import { ComposedChart, Scatter, XAxis, YAxis, ZAxis, ReferenceArea, Legend, Rectangle } from 'recharts'
+import { ComposedChart, Scatter, XAxis, YAxis, ZAxis, ReferenceArea, Legend, Rectangle, Tooltip, Label } from 'recharts'
 
-export default function({contours, features, showGraph, width, height, targets}) {
+export default function({contours, features, showGraph, columns, colors, width, height, targets}) {
 
   const labels = ['x', 'y']
   const data = features.map((feature) => {
@@ -20,7 +20,7 @@ export default function({contours, features, showGraph, width, height, targets})
   //     }
   //   })
   // })
-  const colors = ['red', 'blue', 'green', 'yellow', 'gray', 'pink', 'black']
+  //const colors = ['red', 'blue', 'green', 'yellow', 'gray', 'pink', 'black']
   const points = contours.map((c) => {
     return c.map((xy) => {
       return [xy[1]*(width-60)/100+65, -xy[0]*(height-30)/100+height-50]
@@ -47,19 +47,23 @@ export default function({contours, features, showGraph, width, height, targets})
         <XAxis 
           dataKey={labels[0]} 
           type='number'
-          name={labels[0]} />
+          name={labels[0]} >
+          <Label value={columns[0]} offset={0} position="insideBottomRight" />
+        </XAxis>
         <YAxis 
           dataKey={labels[1]} 
           type='number'
-          name={labels[1]} />
+          name={labels[1]} >          
+          <Label value={columns[1]} offset={0} angle={90} position="topLeft" />
+        </YAxis>
 
-        <polygon
+        { contours.length > 0 &&  <polygon
           fillOpacity={0.3}
           fill={colors[1]}
           points={[[left,top], [right,top], [right, bottom], [left, bottom]]}
         >
 
-        </polygon>
+        </polygon> }
 
         { points.map((pts, idx) => (
           <polygon 
@@ -79,6 +83,7 @@ export default function({contours, features, showGraph, width, height, targets})
         ))}
 
         <Legend></Legend>
+        <Tooltip></Tooltip>
       </ComposedChart>
     </div>
   )

@@ -9,6 +9,9 @@ export default function DataView({title, data, columns, showGraph}) {
     if (typeof d['Date'] !== 'undefined') {
       k['Date'] = moment(d['Date']).format('MM/DD/YYYY')
     }
+    if (columns[0] === 'No.') {
+      k['No.'] = (idx+1)
+    }
     return k
   })
   return (
@@ -34,7 +37,7 @@ export default function DataView({title, data, columns, showGraph}) {
               <tr className='row'>
                 {
                   columns.map(c => (
-                    <td style={{minWidth: 50}}>{typeof row[c] === 'number' ? row[c].toFixed(4) : row[c]}</td>
+                    <td style={{minWidth: c === 'No.' ? 30 : 50}}>{c === 'No.' ? row[c] : typeof row[c] === 'number' ? row[c].toFixed(4) : row[c]}</td>
                   ))
                 }
               </tr>

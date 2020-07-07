@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import './GraphBoard.css'
 import { ComposedChart, Scatter, XAxis, YAxis, Tooltip, CartesianGrid, Line, ReferenceArea, ScatterChart } from 'recharts'
-import moment from 'moment'
+import moment, { min } from 'moment'
 import DataView from './DataView'
 import ContoursGraph from './ContoursGraph'
 
@@ -26,6 +26,9 @@ export default function({title, chart, width, height}) {
 
   console.log(JSON.stringify(columns))
   const getAxisYDomain = () => {
+    if (columns[0].startsWith('C-')) {
+      return ['', '' , []]
+    }
     var ranges = [];
     columns.forEach((col, idx) => {
       if (!hideArray[idx]) {
@@ -55,8 +58,8 @@ export default function({title, chart, width, height}) {
 
   const [firstCol, secondCol, yAxis4Cols] = getAxisYDomain()
   if (firstCol === 0) { return null }
-  const [ bottom, top ] = [chart.mins[firstCol], chart.maxes[firstCol]]
-  const [ bottom2, top2 ] = [chart.mins[secondCol], chart.maxes[secondCol]]
+  const [ bottom, top ] = firstCol === '' ? [Object.keys(chart.mins).reduce((m, k) => m<chart.mins[k]?m:chart.mins[k]), Object.keys(chart.maxes).reduce((m, k) => m>chart.maxes[k]?m:chart.maxes[k])] : [chart.mins[firstCol], chart.maxes[firstCol]]
+  const [ bottom2, top2 ] = secondCol === '' ? [0, 0] : [chart.mins[secondCol], chart.maxes[secondCol]]
   
   const initialState = {
     data: chart.data,
@@ -72,45 +75,12 @@ export default function({title, chart, width, height}) {
     animation: true,
   }
   const [state, setState] = useState(initialState)
-
-  const zoom = () => {
-    let { refAreaLeft, refAreaRight, data } = state;
-
-		if ( refAreaLeft === refAreaRight || refAreaRight === '' ) {
-    	setState( () => ({
-        ...state,
-      	refAreaLeft : '',
-        refAreaRight : ''
-      }) );
-      //setShowZoomOut(false)
-    	return;
-    }
-    setShowZoomOut(true)
-
-		// xAxis domain
-	  if ( refAreaLeft > refAreaRight ) 
-    		[ refAreaLeft, refAreaRight ] = [ refAreaRight, refAreaLeft ];
-
-    // yAxis domain
-    const [ bottom, top ] = getAxisYDomain( refAreaLeft, refAreaRight, yAxisName, 1 );
-    const [ bottom2, top2 ] = getAxisYDomain( refAreaLeft, refAreaRight, yAxisName2, 1 );
-    
-    setState( () => ({
-      ...state,
-      refAreaLeft : '',
-      refAreaRight : '',
-    	data : data.slice(),
-      left : refAreaLeft,
-      right : refAreaRight,
-      bottom, top,
-      bottom2, top2
-    } ) );
-  }
+  
 
   const zoomOut = () => {
     const [ firstCol, secondCol, yAxis4Cols ] = getAxisYDomain()
-    const [ bottom, top ] = [chart.mins[firstCol], chart.maxes[firstCol]]
-    const [ bottom2, top2 ] = [chart.mins[secondCol], chart.maxes[secondCol]] 
+    const [ bottom, top ] = firstCol === '' ? [Object.keys(chart.mins).reduce((m, k) => m<chart.mins[k]?m:chart.mins[k]), Object.keys(chart.maxes).reduce((m, k) => m>chart.maxes[k]?m:chart.maxes[k])] : [chart.mins[firstCol], chart.maxes[firstCol]]
+    const [ bottom2, top2 ] = secondCol === '' ? [0, 0] : [chart.mins[secondCol], chart.maxes[secondCol]]
     setState({
       ...initialState,
       yAxis4Cols,
@@ -162,6 +132,8 @@ export default function({title, chart, width, height}) {
       newCols = ['Date', ...columns]
     } else if (Object.keys(chart.data[0]).indexOf('Main Parameter') >= 0) {
       newCols = ['Main Parameter', ...columns]
+    } else {
+      newCols = ['No.', ...columns]
     }
     return (
       <div className='Graph' style={{marginBottom: 4, height: 'fit-content', alignItems: 'stretch'}}>
@@ -228,6 +200,8 @@ export default function({title, chart, width, height}) {
         <ContoursGraph
           targets={targets}
           width={width-10}
+          colors={LineColors}
+          columns={chart.columns || ['x', 'y']}
           height={height*1.4}
           contours={chart.contours}
           features={chart.features}
@@ -285,13 +259,13 @@ export default function({title, chart, width, height}) {
           type="number"
           yAxisId="1"
         />
-        <YAxis
+        { (state.bottom2 !== state.top2) && <YAxis
           allowDataOverflow={true}
           orientation='right'
           domain={[round(state.bottom2-delta2), round(state.top2+delta2)]}
           type="number"
           yAxisId="2"
-        />
+        /> }
         <Tooltip labelFormatter={showDate ? formatXAxis : null} />
         { columns.map((col, idx) => (
           <Line key={idx} type="monotone" 

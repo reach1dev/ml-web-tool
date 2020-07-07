@@ -83,7 +83,7 @@ export const getTrainResult = async ({fileId, transforms, algParams}) => {
       algParams
     ))
     let columns1 = columns
-    if (AlgorithmTypes[algParams.type] === Classification || AlgorithmTypes[algParams.type] === Clustering || AlgorithmTypes[algParams.type] === Regression) {
+    if (AlgorithmTypes[algParams.type] === Classification || AlgorithmTypes[algParams.type] === Regression) {
       columns1 = ['Date', ...columns]
     }
 
@@ -91,7 +91,8 @@ export const getTrainResult = async ({fileId, transforms, algParams}) => {
     charts.push({
       ...chart,
       contours: contours,
-      features: features
+      features: features,
+      columns: algParams.features.filter((i, j) => algParams.inputFilters[j])
     })
 
     if (overviewChart === null) {
