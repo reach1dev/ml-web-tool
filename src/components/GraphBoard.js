@@ -57,7 +57,7 @@ function GraphBoard({charts, metrics, loading, width, height}) {
             <div key={idx} className='Table-Row'>
               <span className='Table-Head'>{meta !== null ? meta.rows[idx] : data.length === 1 ? 'Score' : 'C-' + (idx+1)}</span>
               { Array.isArray(tr) && tr.map((td, j) => (
-                <span key={j} className='Table-Cell'>{parseFloat(td).toFixed(4)}</span>
+                <span key={j} className='Table-Cell'>{typeof td !== 'number' ? parseFloat(td[td.length-1]) : parseFloat(td).toFixed(4)}</span>
               ))}
               { meta && meta.columns.length === 1 ? <span className='Table-Cell' /> : null}
             </div>

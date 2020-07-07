@@ -15,7 +15,7 @@ export default function({title, chart, width, height}) {
   const [dotHide, setDotHide] = useState(true)
   const [showScatter, setShowScatter] = useState(false)
   const [columns] = useState(chart.data && chart.data.length > 0 ? Object.keys(chart.data[0]).filter((k) => k!=='undefined' && k!=='Date' && k !== 'Time' && k !== 'Main Parameter') : [])
-  const [showDate, setShowDate] = useState(Object.keys(chart.data[0]).indexOf('Date') >= 0 ? true : false)
+  const [showDate, setShowDate] = useState(chart.data.length > 0 && Object.keys(chart.data[0]).indexOf('Date') >= 0 ? true : false)
   const [hideArray] = useState(columns.map((col) => false))
   const [showZoomOut, setShowZoomOut] = useState(false)
   const [yAxisName, setYAxisName] = useState(columns[0] ? columns[0].startsWith('C-') ? '' : columns[0] :'')
@@ -24,8 +24,10 @@ export default function({title, chart, width, height}) {
   const [showData, setShowData] = useState(false)
   const [showContours, setShowContours] = useState(false)
 
-  console.log(JSON.stringify(columns))
   const getAxisYDomain = () => {
+    if (columns.length === 0) {
+      return ['', '', []]
+    }
     if (columns[0].startsWith('C-')) {
       return ['', '' , []]
     }
@@ -58,7 +60,10 @@ export default function({title, chart, width, height}) {
 
   const [firstCol, secondCol, yAxis4Cols] = getAxisYDomain()
   if (firstCol === 0) { return null }
-  const [ bottom, top ] = firstCol === '' ? [Object.keys(chart.mins).reduce((m, k) => m<chart.mins[k]?m:chart.mins[k]), Object.keys(chart.maxes).reduce((m, k) => m>chart.maxes[k]?m:chart.maxes[k])] : [chart.mins[firstCol], chart.maxes[firstCol]]
+  const [ bottom, top ] = firstCol === '' ? [
+    Object.keys(chart.mins).reduce((m, k) => (m === null || m>chart.mins[k])?chart.mins[k]:m, null), 
+    Object.keys(chart.maxes).reduce((m, k) => m === null || m<chart.maxes[k]?chart.maxes[k]:m, null)
+  ] : [chart.mins[firstCol], chart.maxes[firstCol]]
   const [ bottom2, top2 ] = secondCol === '' ? [0, 0] : [chart.mins[secondCol], chart.maxes[secondCol]]
   
   const initialState = {
@@ -79,7 +84,10 @@ export default function({title, chart, width, height}) {
 
   const zoomOut = () => {
     const [ firstCol, secondCol, yAxis4Cols ] = getAxisYDomain()
-    const [ bottom, top ] = firstCol === '' ? [Object.keys(chart.mins).reduce((m, k) => m<chart.mins[k]?m:chart.mins[k]), Object.keys(chart.maxes).reduce((m, k) => m>chart.maxes[k]?m:chart.maxes[k])] : [chart.mins[firstCol], chart.maxes[firstCol]]
+    const [ bottom, top ] = firstCol === '' ? [
+      Object.keys(chart.mins).reduce((m, k) => (m === null || m>chart.mins[k])?chart.mins[k]:m, null), 
+      Object.keys(chart.maxes).reduce((m, k) => m === null || m<chart.maxes[k]?chart.maxes[k]:m, null)
+    ] : [chart.mins[firstCol], chart.maxes[firstCol]]
     const [ bottom2, top2 ] = secondCol === '' ? [0, 0] : [chart.mins[secondCol], chart.maxes[secondCol]]
     setState({
       ...initialState,
@@ -306,7 +314,7 @@ export default function({title, chart, width, height}) {
       { alignedCols.map((cols, idx) => {
         return (
           <div key={idx} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 8}}>
-            {idx === 0 && Object.keys(chart.data[0]).indexOf('Date') >= 0? <span>
+            {idx === 0 && chart.data.length > 0 && Object.keys(chart.data[0]).indexOf('Date') >= 0? <span>
             <input type='checkbox' readOnly onClick={() => setShowDate(!showDate)} checked={showDate} />Show Date </span> : null } &nbsp;
             {/* {idx === 0  ? <span>
             <input type='checkbox' readOnly onClick={() => setShowScatter(!showScatter)} checked={showScatter} />Show Scatter </span> : null } &nbsp; */}

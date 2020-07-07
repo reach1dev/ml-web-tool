@@ -8,9 +8,9 @@ export const parseGraphList = (algType, list, columns, extra = {}) => {
   if (list !== null) {
     let k = 0
     for(let i=0; i<list[0].length; i++) {
-      if (Env.mode === 'debug' && AlgorithmTypes[algType] !== Analyse && i%20 !== 0) {
-        continue
-      }
+      // if (Env.mode === 'debug' && AlgorithmTypes[algType] !== Analyse && i%10 !== 0) {
+      //   continue
+      // }
       let row = {'Time': k++}
 
       for(let j=0; j<list.length; j++) {
