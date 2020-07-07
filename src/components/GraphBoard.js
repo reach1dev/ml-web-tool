@@ -16,6 +16,8 @@ function GraphBoard({charts, metrics, loading, width, height}) {
     setSelectedGraph(0)
   }, [loading])
 
+  const [selClass, setSelClass] = useState(0)
+
   const _renderMetricRow = (meta, idx) => {
     if (meta) {
       if (meta.columns.length >= 1) {
@@ -46,7 +48,17 @@ function GraphBoard({charts, metrics, loading, width, height}) {
 
     return (
       <div className='Graph' style={{height: '100%', minHeight: 300, overflowY: 'scroll'}} key={charts ? (charts.length + 1) : 0}>
-        <p style={{marginBottom: 6}}><b>{ meta && meta.title ? meta.title : 'Train Metrics'}</b></p>
+        <p style={{marginBottom: 6, display: 'flex', justifyContent: 'space-between'}}>
+          <b>{ meta && meta.title ? meta.title : 'Train Metrics'}</b>
+          
+          { labels.length > 0 && <div style={{display: 'flex', justifyContent: 'flex-end',  width: 'fit-content'}}>{
+              labels.map((l, idx) => (
+                <input type='button' style={{marginLeft: 10, marginRight: 10}}
+                  onClick={() => setSelClass(idx)} value={'metrics for ' + l} />
+              ))
+            }</div> }
+        </p>
+
         <div style={{overflowX: 'scroll', maxWidth: 560, backgroundColor: 'gray'}}>
           <div className='Table-Row'>
             <span className='Table-Head'>{ meta ? meta.main : (data.length === 1 ? 'Metric Type' : 'Cluster')}</span>
@@ -58,7 +70,7 @@ function GraphBoard({charts, metrics, loading, width, height}) {
               <span className='Table-Head'>{meta !== null ? meta.rows[idx] : data.length === 1 ? 'Score' : 'C-' + (idx+1)}</span>
               { Array.isArray(tr) && tr.map((td, j) => (
                 <span key={j} className='Table-Cell'>
-                  {typeof td !== 'number' ? td.map((f, i) => (i>0?' , ':'') + parseFloat(f).toFixed(2)) : parseFloat(td ).toFixed(4)}
+                  {typeof td !== 'number' ? parseFloat(td[selClass]).toFixed(4) : parseFloat(td ).toFixed(4)}
                 </span>
               ))}
               { meta && meta.columns.length === 1 ? <span className='Table-Cell' /> : null}
