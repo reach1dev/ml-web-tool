@@ -282,7 +282,7 @@ export default function({title, chart, width, height}) {
             dot={!dotHide}
             fill={'url(#' + col +')'}
             stroke={LineColors[idx%LineColors.length]}
-            yAxisId={columns[idx].startsWith('C-') || columns[0].startsWith('Target')  ? 1 : (yAxis4Cols[col] ? 1 : 2)}></Line>
+            yAxisId={(columns[idx].startsWith('C-') || columns[0].startsWith('Target') || state.bottom2 === state.top2)  ? 1 : (yAxis4Cols[col] ? 1 : 2)}></Line>
         )) }
         { (state.refAreaLeft && state.refAreaRight) ? (
             <ReferenceArea yAxisId="1" x1={state.refAreaLeft} x2={state.refAreaRight} stopColor="blue" strokeOpacity={0.3} /> ) : null
