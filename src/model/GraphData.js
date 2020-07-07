@@ -7,7 +7,8 @@ export const parseGraphList = (algType, list, columns, extra = {}) => {
   let maxes = {}
   if (list !== null) {
     let k = 0
-    for(let i=0; i<list[0].length; i++) {
+    let maxLength = list.reduce((k, l) => (k === null || k<l.length)?l.length:k, null)
+    for(let i=0; i<maxLength; i++) {
       // if (Env.mode === 'debug' && AlgorithmTypes[algType] !== Analyse && i%10 !== 0) {
       //   continue
       // }
