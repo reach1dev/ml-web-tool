@@ -403,7 +403,7 @@ function PropertyWidget({
           { parameters && parameterTypes ? parameterTypes.map((param) => (
             <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
               <label style={{marginRight: 10}}>{param.name}</label>
-              <input style={{width: '100%', maxWidth: 180}} value={parameters[param.name]} disabled={param.required && typeof parameters[param.name] === 'undefined'} placeholder={param.placeholder} onChange={(e)=> changeParameter(param.name, e.target.value, param.type)}></input>
+              <input style={{width: '100%', maxWidth: 180}} value={parameters[param.name]} disabled={(typeof param.required !== 'undefined' && !param.required) && typeof parameters[param.name] === 'undefined'} placeholder={param.placeholder} onChange={(e)=> changeParameter(param.name, e.target.value, param.type)}></input>
               { (typeof param.required !== 'undefined' && !param.required) && 
                 <input type="checkbox" onChange={(e) => changeParameter(param.name, e.target.checked ? param.default : '', param.type)} checked={typeof parameters[param.name] !== 'undefined'} style={{width: 20, height: 20}}></input> }
             </div>
