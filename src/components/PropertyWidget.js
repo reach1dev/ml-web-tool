@@ -6,13 +6,13 @@ import * as TransformAction from '../actions/TransformAction'
 import * as TrainerAction from '../actions/TrainerAction'
 import * as OptimizerAction from '../actions/OptimizerAction'
 import { IDS } from './ItemTypes'
-import { TransformParameters, AlgorithmTypes, Classification, Regression, Clustering } from './TransformParameters'
+import { TransformParameters, AlgorithmTypes, Classification, Regression } from './TransformParameters'
 import OptimizeWidget from './OptimizeWidget'
-import Spinner from './Spinner'
 import { TR_IDS } from './TransformationTools'
 
-function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, inputFileId, transforms, transform, 
-  algParams, 
+function PropertyWidget({
+  sampleCount, hide, setHide, uploading, inputFile, inputFileId, transforms, transform, 
+  algParams, indexColumn,
   TransformAction, TrainerAction, OptimizerAction}) {
 
   const [file, setFile] = useState(null)
@@ -27,6 +27,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
   const [trainLabel, setTrainLabel] = useState('')
   const [testShift, setTestShift] = useState(1)
   const [trainSampleCount, setTrainSampleCount] = useState(1)
+  const [disableSplit, setDisableSplit] = useState(false)
   const [randomSelect, setRandomSelect] = useState(false)
   const [kFoldCV, setKFoldCV] = useState(false)
   const [kFold, setKFold] = useState(2)
@@ -141,7 +142,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
 
   const drawGraph = () => {
     if (inputFileId) {
-      TransformAction.getTransformData(inputFileId, transforms, transform.id)
+      TransformAction.getTransformData(inputFileId, transforms, transform.id, indexColumn)
     } else{
       window.alert('Please upload input file')
     }
@@ -152,7 +153,11 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
     for (let paramName in parameters) {
       const paramType = parameterTypes.find(p => p.name === paramName)
       if (paramType && paramType.type === 'number') {
-        params[paramName] = parseFloat(params[paramName])
+        if (params[paramName] !== '') {
+          params[paramName] = parseFloat(params[paramName])
+        } else {
+          delete(params[paramName])
+        }
       }
       setParameters(params)
     }
@@ -179,6 +184,7 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
         maxHold: tripleMaxHold
       },
       testShift: testShift,
+      disableSplit: disableSplit,
       trainSampleCount: trainSampleCount,
       randomSelect: randomSelect,
       parameters: parameters,
@@ -234,10 +240,14 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
   }
 
   const changeParameter = (name, value, type) => {
-    if (type === 'number') {
-      parameters[name] = value //parseFloat(value)
+    if (value === '') {
+      delete(parameters[name])
     } else {
-      parameters[name] = value
+      if (type === 'number') {
+        parameters[name] = value //parseFloat(value)
+      } else {
+        parameters[name] = value
+      }
     }
     setParameters(parameters)
     setFilterChanged(filterChanged+1)
@@ -393,7 +403,9 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
           { parameters && parameterTypes ? parameterTypes.map((param) => (
             <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
               <label style={{marginRight: 10}}>{param.name}</label>
-              <input style={{width: '100%', maxWidth: 180}} value={parameters[param.name]} placeholder={param.placeholder} onChange={(e)=> changeParameter(param.name, e.target.value, param.type)}></input>
+              <input style={{width: '100%', maxWidth: 180}} value={parameters[param.name]} disabled={param.required && typeof parameters[param.name] === 'undefined'} placeholder={param.placeholder} onChange={(e)=> changeParameter(param.name, e.target.value, param.type)}></input>
+              { (typeof param.required !== 'undefined' && !param.required) && 
+                <input type="checkbox" onChange={(e) => changeParameter(param.name, e.target.checked ? param.default : '', param.type)} checked={typeof parameters[param.name] !== 'undefined'} style={{width: 20, height: 20}}></input> }
             </div>
           )) : null }
         </div>
@@ -422,6 +434,10 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
           <span>Sample count: </span><b>{sampleCount}</b>
         </p>
         <p className='Property-Item-Row'>
+          <span>Disable split </span> 
+          <input type="checkbox" checked={disableSplit} onChange={(e) => { setDisableSplit(e.target.checked) }} />
+        </p>
+        { !disableSplit && <p className='Property-Item-Row'>
           <span>Train sample count: </span>
           <input style={{width: 50}} value={trainSampleCount} onChange={(e) => {
             const val = parseInt(e.target.value)
@@ -429,22 +445,22 @@ function PropertyWidget({sampleCount, hide, setHide, uploading, inputFile, input
               setTrainSampleCount(val)
             }
           }} />
-        </p>
-        <p className='Property-Item-Row'>
+        </p> }
+        { !disableSplit && <p className='Property-Item-Row'>
           <span>Choose samples randomly: </span>
           <input type="checkbox" checked={randomSelect} onChange={(e) => {
             setKFoldCV(e.target.checked ? false: kFoldCV)
             setRandomSelect(e.target.checked)
           }} />
-        </p>
-        <p className='Property-Item-Row'>
+        </p> }
+        { !disableSplit && <p className='Property-Item-Row'>
           <span>kFold CV: </span>
           <input type="checkbox" checked={kFoldCV} onChange={(e) => {
             setRandomSelect(e.target.checked ? false : randomSelect)
             setKFoldCV(e.target.checked)
           }} />
-        </p>
-        { kFoldCV && 
+        </p> }
+        { !disableSplit && kFoldCV && 
           <p className='Property-Item-Row'>
             <span>kFold CV n_splits: </span>
             <input style={{width: 50}} value={kFold} onChange={(e) => setKFold(e.target.value)} />
@@ -558,6 +574,7 @@ const mapStateToProps = (state) => {
     parentTransform: parentTransform,
     transform: state.transforms.selectedTransform,
     transforms: state.transforms.transforms,
+    indexColumn: state.transforms.indexColumn,
     sampleCount: state.transforms.sampleCount,
     algParams: state.trainer.options
   }

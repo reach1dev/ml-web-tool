@@ -276,7 +276,7 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
   const tools = TransformationTools
   
   useEffect(() => {
-    //transformAction.clearTransforms()
+    // transformAction.clearTransforms()
     forceUpdate()
   }, [transforms])
 

@@ -11,21 +11,18 @@ const AreaColors = LineColors
 const round = x => Math.round((x + Number.EPSILON) * 100) / 100
 const GRAPH_COL = 6
 
-export default function({title, chart, width, height}) {
+export default function({title, chart, indexColumn, width, height}) {
 
   if (chart === null) {
     return null
   }
 
   const [dotHide, setDotHide] = useState(true)
-  const [showScatter, setShowScatter] = useState(false)
-  const [columns] = useState(chart.data && chart.data.length > 0 ? Object.keys(chart.data[0]).filter((k) => k!=='undefined' && k!=='Date' && k !== 'Time' && k !== 'Main Parameter') : [])
+  const [columns] = useState(chart.data && chart.data.length > 0 ? Object.keys(chart.data[0]).filter((k) => k!=='undefined' && k!==indexColumn && k !== 'Time' && k !== 'Main Parameter') : [])
   const [showDate, setShowDate] = useState(chart.data.length > 0 && Object.keys(chart.data[0]).indexOf('Date') >= 0 ? true : false)
   const [hideArray] = useState(columns.map((col) => false))
   const [showZoomOut, setShowZoomOut] = useState(false)
-  const [yAxisName, setYAxisName] = useState(columns[0] ? columns[0].startsWith('C-') ? '' : columns[0] :'')
-  const [yAxisName2, setYAxisName2] = useState(columns[columns.length-1] ? columns[columns.length-1].startsWith('C-') ? '' : columns[columns.length-1] : '')
-
+  
   const [showData, setShowData] = useState(false)
   const [showContours, setShowContours] = useState(false)
 
@@ -134,8 +131,9 @@ export default function({title, chart, width, height}) {
   })
   alignedCols.push(cols)
 
-  const delta = (state.top - state.bottom) * 0.1
-  const delta2 = (state.top2 - state.bottom2) * 0.1
+  const deltaMul = 0.0
+  const delta = (state.top - state.bottom) * deltaMul
+  const delta2 = (state.top2 - state.bottom2) * deltaMul
   const shCols = columns.filter((c, idx) => !hideArray[idx])
   console.log(JSON.stringify(shCols))
 
@@ -261,10 +259,10 @@ export default function({title, chart, width, height}) {
         <CartesianGrid stroke="#C5C5f5" />
         <XAxis 
           allowDataOverflow={true}
-          dataKey={showDate ? "Date" : "Time"}
-          tickFormatter={showDate ? formatXAxis : null}
+          dataKey={showDate && indexColumn === "Date" ? "Date" : (indexColumn === 'Date' ? 'Time' : indexColumn)}
+          tickFormatter={showDate && indexColumn === "Date" ? formatXAxis : null}
           domain={[state.left, state.right]}
-          type="number"
+          type={indexColumn === 'Date' || indexColumn === 'Time ' ? 'number' : 'category'}
         />
         <YAxis
           allowDataOverflow={true}

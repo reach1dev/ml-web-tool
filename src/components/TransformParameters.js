@@ -49,12 +49,7 @@ export const TransformParameters = {
   }, {
     type: 2,
     name: 'Linear Regression',
-    parameters: [{
-      name: 'multiple',
-      desc: 'use all features as targets',
-      type: 'boolean',
-      default: false
-    }]
+    parameters: []
   }, {
     type: 3,
     name: 'Logistic Regression',
@@ -129,7 +124,8 @@ export const TransformParameters = {
   [TR_IDS.Normalization]: [{
     name: 'rolling',
     type: 'number',
-    default: 20
+    default: 20,
+    required: false
   }, {
     name: 'min',
     type: 'number',
@@ -143,7 +139,8 @@ export const TransformParameters = {
   [TR_IDS.Standardization]: [{
     name: 'rolling',
     type: 'number',
-    default: 20
+    default: 20,
+    required: false
   }],
 
   [TR_IDS.Fisher]: [],
@@ -151,13 +148,15 @@ export const TransformParameters = {
   [TR_IDS.SubtractMedium]: [{
     name: 'rolling',
     type: 'number',
-    default: 20
+    default: 20,
+    required: false
   }],
 
   [TR_IDS.SubtractAverage]: [{
     name: 'rolling',
     type: 'number',
-    default: 20
+    default: 20,
+    required: false
   }],
 
   [TR_IDS.FirstDiff]: [{
@@ -206,7 +205,8 @@ export const TransformParameters = {
   [TR_IDS.RollingMean]: [{
     name: 'rolling',
     type: 'number',
-    default: 20
+    default: 20,
+    required: false
   }],
 
   [TR_IDS.TurnC2CD]: [],
@@ -216,7 +216,8 @@ export const TransformParameters = {
   [TR_IDS.TurnPercentiles]: [{
     name: 'rolling',
     type: 'number',
-    default: 0
+    default: 0,
+    required: false
   }],
 
   [TR_IDS.PowerFunctions]: [{

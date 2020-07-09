@@ -40,7 +40,8 @@ const initialState = {
   fileId: null,
   file: null,
   uploading: false,  
-  sampleCount: 0
+  sampleCount: 0,
+  indexColumn: 'Date'
 };
 
 
@@ -88,13 +89,14 @@ export default function(state = initialState, action) {
     case types.CLEAR_ALL:
       return initialState
     case types.UPLOADING_INPUT_DATA_SUCCESS: {
-      const { file, fileId, columns, sampleCount } = action.payload;
+      const { file, fileId, columns, indexColumn, sampleCount } = action.payload;
       return {
         ...state,
         uploading: false,
         file: file,
         fileId: fileId,
         sampleCount: sampleCount,
+        indexColumn: indexColumn,
         transforms: state.transforms.map(t => {
           if (t.id === IDS.InputData) {
             const outputs = {}

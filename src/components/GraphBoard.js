@@ -8,7 +8,7 @@ import Spinner from './Spinner'
 import Graph from './Graph'
 import ConfusionMatrix from './ConfusionMatrix'
 
-function GraphBoard({charts, metrics, loading, width, height}) {
+function GraphBoard({charts, metrics, loading, width, height, indexColumn}) {
 
   const [selectedGraph, setSelectedGraph] = useState(charts.length > 1 && charts[0] === null ? 1 : 0)
 
@@ -93,6 +93,7 @@ function GraphBoard({charts, metrics, loading, width, height}) {
             key={selectedGraph}
             title={'Train & test comparison'}
             chart={selectedGraph >= 0 && charts[selectedGraph]}
+            indexColumn={indexColumn}
             width={width}
             height={height}
           />
@@ -114,6 +115,7 @@ function GraphBoard({charts, metrics, loading, width, height}) {
         key={idx}
         title={idx === 0 ? 'Input data' : 'Transformed data'}
         chart={chart}
+        indexColumn={indexColumn}
         width={width}
         height={height}
       />
@@ -143,7 +145,8 @@ const mapStateToProps = (state) => {
   return {
     charts: state.chart.charts,
     metrics: state.metric.metrics,
-    loading: state.chart.loading
+    loading: state.chart.loading,
+    indexColumn: state.transforms.indexColumn
   }
 }
 

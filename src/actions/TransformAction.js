@@ -67,20 +67,21 @@ export const selectTransform = (id) => {
   }
 }
 
-function getChartData(data, columns, offset) {
+function getChartData(data, columns, offset, indexColumn) {
   if (data === null) {
     return []
   }
   const chartData = []
   let k = 0
   for(let i=0; i<data.length; i++) {
-    if (Env.mode === 'debug' && i%20 !== 0) {
-      continue
-    }
+    // if (Env.mode === 'debug' && i%20 !== 0) {
+    //   continue
+    // }
     const obj = {
       Time: k++,
-      Date: Date.parse(data[i][0])
+      [indexColumn]: indexColumn === 'Date' ? Date.parse(data[i][0]) : data[i][0]
     }
+    
     columns.forEach((param, j) => {
       obj[param] = data[i][j+offset]
     })
@@ -89,7 +90,7 @@ function getChartData(data, columns, offset) {
   return chartData
 }
 
-export const getTransformData = (fileId, allTransforms, transformId) => {
+export const getTransformData = (fileId, allTransforms, transformId, indexColumn) => {
   return (dispatch) => {
     const temp = allTransforms.filter((t) => t.id === transformId)
     if (temp.length === 0) {
@@ -144,19 +145,20 @@ export const getTransformData = (fileId, allTransforms, transformId) => {
           maxes1[col] = res.data.columns[2][idx]
         }
       })
+      const offset = indexColumn === 'Date' ? 2 : 1
       if (lastTransform.id === IDS.InputData) {
         charts.push({
-          data: getChartData(res.data.data, outCols, 2),
+          data: getChartData(res.data.data, outCols, offset, indexColumn),
           mins: mins2,
           maxes: maxes2
         })
       } else {
         charts.push({
-          data: getChartData(res.data.data, inCols, 2),
+          data: getChartData(res.data.data, inCols, offset, indexColumn),
           mins: mins1,
           maxes: maxes1
         }, {
-          data: getChartData(res.data.data, outCols, 2 + inCols.length),
+          data: getChartData(res.data.data, outCols, offset + inCols.length, indexColumn),
           mins: mins2,
           maxes: maxes2
         })
@@ -215,7 +217,8 @@ export const uploadInputData = (file) => {
               file: file.name,
               fileId: res.data.file_id,
               sampleCount: res.data.sample_count,
-              columns: res.data.columns
+              columns: res.data.columns,
+              indexColumn: res.data.index
             }
           })
         } else {
