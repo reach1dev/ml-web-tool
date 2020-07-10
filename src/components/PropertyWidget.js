@@ -151,7 +151,7 @@ function PropertyWidget({
   const getCurrentParams = () => {
     return {
       type: algorithmType,
-      inputFilters: transform.inputParameters.map((p, i) => i<inputFilters.length?inputFilters[i]: true),
+      inputFilters: transform.inputParameters.map((p, i) => i<inputFilters.length?inputFilters[i]: false),
       features: transform.inputParameters,
       trainLabel: trainLabel,//AlgorithmTypes[algorithmType] !== Clustering ? trainLabel : '',
       tripleOptions: {
@@ -198,7 +198,7 @@ function PropertyWidget({
     }
     let newFilters = inputFilters
     if (idx >= inputFilters.length) {
-      newFilters = transform.inputParameters.map((f, i) => i<inputFilters.length ? inputFilters[i] : true)
+      newFilters = transform.inputParameters.map((f, i) => i<inputFilters.length ? inputFilters[i] : false)
     }
     newFilters[idx] = !newFilters[idx]
     setInputFilters(newFilters)
