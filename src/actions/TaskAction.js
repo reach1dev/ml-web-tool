@@ -34,6 +34,7 @@ export const createTask = ({
         })
       }
     } else {
+      window.alert('It takes too long to train/optimize.')
       clearInterval(timer)
       dispatch({
         type: timeoutType,

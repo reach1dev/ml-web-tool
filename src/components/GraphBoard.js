@@ -51,7 +51,7 @@ function GraphBoard({charts, metrics, loading, width, height, indexColumn}) {
         <p style={{marginBottom: 6, display: 'flex', justifyContent: 'space-between'}}>
           <b>{ meta && meta.title ? meta.title : 'Train Metrics'}</b>
           
-          { labels.length > 0 && <div style={{display: 'flex', justifyContent: 'flex-end',  width: 'fit-content'}}>{
+          { labels && labels.length > 1 && <div style={{display: 'flex', justifyContent: 'flex-end',  width: 'fit-content'}}>{
               labels.map((l, idx) => (
                 <input type='button' style={{marginLeft: 10, marginRight: 10}}
                   onClick={() => setSelClass(idx)} value={'metrics for ' + l} />
@@ -70,7 +70,7 @@ function GraphBoard({charts, metrics, loading, width, height, indexColumn}) {
               <span className='Table-Head'>{meta !== null ? meta.rows[idx] : data.length === 1 ? 'Score' : 'C-' + (idx+1)}</span>
               { Array.isArray(tr) && tr.map((td, j) => (
                 <span key={j} className='Table-Cell'>
-                  {typeof td !== 'number' ? parseFloat(td[selClass]).toFixed(4) : parseFloat(td ).toFixed(4)}
+                  {typeof td !== 'number' && Array.isArray(td) ? parseFloat(td[selClass]).toFixed(4) : parseFloat(td ).toFixed(4)}
                 </span>
               ))}
               { meta && meta.columns.length === 1 ? <span className='Table-Cell' /> : null}

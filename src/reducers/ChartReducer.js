@@ -1,9 +1,10 @@
-import { TRAINER_FINISHED, SET_CHART_DATA, GET_CHART_DATA, CLEAR_ALL, TRAINER_STARTED, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_SUCCESS, OPTIMIZER_STARTED, OPTIMIZER_FINISHED, OPTIMIZER_FAILED, TRAINER_FAILED } from '../redux/ActionTypes'
+import { TRAINER_FINISHED, SET_CHART_DATA, GET_CHART_DATA, CLEAR_ALL, TRAINER_STARTED, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_SUCCESS, OPTIMIZER_STARTED, OPTIMIZER_FINISHED, OPTIMIZER_FAILED, TRAINER_FAILED, TASK_TIMEOUT } from '../redux/ActionTypes'
 
 
 const initialState = {
   charts: [],
-  loading: false
+  loading: false,
+  timeOut: false
 }
 
 export default function(state = initialState, action) {
@@ -62,10 +63,11 @@ export default function(state = initialState, action) {
         loading: false
       }
     }
-    case OPTIMIZER_FAILED: {
+    case TASK_TIMEOUT: {
       return {
         ...state,
-        loading: false
+        loading: false,
+        timeOut: true
       }
     }
     case TRAINER_FAILED: {

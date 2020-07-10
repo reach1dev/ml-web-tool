@@ -103,7 +103,7 @@ export const getTrainResult = async ({fileId, transforms, algParams}) => {
           if (chart.mins[c] < overviewChart.mins[c]) {
             overviewChart.mins[c] = chart.mins[c]
           }
-          if (chart.maxes[c] < overviewChart.maxes[c]) {
+          if (chart.maxes[c] > overviewChart.maxes[c]) {
             overviewChart.maxes[c] = chart.maxes[c]
           }
         })

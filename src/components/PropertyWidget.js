@@ -17,7 +17,7 @@ function PropertyWidget({
 
   const [file, setFile] = useState(null)
   const [error, setError] = useState(false)
-  const [inputFilters, setInputFilters] = useState(transform ? transform.inputFilters || [] : [])
+  const [inputFilters, setInputFilters] = useState(algParams ? algParams.inputFilters || [] : [])
   const [features, setFeatures] = useState(transform ? transform.features || {} : {})
   const [targetColumn, setTargetColumn] = useState(transform ? transform.targetColumn || '' : '')
   const [filterChanged, setFilterChanged] = useState(1)
@@ -49,7 +49,7 @@ function PropertyWidget({
   useEffect(() => {
     if (transform && transform.id === IDS.MLAlgorithm) {
       setAlgorithmType(algParams.type)
-      setInputFilters(transform.inputFilters || [])
+      setInputFilters(algParams.inputFilters || [])
       setTrainLabel(algParams.trainLabel || '')
       setTestShift(algParams.testShift || 1)
       setTrainSampleCount(algParams.trainSampleCount || Math.floor(sampleCount*0.7))
