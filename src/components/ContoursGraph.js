@@ -76,7 +76,7 @@ export default function({contours, features, showGraph, columns, colors, width, 
 
         { data.map((features, idx) => (
           <Scatter
-            name={targets ? ('' + Object.keys(targets)[idx]) : ('' + (idx+1))}
+            name={targets ? ('' + Object.keys(targets).sort()[idx]) : ('' + (idx+1))}
             fill={colors[idx%colors.length]}
             data={features}
           ></Scatter>
