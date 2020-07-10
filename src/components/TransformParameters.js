@@ -5,7 +5,7 @@ export const Classification = 1
 export const Regression = 2
 export const Analyse = 3
 
-export const AlgorithmTypes = [Clustering, Classification, Regression, Regression, Classification, Analyse, Classification]
+export const AlgorithmTypes = [Clustering, Classification, Regression, Classification, Classification, Analyse, Classification]
 
 export const TransformParameters = {
   [TR_IDS.MLAlgorithm]: [{
