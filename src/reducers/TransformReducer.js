@@ -72,7 +72,7 @@ const updateTransforms = (state, transforms) => {
         return {
           ...t,
           inputParameters: features,
-          inputFilters: features.map(t => true),
+          inputFilters: features.map((f, idx) => (idx<t.inputFilters.length) ? t.inputFilters[idx] : true),
           targets: targets,
           parameters: {
             ...t.parameters,

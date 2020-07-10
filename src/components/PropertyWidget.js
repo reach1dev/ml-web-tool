@@ -84,30 +84,6 @@ function PropertyWidget({
     }
   }
 
-  const startOptimize = (optParams) => {
-    if (trainLabel === '' && 
-      (AlgorithmTypes[algorithmType] === Classification || 
-        (AlgorithmTypes[algorithmType] === Regression && parameters['multiple']))) {
-      window.alert('Please select target.')
-      return
-    }
-    if (inputFileId) {
-      const params = optParams
-      const allParams = {
-        ...params,
-        algorithmType: algorithmType,
-        trainLabel: trainLabel,
-        testShift: testShift,
-        trainSampleCount: trainSampleCount,
-        randomSelect: randomSelect
-      }
-      setParameters(allParams)
-      TransformAction.trainAndTest(inputFileId, transforms, allParams, true)
-    } else {
-      window.alert('Please upload input file.')
-    }
-  }
-
   const trainAndTest = () => {
     if (trainLabel === '' && (algorithmType !== 0 && algorithmType !== 5 && (algorithmType !== 2 || !parameters['multiple']))) {
       window.alert('Please select target.')
@@ -175,7 +151,7 @@ function PropertyWidget({
   const getCurrentParams = () => {
     return {
       type: algorithmType,
-      inputFilters: inputFilters,
+      inputFilters: transform.inputParameters.map((p, i) => i<inputFilters.length?inputFilters[i]: true),
       features: transform.inputParameters,
       trainLabel: trainLabel,//AlgorithmTypes[algorithmType] !== Clustering ? trainLabel : '',
       tripleOptions: {
@@ -220,8 +196,12 @@ function PropertyWidget({
     if (transform.inputParameters[idx] === 'Date' || transform.inputParameters[idx] === 'Time') {
       return
     }
-    inputFilters[idx] = !inputFilters[idx]
-    setInputFilters(inputFilters)
+    let newFilters = inputFilters
+    if (idx >= inputFilters.length) {
+      newFilters = transform.inputParameters.map((f, i) => i<inputFilters.length ? inputFilters[i] : true)
+    }
+    newFilters[idx] = !newFilters[idx]
+    setInputFilters(newFilters)
     setFilterChanged(filterChanged+1)
   }
 
