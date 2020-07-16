@@ -5,3 +5,18 @@
   padding-right: 0.4rem;
   height: 100%;
 }
+
+.Header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.Header h2 {
+  margin-bottom: 0.6rem;
+}
+
+.Menu {
+  margin-left: 2rem;
+  margin-bottom: -1rem;
+}

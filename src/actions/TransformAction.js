@@ -1,7 +1,7 @@
 import { UPLOADING_INPUT_DATA, UPLOADING_INPUT_DATA_SUCCESS, UPLOADING_INPUT_DATA_FAILED } from "../redux/ActionTypes"
 import axios from 'axios'
 import { BaseUrl } from "./Constants"
-import { REMOVE_TRANSFORM_FROM_MLA, REMOVE_TRANSFORM, APPLY_TRANSFORM_SETTINGS, SELECT_TRANSFORM, CLEAR_ALL, ADD_TRANSFORM, ADD_TRANSFORM_TO_MLA, MOVE_TRANSFORM, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_FAILED } from "../redux/ActionTypes";
+import { UPDATE_TRANSFORMS, REMOVE_TRANSFORM_FROM_MLA, REMOVE_TRANSFORM, APPLY_TRANSFORM_SETTINGS, SELECT_TRANSFORM, CLEAR_ALL, ADD_TRANSFORM, ADD_TRANSFORM_TO_MLA, MOVE_TRANSFORM, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_FAILED } from "../redux/ActionTypes";
 import { IDS } from "../components/ItemTypes";
 import { Env } from "../config";
 
@@ -228,5 +228,14 @@ export const uploadInputData = (file) => {
         }
       })
       .catch(err => console.log(err));
+  }
+}
+
+export const loadTransforms = (transforms) => {
+  return (dispatch) => {
+    dispatch({
+      type: UPDATE_TRANSFORMS,
+      transforms: transforms
+    })
   }
 }

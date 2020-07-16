@@ -2,10 +2,11 @@
   z-index: 2;
   flex: auto;
   min-width: 360px;
-  background-color: white;
+  background-color: #eee;
   display: flex;
   flex-direction: column;
-  padding-left: 8px;
+  padding-left: 0.5rem;
+  margin-left: 0.5rem;
 }
 
 .Graph {

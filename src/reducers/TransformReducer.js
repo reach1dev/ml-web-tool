@@ -88,6 +88,12 @@ export default function(state = initialState, action) {
   switch (action.type) {
     case types.CLEAR_ALL:
       return initialState
+    case types.UPDATE_TRANSFORMS:
+      const transforms = action.transforms
+      return {
+        ...state,
+        transforms: transforms
+      }
     case types.UPLOADING_INPUT_DATA_SUCCESS: {
       const { file, fileId, columns, indexColumn, sampleCount } = action.payload;
       return {
