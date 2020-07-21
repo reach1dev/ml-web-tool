@@ -1,13 +1,13 @@
 import React from 'react'
 import './ConfusionMatrix.css'
 
-export default function ConfusionMatrix({confusion, labels}) {
+export default function ConfusionMatrix({title, confusion, labels}) {
   const cmColors = ['#444', '#666', '#777', '#888', '#999', '#aaa']
   const cmColors1 = ['#44a', '#66a', '#77a', '#88a', '#99c', '#aae']
 
   return (
     <div className="confusion-matrix" style={{marginTop: 10}}>
-      <b>Confusion Matrix</b>
+      <b>{title}</b>
       <table style={{marginTop: 6}}>
         <thead>
           <th style={{width: 60}}>Labels</th>

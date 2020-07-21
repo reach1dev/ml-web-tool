@@ -25,6 +25,7 @@ function PropertyWidget({
   const [parameterTypes, setParameterTypes] = useState([])
   const [algorithmType, setAlgorithmType] = useState(0)
   const [trainLabel, setTrainLabel] = useState('')
+  const [resampling, setResampling] = useState('')
   const [testShift, setTestShift] = useState(1)
   const [trainSampleCount, setTrainSampleCount] = useState(1)
   const [disableSplit, setDisableSplit] = useState(false)
@@ -164,7 +165,8 @@ function PropertyWidget({
       trainSampleCount: trainSampleCount,
       randomSelect: randomSelect,
       parameters: parameters,
-      kFold: kFoldCV ? kFold : 0
+      kFold: kFoldCV ? kFold : 0,
+      resampling: resampling
     }
   }
 
@@ -481,6 +483,16 @@ function PropertyWidget({
             <input style={{width: 110}} value={testShift} onChange={(e) => setTestShift(parseInt(e.target.value))} />
           </p>
         )}
+
+        <p className='Property-Item-Row'>
+          <span>Resampling: </span>
+          <select style={{width: 120}} value={resampling} onChange={(e) => setResampling(e.target.value)}>
+            <option key={0} value='none'>None</option>
+            <option key={1} value='undersampling'>Undersampling</option>
+            <option key={2} value='oversampling'>Oversampling</option>
+            <option key={3} value='smote'>SMOTE</option>
+          </select>
+        </p>
       </div>
     )
   }
