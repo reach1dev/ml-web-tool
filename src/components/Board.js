@@ -75,14 +75,13 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
   const [graphWidth, setGraphWidth] = useState(window.innerWidth * 0.28)
   const [graphHeight, setGraphHeight] = useState(window.innerHeight * 0.24)
 
-  function handleResize() {
-    setGraphWidth(window.innerWidth*(propertiesHide ? 0.5 : 0.28 ))
-    setGraphHeight(window.innerHeight*0.24)
-  }
 
-  useEffect(() => {    
-    window.addEventListener('resize', handleResize)
-  }, [])
+  useEffect(() => {
+    window.addEventListener('resize', () => {
+      setGraphWidth(window.innerWidth*(propertiesHide ? 0.38 : 0.28 ))
+      setGraphHeight(window.innerHeight*0.24)
+    })
+  }, [propertiesHide])
   
 
   const forceUpdate = () => {
@@ -249,7 +248,8 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
   }
 
   const hideProperties = (hide) => {
-    setGraphWidth(hide ? 600 : 400)
+    //setGraphWidth(hide ? 600 : 400)
+    setGraphWidth(window.innerWidth*(hide ? 0.38 : 0.28 ))
     setPropertiesHide(hide)
   }
 
