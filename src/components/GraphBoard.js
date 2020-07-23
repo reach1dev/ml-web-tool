@@ -59,14 +59,14 @@ function GraphBoard({charts, metrics, loading, width, height, indexColumn}) {
             }</div> }
         </p>
 
-        <div style={{overflowX: 'scroll', maxWidth: 560, backgroundColor: 'gray'}}>
-          <div className='Table-Row'>
+        <div style={{overflowX: 'scroll', maxWidth: '100%', backgroundColor: 'gray'}}>
+          <div className='Table-Row' style={{width: '100%'}}>
             <span className='Table-Head'>{ meta ? meta.main : (data.length === 1 ? 'Metric Type' : 'Cluster')}</span>
             { _renderMetricRow(meta) }
           </div>
 
           { Array.isArray(data) && data.map((tr, idx) => (
-            <div key={idx} className='Table-Row'>
+            <div key={idx} className='Table-Row' style={{width: '100%'}}>
               <span className='Table-Head'>{meta !== null ? meta.rows[idx] : data.length === 1 ? 'Score' : 'C-' + (idx+1)}</span>
               { Array.isArray(tr) && tr.map((td, j) => (
                 <span key={j} className='Table-Cell'>

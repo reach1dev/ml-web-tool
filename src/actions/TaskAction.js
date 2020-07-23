@@ -12,7 +12,7 @@ export const createTask = ({
   successType = TASK_FINISHED, 
   failedType = TASK_FAILED, 
   timeoutType = TASK_TIMEOUT, 
-  interval = 2500, retry = 20}) => {
+  interval = 4000, retry = 40}) => {
 
   dispatch({
     type: createType,
