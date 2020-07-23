@@ -77,7 +77,7 @@ function GraphBoard({charts, metrics, loading, width, height, indexColumn}) {
             </div>
           ))}
         </div>
-        { confusion ? <ConfusionMatrix title='Confusion matrix for test' confusion={confusion[0]} labels={labels}></ConfusionMatrix> : null}
+        { confusion ? <ConfusionMatrix title='Confusion matrix for test' confusion={confusion} labels={labels}></ConfusionMatrix> : null}
       </div>
     )
   }

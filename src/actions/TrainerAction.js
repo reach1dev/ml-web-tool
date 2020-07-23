@@ -123,13 +123,9 @@ export const getTrainResult = async ({fileId, transforms, algParams}) => {
     } else {
       confusionMatrix.forEach((r, i) => {
         r.forEach((c, j) => {
-          let a = overviewMetric.confusion[0][i][j]
-          let b = confusionMatrix[0][i][j]
-          overviewMetric.confusion[0][i][j] = a + b
-          
-          a = overviewMetric.confusion[1][i][j]
-          b = confusionMatrix[1][i][j]
-          overviewMetric.confusion[1][i][j] = a + b
+          let a = overviewMetric.confusion[i][j]
+          let b = confusionMatrix[i][j]
+          overviewMetric.confusion[i][j] = a + b
         })
       })
       metric.forEach((r, i) => {
