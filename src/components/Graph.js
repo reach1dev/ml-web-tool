@@ -238,14 +238,11 @@ export default function({title, chart, indexColumn, width, height}) {
         { _showTargetValues() }
       </div>
 
-      { <ComposedChart
+      <ComposedChart
         width={width || 360}
         height={height+90 - (Math.ceil(columns.length/GRAPH_COL))*24}
         data={state.data}
         style={{backgroundColor: 'white', margin: 'auto'}}
-        //onMouseDown={e => e && setState({ ...state, refAreaLeft: e.activeLabel })}
-        //onMouseMove={e => e && state.refAreaLeft && setState({ ...state,  refAreaRight: e.activeLabel })}
-        //onMouseUp={e => e && zoom()}
         margin={{ top: 25, right: 20, left: 5, bottom: 5 }}
       >
         <defs>
@@ -290,30 +287,8 @@ export default function({title, chart, indexColumn, width, height}) {
         { (state.refAreaLeft && state.refAreaRight) ? (
             <ReferenceArea yAxisId="1" x1={state.refAreaLeft} x2={state.refAreaRight} stopColor="blue" strokeOpacity={0.3} /> ) : null
         }
-      </ComposedChart> }
-      {/* { chart.type===1 && 
-        <ScatterChart
-          width={width || 360}
-          height={390 - (Math.ceil(columns.length/GRAPH_COL))*24}
-          style={{backgroundColor: 'white'}}
-        >
-          <XAxis 
-            allowDataOverflow={true}
-            dataKey={columns[0]}
-            domain={[round(state.bottom2-delta2), round(state.top2+delta2)]}
-            type="number"
-          />
-          <YAxis
-            allowDataOverflow={true}
-            dataKey={columns[1]}
-            domain={[round(state.bottom-delta), round(state.top+delta)]}
-            type="number"
-          />
-          { [...Array(chart.meta.n_clusters).keys()].map((col, idx) => (
-            <Scatter key={idx} name={'C-' + (idx+1)} data={state.data.filter(d => d['Tar'] === idx)} fill={LineColors[idx%chart.meta.n_clusters]} />
-          )) }          
-        </ScatterChart>
-      } */}
+      </ComposedChart>
+      
       { alignedCols.map((cols, idx) => {
         return (
           <div key={idx} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 8}}>

@@ -5,7 +5,7 @@ export const Classification = 1
 export const Regression = 2
 export const Analyse = 3
 
-export const AlgorithmTypes = [Clustering, Classification, Regression, Classification, Classification, Analyse, Classification]
+export const AlgorithmTypes = [Clustering, Classification, Regression, Classification, Classification, Analyse, Classification, Classification, Classification]
 
 export const TransformParameters = {
   [TR_IDS.MLAlgorithm]: [{
@@ -118,6 +118,30 @@ export const TransformParameters = {
       name: 'n_components',
       type: 'number',
       default: 2
+    }]
+  }, {
+    type: 7,
+    name: 'Decision Tree',
+    parameters: [{
+      name: 'max_depth',
+      type: 'number',
+      default: 2
+    }, {
+      name: 'random_state',
+      type: 'number',
+      default: 0
+    }]
+  }, {
+    type: 8,
+    name: 'Random forest',
+    parameters: [{
+      name: 'max_depth',
+      type: 'number',
+      default: 2
+    }, {
+      name: 'random_state',
+      type: 'number',
+      default: 0
     }]
   }],
 

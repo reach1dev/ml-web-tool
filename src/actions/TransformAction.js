@@ -145,7 +145,7 @@ export const getTransformData = (fileId, allTransforms, transformId, indexColumn
           maxes1[col] = res.data.columns[2][idx]
         }
       })
-      const offset = indexColumn === 'Date' ? 2 : 1
+      const offset = indexColumn === 'Date' && data.columns[1] === 'Time' ? 2 : 1
       if (lastTransform.id === IDS.InputData) {
         charts.push({
           data: getChartData(res.data.data, outCols, offset, indexColumn),

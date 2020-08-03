@@ -27,7 +27,7 @@ export const saveTrainerSettings = (options) => {
 }
 
 
-export const startTrainer = (fileId, transforms, algParams) => {
+export const startTrainer = (fileId, transforms, algParams, indexColumn) => {
   return (dispatch) => {
     axios.defaults.baseURL = BaseUrl
     axios.post('/train-and-test/' + fileId, {
@@ -44,7 +44,7 @@ export const startTrainer = (fileId, transforms, algParams) => {
         createType: TRAINER_STARTED,
         successType: TRAINER_FINISHED,
         failedType: TRAINER_FAILED,
-        params: {fileId, transforms, algParams}
+        params: {fileId, transforms, algParams, indexColumn}
       })
 
     }).catch((err) => {
@@ -53,7 +53,7 @@ export const startTrainer = (fileId, transforms, algParams) => {
   }
 }
 
-export const getTrainResult = async ({fileId, transforms, algParams}) => {
+export const getTrainResult = async ({fileId, transforms, algParams, indexColumn}) => {
   const res = await axios.post('/get-train-result/' + fileId)
   if (res.status === 204) {
     return {
@@ -84,10 +84,10 @@ export const getTrainResult = async ({fileId, transforms, algParams}) => {
     ))
     let columns1 = columns
     if (AlgorithmTypes[algParams.type] === Classification || AlgorithmTypes[algParams.type] === Regression) {
-      columns1 = ['Date', ...columns]
+      columns1 = [(indexColumn || 'Date'), ...columns]
     }
 
-    const chart = parseGraphList(algParams.type, graph, columns1, algParams)
+    const chart = parseGraphList(algParams.type, graph, columns1, indexColumn, algParams)
     charts.push({
       ...chart,
       contours: contours,

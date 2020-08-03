@@ -1,7 +1,7 @@
 import { Env } from "../config"
 import { AlgorithmTypes, Analyse } from "../components/TransformParameters"
 
-export const parseGraphList = (algType, list, columns, extra = {}) => {
+export const parseGraphList = (algType, list, columns, indexColumn = 'Date', extra = {}) => {
   let data = []
   let mins = {}
   let maxes = {}
@@ -16,8 +16,12 @@ export const parseGraphList = (algType, list, columns, extra = {}) => {
 
       for(let j=0; j<list.length; j++) {
         let label =  columns[j]
-        if (columns[j] === 'Date') {
-          row[label] = Date.parse(list[j][i])
+        if (columns[j] === indexColumn) {
+          if (indexColumn === 'Date') {
+            row[label] = Date.parse(list[j][i])
+          } else {
+            row[label] = list[j][i]
+          }          
           continue
         }
         row[label] = list[j][i]

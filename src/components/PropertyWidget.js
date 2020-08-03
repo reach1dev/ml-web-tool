@@ -111,7 +111,7 @@ function PropertyWidget({
       }
 
       setParameters(allParams)
-      TrainerAction.startTrainer(inputFileId, transforms, allParams)
+      TrainerAction.startTrainer(inputFileId, transforms, allParams, indexColumn)
     } else {
       window.alert('Please upload input file.')
     }
@@ -357,7 +357,7 @@ function PropertyWidget({
         <div style={{display: 'flex', alignItems: 'stretch', flexDirection: 'column'}}>
           { getMLParams() }
         </div>
-        { algorithmType !== 2 && algorithmType < 5 && 
+        { ((algorithmType !== 2 && algorithmType < 5) || (algorithmType===7 || algorithmType === 8)) && 
         <OptimizeWidget 
           algorithmType={algorithmType}
           parameters={parameters && parameterTypes && parameterTypes[algorithmType] && 
