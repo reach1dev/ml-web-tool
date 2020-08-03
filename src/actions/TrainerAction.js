@@ -131,12 +131,13 @@ export const getTrainResult = async ({fileId, transforms, algParams, indexColumn
       metric.forEach((r, i) => {
         r.forEach((c, j) => {
           let a = overviewMetric.data[i][j]
+          let k = a.length
           let b = metric[i][j]
           if (typeof a !== 'number') {
-            a = a[a.length-1]
+            a = a[k-1]
           }
           if (typeof b !== 'number') {
-            b = b[a.length-1]
+            b = b[k-1]
           }
           overviewMetric.data[i][j] = (a * (metrics.length-1) + b) / metrics.length
         })
