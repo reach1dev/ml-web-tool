@@ -12,7 +12,7 @@ export const parseGraphList = (algType, list, columns, indexColumn = 'Date', ext
       // if (Env.mode === 'debug' && AlgorithmTypes[algType] !== Analyse && i%10 !== 0) {
       //   continue
       // }
-      let row = {'Time': k++}
+      let row = {}
 
       for(let j=0; j<list.length; j++) {
         let label =  columns[j]
