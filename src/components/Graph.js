@@ -140,7 +140,7 @@ export default function({title, chart, indexColumn, width, height}) {
   if (showData) {
     let newCols = columns
     if (Object.keys(chart.data[0]).indexOf('Date') >= 0) {
-      if (Object.keys(chart.data[0]).indexOf('Time') >= 0) {
+      if (Object.keys(chart.data[0]).indexOf('Time') >= 0 && chart.data[0]['Time'] !== 1) {
         newCols = ['Date', 'Time', ...columns]
       } else {
         newCols = ['Date', ...columns]
