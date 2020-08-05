@@ -123,6 +123,10 @@ export const TransformParameters = {
     type: 7,
     name: 'Decision Tree',
     parameters: [{
+      name: 'regression',
+      type: 'boolean',
+      default: false
+    }, {
       name: 'max_depth',
       type: 'number',
       default: 2
@@ -135,6 +139,10 @@ export const TransformParameters = {
     type: 8,
     name: 'Random forest',
     parameters: [{
+      name: 'regression',
+      type: 'boolean',
+      default: false
+    }, {
       name: 'max_depth',
       type: 'number',
       default: 2

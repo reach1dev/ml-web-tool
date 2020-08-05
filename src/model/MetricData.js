@@ -19,7 +19,7 @@ export const getMetricMeta = (algType, featureColumns, extra = {}) => {
     const mainType = AlgorithmTypes[algType]
     metricMeta = {
       'columns': ['Train', 'Test'],
-      'rows': (mainType !== Classification) || extra['useSVR'] ? ['R2', 'MSE', 'MAE', 'Explained variance'] : ['Accuracy', 'Precision', 'Recall', 'F1'], 
+      'rows': (mainType !== Classification) || extra['useSVR'] || extra['regression'] ? ['R2', 'MSE', 'MAE', 'Explained variance'] : ['Accuracy', 'Precision', 'Recall', 'F1'], 
       'main': 'Metric type'
     }
   }
