@@ -24,7 +24,7 @@ export default function({title, chart, indexColumn, width, height}) {
   const [showZoomOut, setShowZoomOut] = useState(false)
   
   const [showData, setShowData] = useState(false)
-  const [showContours, setShowContours] = useState(false)
+  const [showContours, setShowContours] = useState(chart.contours.length === 1)
 
   const getAxisYDomain = () => {
     if (columns.length === 0) {
@@ -217,10 +217,12 @@ export default function({title, chart, indexColumn, width, height}) {
           width={width-10}
           colors={LineColors}
           columns={chart.columns || ['x', 'y']}
+          targetColumn={chart.meta.targetColumn}
           height={height*1.4}
           contours={chart.contours}
           features={chart.features}
           showGraph={() => setShowContours(false)}
+          showData={() => setShowData(true)}
         ></ContoursGraph>
       </div>
     )
@@ -234,7 +236,7 @@ export default function({title, chart, indexColumn, width, height}) {
         <div style={{display: 'flex', justifyContent: 'flex-end'}}>
           <input type='button' onClick={() => showValues()} value='Show values' />
           { chart.features && chart.features.length > 0 &&
-            <input style={{marginLeft: 10}} type='button' onClick={() => setShowContours(true)} value={chart.contours.length > 0 ? 'Show decision boundaries' : 'Show scatters'}  /> }
+            <input style={{marginLeft: 10}} type='button' onClick={() => setShowContours(true)} value={chart.contours.length > 1 ? 'Show decision boundaries' : chart.contours.length === 1 ? 'Show regression' : 'Show scatters'}  /> }
         </div>
       </div>
       <div style={{paddingBottom: 10}}>

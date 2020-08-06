@@ -45,7 +45,8 @@ export const parseGraphList = (algType, list, columns, indexColumn = 'Date', ext
       columns:  ['Vol', 'Rng', 'Tar'],
       'n_clusters': parseInt(extra['n_clusters'])
     } : {
-      columns: columns
+      columns: columns,
+      targetColumn: extra['trainLabel']
     }
   }
 }

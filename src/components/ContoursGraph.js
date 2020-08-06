@@ -1,7 +1,7 @@
 import React from 'react'
 import { ComposedChart, Scatter, XAxis, YAxis, ZAxis, ReferenceArea, Legend, Rectangle, Tooltip, Label } from 'recharts'
 
-export default function({contours, features, showGraph, columns, colors, width, height, targets}) {
+export default function({contours, features, showGraph, columns, colors, width, height, targets, targetColumn, showData}) {
 
   const labels = ['x', 'y']
   const data = features.map((feature) => {
@@ -44,7 +44,11 @@ export default function({contours, features, showGraph, columns, colors, width, 
     <div>
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12}}>
         <b>Decision boundaries</b>
-        <input type='button' onClick={() => showGraph()} value='Show graph' />
+        <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+        <input type='button' onClick={() => showGraph()} value='Show target graph' />
+        <span style={{width: 10}}></span>
+        <input type='button' onClick={() => showData()} value='Show values' />
+        </div>
       </div>
 
       <ComposedChart
@@ -62,7 +66,7 @@ export default function({contours, features, showGraph, columns, colors, width, 
           dataKey={labels[1]} 
           type='number'
           name={labels[1]} >          
-          <Label value={columns[1]} offset={0} angle={90} position="topLeft" />
+          <Label value={columns[1] || targetColumn} offset={0} angle={90} position="topLeft" />
         </YAxis>
 
         { contours.length > 0 &&  <polygon
