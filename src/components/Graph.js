@@ -236,7 +236,7 @@ export default function({title, chart, indexColumn, width, height}) {
         <div style={{display: 'flex', justifyContent: 'flex-end'}}>
           <input type='button' onClick={() => showValues()} value='Show values' />
           { chart.features && chart.features.length > 0 &&
-            <input style={{marginLeft: 10}} type='button' onClick={() => setShowContours(true)} value={chart.contours.length > 1 ? 'Show decision boundaries' : (chart.contours && chart.contours.length === 2) ? 'Show regression' : 'Show scatters'}  /> }
+            <input style={{marginLeft: 10}} type='button' onClick={() => setShowContours(true)} value='Show scatters'  /> }
         </div>
       </div>
       <div style={{paddingBottom: 10}}>

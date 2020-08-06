@@ -115,6 +115,8 @@ export default function({contours, features, showGraph, columns, colors, width, 
           ></Scatter>
         ))}
 
+        {contours.length !== 2 && <Legend></Legend>}
+
         <Tooltip></Tooltip>
       </ComposedChart>
       <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 8, marginRight: 16}}>
