@@ -24,7 +24,7 @@ export default function({title, chart, indexColumn, width, height}) {
   const [showZoomOut, setShowZoomOut] = useState(false)
   
   const [showData, setShowData] = useState(false)
-  const [showContours, setShowContours] = useState(chart.contours.length === 1)
+  const [showContours, setShowContours] = useState(chart.contours && chart.contours.length === 1)
 
   const getAxisYDomain = () => {
     if (columns.length === 0) {
