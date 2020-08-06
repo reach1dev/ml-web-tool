@@ -13,7 +13,7 @@ export default function({contours, features, showGraph, columns, colors, width, 
         [labels[1]]: feature[1][idx],
       }
     })
-  }).filter((f, idx) => contours.length === 2 && ((showTrain || idx!==0) && (showTest || idx!==1)))
+  }).filter((f, idx) => contours.length !== 2 || ((showTrain || idx!==0) && (showTest || idx!==1)))
   
   const data1 = contours.reduce((all_contours, contour, k) => {
     if (!showTrain && k === 0) {
