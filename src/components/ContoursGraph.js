@@ -12,6 +12,14 @@ export default function({contours, features, showGraph, columns, colors, width, 
       }
     })
   })
+  const data1 = contours.map((contour) => {
+    return contour[0].map((f, idx) => {
+      return {
+        [labels[0]]: contour[0][idx],
+        [labels[1]]: contour[1][idx],
+      }
+    })
+  })
   // const data2 = contours.map((feature) => {
   //   return feature[0].map((f, idx) => {
   //     return {
@@ -74,11 +82,23 @@ export default function({contours, features, showGraph, columns, colors, width, 
           </polygon>
         ))}
 
+        { contours.length === 1 && data1.map((contour, idx) => (
+          <Scatter 
+            line={true}
+            strokeWidth='2'
+            data={contour} 
+            fill={colors[1]}
+            shape={() => <div></div>}>
+
+          </Scatter>
+        ))}
+
         { data.map((features, idx) => (
           <Scatter
             name={targets ? ('' + Object.keys(targets).sort()[idx]) : ('' + (idx+1))}
             fill={colors[idx%colors.length]}
             data={features}
+            shape='circle'
           ></Scatter>
         ))}
 
