@@ -118,10 +118,10 @@ export default function({contours, features, showGraph, columns, colors, width, 
         <Tooltip></Tooltip>
       </ComposedChart>
       <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 8, marginRight: 16}}>
-        <input type='checkbox' onChange={(e) => setShowTrain(e.target.checked)} checked={showTrain} />
+        <input type='checkbox' onChange={(e) => setShowTrain(showTest ? e.target.checked : true)} checked={showTrain} />
         <span>Show train</span>
         <span style={{width: 10}}></span>
-        <input type='checkbox' onChange={(e) => setShowTest(e.target.checked)} checked={showTest} />
+        <input type='checkbox' onChange={(e) => setShowTest(showTrain ? e.target.checked : true)} checked={showTest} />
         <span>Show test</span>
       </div>
     </div>
