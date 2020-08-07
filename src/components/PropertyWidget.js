@@ -38,7 +38,7 @@ function PropertyWidget({
   const [tripleDown, setTripleDown] = useState(10)
   const [tripleMaxHold, setTripleMaxHold] = useState(10)
 
-  const [hasIndex, setHasIndex] = useState(false)
+  const [hasIndex, setHasIndex] = useState(true)
   
   useEffect(() => {
     if (transform && transform.id !== IDS.MLAlgorithm) {
