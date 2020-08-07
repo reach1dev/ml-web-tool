@@ -150,6 +150,10 @@ export const TransformParameters = {
       name: 'random_state',
       type: 'number',
       default: 0
+    }, {
+      name: 'n_estimators',
+      type: 'number',
+      default: 100
     }]
   }],
 
