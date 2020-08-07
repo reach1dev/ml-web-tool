@@ -37,6 +37,8 @@ function PropertyWidget({
   const [tripleUp, setTripleUp] = useState(10)
   const [tripleDown, setTripleDown] = useState(10)
   const [tripleMaxHold, setTripleMaxHold] = useState(10)
+
+  const [hasIndex, setHasIndex] = useState(false)
   
   useEffect(() => {
     if (transform && transform.id !== IDS.MLAlgorithm) {
@@ -75,7 +77,7 @@ function PropertyWidget({
     if (file === null) {
       setError(true)
     } else {
-      TransformAction.uploadInputData(file)
+      TransformAction.uploadInputData(file, hasIndex)
     }
   }
 
@@ -299,6 +301,10 @@ function PropertyWidget({
     return (
       <div className='Property-Item-Container' key={0}>
         <p style={{display: 'flex', justifyContent: 'space-between'}}><b>Input Data: {uploading ? 'uploading...' : inputFile} </b> <input type='button' onClick={uploadFile} value='Upload' /></p>
+        <div style={{display: 'flex', alignItems: 'center', marginBottom: 10, marginLeft: -4}}>
+          <input type="checkbox" onChange={(e)=>{setHasIndex(e.target.checked)}} checked={hasIndex}></input>
+          <span>Has index</span>
+        </div>
         <input id='files' type='file' onChange={(e) => setFile(e.target.files[0])} />
         <p style={{color: 'red'}}>{error && !file ? 'Please select file' : ''}</p>
       </div>

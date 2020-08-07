@@ -197,7 +197,7 @@ export const removeTransform = (transformId) => {
   }
 }
 
-export const uploadInputData = (file) => {
+export const uploadInputData = (file, hasIndex) => {
   return (dispatch) => {
     dispatch({
       type: UPLOADING_INPUT_DATA,
@@ -209,7 +209,7 @@ export const uploadInputData = (file) => {
     axios.defaults.baseURL = BaseUrl
     // axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*'
     axios
-      .post("/upload-input-data", formData)
+      .post("/upload-input-data/" + (hasIndex?'1':'0'), formData)
       .then(res => {
         if (res.status === 200) {
           dispatch({
