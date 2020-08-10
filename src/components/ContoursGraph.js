@@ -29,25 +29,15 @@ export default function({contours, features, showGraph, columns, colors, width, 
       }
     }))
   }, [])
-  // const data2 = contours.map((feature) => {
-  //   return feature[0].map((f, idx) => {
-  //     return {
-  //       [labels[0]]: feature[0][idx],
-  //       [labels[1]]: feature[1][idx],
-  //     }
-  //   })
-  // })
-  //const colors = ['red', 'blue', 'green', 'yellow', 'gray', 'pink', 'black']
-  const points = contours.map((c) => {
-    return c.map((xy) => {
-      return [xy[1]*(width-60)/100+65, -xy[0]*(height-30)/100+height-50]
+  
+  const data2 = contours.map((feature) => {
+    return feature[0].map((f, idx) => {
+      return {
+        [labels[0]]: feature[0][idx],
+        [labels[1]]: feature[1][idx],
+      }
     })
   })
-
-  const left = 64
-  const top = 2
-  const right = left+width-60
-  const bottom = top+height-52
 
   return (
     <div>
@@ -78,33 +68,25 @@ export default function({contours, features, showGraph, columns, colors, width, 
           <Label value={columns[1] || targetColumn} offset={0} angle={90} position="topLeft" />
         </YAxis>
 
-        { contours.length > 0 && contours.length !== 2 &&  <polygon
-          fillOpacity={0.3}
-          fill={colors[1]}
-          points={[[left,top], [right,top], [right, bottom], [left, bottom]]}
-        >
-
-        </polygon> }
-
-        { points.map((pts, idx) => (
-          <polygon 
-            points={pts} 
-            fillOpacity={0.3}
-            fill={colors[0]}>
-
-          </polygon>
-        ))}
-
         { contours.length === 2 &&  (
           <Scatter 
             line={true}
             strokeWidth='2'
             data={data1} 
-            fill={colors[1]}
-            shape={() => <div></div>}>
+            fill={colors[2]}
+            shape={<div></div>}>
 
           </Scatter>
         )}
+
+        { data2.map((features, idx) => (
+          <Scatter
+            line={true}
+            strokeWidth='2'
+            data={features} 
+            fill={colors[2]}
+            shape={<div></div>}></Scatter>
+        ))}
 
         { data.map((features, idx) => (
           <Scatter
@@ -114,18 +96,16 @@ export default function({contours, features, showGraph, columns, colors, width, 
             shape='circle'
           ></Scatter>
         ))}
-
-        {contours.length !== 2 && <Legend></Legend>}
-
+        
         <Tooltip></Tooltip>
       </ComposedChart>
-      <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 8, marginRight: 16}}>
+      { contours.length === 2 && <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 8, marginRight: 16}}>
         <input type='checkbox' onChange={(e) => setShowTrain(showTest ? e.target.checked : true)} checked={showTrain} />
         <span>Show train</span>
         <span style={{width: 10}}></span>
         <input type='checkbox' onChange={(e) => setShowTest(showTrain ? e.target.checked : true)} checked={showTest} />
         <span>Show test</span>
-      </div>
+      </div> }
     </div>
   )
 }

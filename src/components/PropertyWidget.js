@@ -54,7 +54,7 @@ function PropertyWidget({
       setAlgorithmType(algParams.type)
       setInputFilters(algParams.inputFilters || [])
       setTrainLabel(algParams.trainLabel || '')
-      setTestShift(algParams.testShift || 1)
+      setTestShift(typeof (algParams.testShift) !== 'undefined' ? algParams.testShift : 1)
       setTrainSampleCount(algParams.trainSampleCount || Math.floor(sampleCount*0.7))
       setParameters(algParams.parameters || {} )
       setParameterTypes(TransformParameters[transform.tool.id] || [])
