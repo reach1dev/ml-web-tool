@@ -6,7 +6,11 @@ export default function({contours, features, showGraph, columns, colors, width, 
   const [showTest, setShowTest] = useState(true)
 
   const labels = ['x', 'y']
-  const data = features.map((feature) => {
+  const trainFeatures = features[0]
+  const testFeatures = features[1]
+  const selectedFeatures = contours.length === 2 ? features : showTrain && showTest ? trainFeatures.map((features, i) => features.map((feature, j) => feature.concat(testFeatures[i][j]))) : showTrain ? trainFeatures: testFeatures
+
+  const data = selectedFeatures.map((feature) => {
     return feature[0].map((f, idx) => {
       return {
         [labels[0]]: feature[0][idx],
@@ -99,7 +103,7 @@ export default function({contours, features, showGraph, columns, colors, width, 
         
         <Tooltip></Tooltip>
       </ComposedChart>
-      { contours.length === 2 && <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 8, marginRight: 16}}>
+      { <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 8, marginRight: 16}}>
         <input type='checkbox' onChange={(e) => setShowTrain(showTest ? e.target.checked : true)} checked={showTrain} />
         <span>Show train</span>
         <span style={{width: 10}}></span>
