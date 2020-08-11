@@ -153,7 +153,7 @@ export const TransformParameters = {
     }, {
       name: 'n_estimators',
       type: 'number',
-      default: 100
+      default: 90
     }]
   }],
 
