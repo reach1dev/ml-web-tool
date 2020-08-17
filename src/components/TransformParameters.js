@@ -134,6 +134,10 @@ export const TransformParameters = {
       name: 'random_state',
       type: 'number',
       default: 0
+    }, {
+      name: 'criterion',
+      type: 'string',
+      default: 'gini'
     }]
   }, {
     type: 8,
@@ -154,6 +158,10 @@ export const TransformParameters = {
       name: 'n_estimators',
       type: 'number',
       default: 90
+    }, {
+      name: 'criterion',
+      type: 'string',
+      default: 'gini'
     }]
   }],
 
