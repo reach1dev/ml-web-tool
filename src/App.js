@@ -68,7 +68,7 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
 
   const onModelSelected = (modelId) => {
     console.log('model id = ' + modelId)
-    const models1 = models.filter((m) => m.model_id === modelId)
+    const models1 = models.filter((m) => (""+m.model_id) === modelId)
     if (models1.length > 0) {
       const option = JSON.parse(models1[0].model_options)
       try {
