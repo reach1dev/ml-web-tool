@@ -67,9 +67,12 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
   }
 
   const onModelSelected = (modelId) => {
+    console.log('model id = ' + modelId)
     const m = models.filter((m) => m.model_id === modelId)
     if (m.length > 0) {
       const option = JSON.parse(m[0].model_options)
+      console.log('transforms = ' + JSON.stringify(option.transforms))
+      console.log('parameters = ' + JSON.stringify(option.parameters))
       transformAction.loadTransforms(option.transforms)
       trainerAction.saveTrainerSettings(option.parameters)
     }
@@ -113,7 +116,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    transformAction: bindActionCreators(TransformAction, dispatch)
+    transformAction: bindActionCreators(TransformAction, dispatch),
+    trainerAction: bindActionCreators(TrainerAction, dispatch),
   }
 }
 
