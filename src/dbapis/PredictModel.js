@@ -22,7 +22,7 @@ export const updatePredictModel = (modelId, transforms, parameters) => {
     parameters: parameters,
   }).then((res) => {
     if (res.status === 200 && res.data.success === true) {
-      window.alert('Model \"' + modelName + '\" has been updated.')
+      window.alert('Model #' + modelId + ' has been updated.')
     }
   })
 }
