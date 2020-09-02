@@ -6,6 +6,7 @@ import { bindActionCreators } from 'redux';
 import * as TransformAction from './actions/TransformAction';
 import * as TrainerAction from './actions/TrainerAction';
 import { savePredictModel } from './dbapis/PredictModel';
+import { updatePredictModel } from './dbapis/PredictModel';
 import { getPredictModels } from './dbapis/PredictModel';
 
 function App({transforms, trainOptions, transformAction, trainerAction}) {
@@ -19,6 +20,7 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
   const [modelName, setModelName] = useState("")
 
   const [models, setModels] = useState([])
+  const [selectedModelId, setSelectedModelId] = useState(0)
 
   const saveTransformations = () => {
     const href = JsonFileHeader + encodeURIComponent(JSON.stringify(transforms));
@@ -48,11 +50,19 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
 
   const saveModel = () => {
     if (showModelName) {
-      savePredictModel(modelName, transforms, trainOptions)
-      setShowModelName(false)
+      if (modelName !== '') {
+        savePredictModel(modelName, transforms, trainOptions)
+        setShowModelName(false)
+      } else {
+        window.alert('Please input model name.')
+      }
     } else {
       setShowModelName(true)
     }
+  }
+
+  const updateModel = () => {
+      updatePredictModel(selectedModelId, transforms, trainOptions)
   }
 
   const loadModelList = () => {
@@ -75,7 +85,8 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
         console.log('transforms = ' + JSON.stringify(option.transforms))
         console.log('parameters = ' + JSON.stringify(option.parameters))
         transformAction.loadTransforms(option.transforms)
-        trainerAction.saveTrainerSettings(option.parameters)        
+        trainerAction.saveTrainerSettings(option.parameters)
+        setSelectedModelId(modelId)      
       } catch (error) {
         console.log(error)        
       }
@@ -96,9 +107,9 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
         <button className='Menu' onClick={() => loadTransformations()} value='Save'>Load transformations</button>
 
         { showModelName && <input className='Menu' placeholder='Type model name' value={modelName} onChange={(e)=>setModelName(e.target.value)} ></input>}
-        <button className='Menu' onClick={() => saveModel()} value='Save'>Save model</button>
+        <button className='Menu' onClick={() => saveModel()} value='Save'>Create new model</button>
 
-        <button className='Menu' onClick={() => loadModelList()} value='Save'>Load models</button>
+        <button className='Menu' onClick={() => loadModelList()} value='Save'>Load all models</button>
 
         {models.length > 0 && <select className='Menu' onChange={(e) => onModelSelected(e.target.value)}>
           <option>Select model</option>
@@ -106,6 +117,8 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
             <option value={model.model_id}>{model.model_name}</option>
           )) }
         </select> }
+
+        { (models.length > 0 && selectedModelId > 0) && <button className='Menu' onClick={() => updateModel()} value='Save'>Update current model</button> }
       </div>
       <Board/>
     </div>

@@ -15,6 +15,18 @@ export const savePredictModel = (modelName, transforms, parameters) => {
   })
 }
 
+export const updatePredictModel = (modelId, transforms, parameters) => {
+  axios.defaults.baseURL = BaseUrl
+  axios.put('/update-model/' + modelId, {
+    transforms: transforms,
+    parameters: parameters,
+  }).then((res) => {
+    if (res.status === 200 && res.data.success === true) {
+      window.alert('Model \"' + modelName + '\" has been updated.')
+    }
+  })
+}
+
 export const getPredictModels = async () => {
   axios.defaults.baseURL = BaseUrl
   const res = await axios.get('/list-model')
