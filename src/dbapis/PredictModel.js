@@ -14,3 +14,12 @@ export const savePredictModel = (modelName, transforms, parameters) => {
     }
   })
 }
+
+export const getPredictModels = async () => {
+  axios.defaults.baseURL = BaseUrl
+  const res = await axios.get('/list-model')
+  if (res.status === 200) {
+    return res.data
+  }
+  return []
+}

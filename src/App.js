@@ -4,9 +4,11 @@ import Board from './components/Board';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as TransformAction from './actions/TransformAction';
+import * as TrainerAction from './actions/TrainerAction';
 import { savePredictModel } from './dbapis/PredictModel';
+import { getPredictModels } from './dbapis/PredictModel';
 
-function App({transforms, trainOptions, transformAction}) {
+function App({transforms, trainOptions, transformAction, trainerAction}) {
 
 
   const linkRef = React.createRef();
@@ -15,6 +17,8 @@ function App({transforms, trainOptions, transformAction}) {
 
   const [showModelName, setShowModelName] = useState(false)
   const [modelName, setModelName] = useState("")
+
+  const [models, setModels] = useState([])
 
   const saveTransformations = () => {
     const href = JsonFileHeader + encodeURIComponent(JSON.stringify(transforms));
@@ -51,6 +55,22 @@ function App({transforms, trainOptions, transformAction}) {
     }
   }
 
+  const loadModelList = () => {
+    getPredictModels().then((res) => {
+      setModels(res)
+      window.alert('Loaded models successfully, select model to load.')
+    })
+  }
+
+  const onModelSelected = (modelId) => {
+    const m = models.filter((m) => m.model_id === modelId)
+    if (m.length > 0) {
+      const option = JSON.parse(m[0].model_options)
+      transformAction.loadTransforms(option.transforms)
+      trainerAction.saveTrainerSettings(option.parameters)
+    }
+  }
+
   return (
     <div className="App">
       <div className="Header">
@@ -64,6 +84,15 @@ function App({transforms, trainOptions, transformAction}) {
 
         { showModelName && <input className='Menu' placeholder='Type model name' value={modelName} onChange={(e)=>setModelName(e.target.value)} ></input>}
         <button className='Menu' onClick={() => saveModel()} value='Save'>Save model</button>
+
+        <button className='Menu' onClick={() => loadModelList()} value='Save'>Load models</button>
+
+        {models.length > 0 && <select className='Menu' onChange={(e) => onModelSelected(e.target.value)}>
+          <option>Select model</option>
+          { models.map((model) => (
+            <option value={model.model_id}>{model.model_name}</option>
+          )) }
+        </select> }
       </div>
       <Board/>
     </div>
