@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import Board from './components/Board';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as TransformAction from './actions/TransformAction';
+import { savePredictModel } from './dbapis/PredictModel';
 
-function App({transforms, transformAction}) {
+function App({transforms, trainOptions, transformAction}) {
 
 
   const linkRef = React.createRef();
   const uploadFileRef = React.createRef();
-  const JsonFileHeader = "text/json;charset=utf-8,"
+  const JsonFileHeader = "text/json;charset=utf-8,";
+
+  const [showModelName, setShowModelName] = useState(false)
+  const [modelName, setModelName] = useState("")
 
   const saveTransformations = () => {
     const href = JsonFileHeader + encodeURIComponent(JSON.stringify(transforms));
@@ -38,6 +42,15 @@ function App({transforms, transformAction}) {
     }
   }
 
+  const saveModel = () => {
+    if (showModelName) {
+      savePredictModel(modelName, transforms, trainOptions)
+      setShowModelName(false)
+    } else {
+      setShowModelName(true)
+    }
+  }
+
   return (
     <div className="App">
       <div className="Header">
@@ -48,6 +61,9 @@ function App({transforms, transformAction}) {
 
         <input type="file" onChange={(e) => loadFile(e.target.files[0])} id="file" ref={uploadFileRef} style={{display: "none"}}/>
         <button className='Menu' onClick={() => loadTransformations()} value='Save'>Load transformations</button>
+
+        { showModelName && <input className='Menu' placeholder='Type model name' value={modelName} onChange={(e)=>setModelName(e.target.value)} ></input>}
+        <button className='Menu' onClick={() => saveModel()} value='Save'>Save model</button>
       </div>
       <Board/>
     </div>
@@ -57,6 +73,7 @@ function App({transforms, transformAction}) {
 const mapStateToProps = (state) => {
   return {
     transforms: state.transforms.transforms,
+    trainOptions: state.trainer.options,
   }
 }
 

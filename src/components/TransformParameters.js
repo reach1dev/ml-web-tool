@@ -129,15 +129,18 @@ export const TransformParameters = {
     }, {
       name: 'max_depth',
       type: 'number',
-      default: 2
+      default: 2,
+      defaultRange: '2~4'
     }, {
       name: 'random_state',
       type: 'number',
-      default: 0
+      default: 0,
+      defaultRange: '0'
     }, {
       name: 'criterion',
       type: 'string',
-      default: 'gini'
+      default: 'mse',
+      defaultRange: 'mse,mae'
     }]
   }, {
     type: 8,
@@ -161,7 +164,8 @@ export const TransformParameters = {
     }, {
       name: 'criterion',
       type: 'string',
-      default: 'gini'
+      default: 'mse',
+      defaultRange: 'mse,mae'
     }]
   }],
 
