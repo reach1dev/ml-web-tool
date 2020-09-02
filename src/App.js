@@ -57,8 +57,12 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
 
   const loadModelList = () => {
     getPredictModels().then((res) => {
-      setModels(res)
-      window.alert('Loaded models successfully, select model to load.')
+      if (res.success) {
+        setModels(res.models)
+        window.alert('Loaded models successfully, select model to load.')
+      } else {
+        window.alert('Loaded models failed.')
+      }
     })
   }
 
