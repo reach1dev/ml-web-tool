@@ -39,6 +39,8 @@ function PropertyWidget({
   const [tripleMaxHold, setTripleMaxHold] = useState(10)
 
   const [hasIndex, setHasIndex] = useState(true)
+
+  const [selectedServerFile, setSelectedServerFile] = useState('data_BCRaw')
   
   useEffect(() => {
     if (transform && transform.id !== IDS.MLAlgorithm) {
@@ -79,6 +81,10 @@ function PropertyWidget({
     } else {
       TransformAction.uploadInputData(file, hasIndex)
     }
+  }
+
+  const selectFile = () => {
+    TransformAction.selectServerFile(selectedServerFile)
   }
 
   const removeNode = () => {
@@ -300,13 +306,21 @@ function PropertyWidget({
   const _renderInputData = () => {
     return (
       <div className='Property-Item-Container' key={0}>
-        <p style={{display: 'flex', justifyContent: 'space-between'}}><b>Input Data: {uploading ? 'uploading...' : inputFile} </b> <input type='button' onClick={uploadFile} value='Upload' /></p>
+        <p style={{display: 'flex', justifyContent: 'space-between'}}><b>Input Data: {uploading ? 'uploading...' : inputFile} </b> 
+          <input type='button' onClick={uploadFile} value='Upload' /></p>
         <div style={{display: 'flex', alignItems: 'center', marginBottom: 10, marginLeft: -4}}>
           <input type="checkbox" onChange={(e)=>{setHasIndex(e.target.checked)}} checked={hasIndex}></input>
           <span>Has index</span>
         </div>
         <input id='files' type='file' onChange={(e) => setFile(e.target.files[0])} />
         <p style={{color: 'red'}}>{error && !file ? 'Please select file' : ''}</p>
+
+        <p style={{display: 'flex', justifyContent: 'space-between'}}>
+        <select onChange={(e) => {setSelectedServerFile(e.target.value)}}>
+          <option value="data_BCRaw">&nbsp;&nbsp;BCRaw.txt&nbsp;&nbsp;</option>
+        </select>
+        <input type='button' onClick={selectFile} value='Select server file' />
+        </p>
       </div>
     )
   }

@@ -197,6 +197,38 @@ export const removeTransform = (transformId) => {
   }
 }
 
+export const selectServerFile = (fileId) => {
+  return (dispatch) => {
+    dispatch({
+      type: UPLOADING_INPUT_DATA,
+    })
+
+
+    axios.defaults.baseURL = BaseUrl
+    axios
+      .post("/select-input-data/" + fileId)
+      .then(res => {
+        if (res.status === 200) {
+          dispatch({
+            type: UPLOADING_INPUT_DATA_SUCCESS,
+            payload: {
+              file: fileId,
+              fileId: fileId,
+              sampleCount: res.data.sample_count,
+              columns: res.data.columns,
+              indexColumn: res.data.index
+            }
+          })
+        } else {
+          dispatch({
+            type: UPLOADING_INPUT_DATA_FAILED,
+          })
+        }
+      })
+      .catch(err => console.log(err));
+  }
+}
+
 export const uploadInputData = (file, hasIndex) => {
   return (dispatch) => {
     dispatch({
