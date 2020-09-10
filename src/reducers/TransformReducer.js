@@ -37,7 +37,7 @@ const initialState = {
   outputData: null,
   trainMetrics: null,
   metricMeta: null,
-  fileId: null,
+  fileId: 'data_BCRaw',
   file: null,
   uploading: false,  
   sampleCount: 0,
