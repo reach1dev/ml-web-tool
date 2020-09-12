@@ -5,7 +5,7 @@ export const Classification = 1
 export const Regression = 2
 export const Analyse = 3
 
-export const AlgorithmTypes = [Clustering, Classification, Regression, Classification, Classification, Analyse, Classification, Classification, Classification]
+export const AlgorithmTypes = [Clustering, Classification, Regression, Classification, Classification, Analyse, Classification, Classification, Classification, Classification]
 
 export const TransformParameters = {
   [TR_IDS.MLAlgorithm]: [{
@@ -166,6 +166,47 @@ export const TransformParameters = {
       type: 'string',
       default: 'mse',
       defaultRange: 'mse,mae'
+    }]
+  }, {
+    type: 9,
+    name: 'Multi-Layer Perceptron',
+    parameters: [{
+      name: 'regression',
+      type: 'boolean',
+      default: false
+    }, {
+      name: 'alpha',
+      type: 'number',
+      default: 0.00001,
+      defaultRange: '0.001,0.0001,0.00001'
+    }, {
+      name: 'hidden_layer_sizes',
+      type: 'text',
+      default: '5,2'
+    }, {
+      name: 'random_state',
+      type: 'number',
+      default: 0
+    }, {
+      name: 'solver',
+      type: 'string',
+      default: 'sgd',
+      defaultRange: 'lbfgs,sgd,adam'
+    }, {
+      name: 'learning_rate',
+      type: 'string',
+      default: 'constant',
+      defaultRange: 'constant,invscaling,adaptive'
+    }, {
+      name: 'batch_size',
+      type: 'string',
+      default: 'auto',
+      defaultRange: '10,50,100,200'
+    }, {
+      name: 'learning_rate_init',
+      type: 'number',
+      default: 0.001,
+      defaultRange: '0.01,0.05,0.001'
     }]
   }],
 

@@ -27,6 +27,15 @@ export const updatePredictModel = (modelId, transforms, parameters) => {
   })
 }
 
+export const removePredictModel = (modelId) => {
+  axios.defaults.baseURL = BaseUrl
+  axios.delete('/remove-model/' + modelId).then((res) => {
+    if (res.status === 200 && res.data.success === true) {
+      window.alert('Model #' + modelId + ' has been removed.')
+    }
+  })
+}
+
 export const getPredictModels = async () => {
   axios.defaults.baseURL = BaseUrl
   const res = await axios.get('/list-model')

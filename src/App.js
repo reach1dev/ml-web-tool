@@ -6,7 +6,7 @@ import { bindActionCreators } from 'redux';
 import * as TransformAction from './actions/TransformAction';
 import * as TrainerAction from './actions/TrainerAction';
 import { savePredictModel } from './dbapis/PredictModel';
-import { updatePredictModel } from './dbapis/PredictModel';
+import { removePredictModel, updatePredictModel } from './dbapis/PredictModel';
 import { getPredictModels } from './dbapis/PredictModel';
 
 function App({transforms, trainOptions, transformAction, trainerAction}) {
@@ -59,6 +59,10 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
     } else {
       setShowModelName(true)
     }
+  }
+
+  const removeModel = () => {
+      removePredictModel(selectedModelId)
   }
 
   const updateModel = () => {
@@ -119,6 +123,7 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
         </select> }
 
         { (models.length > 0 && selectedModelId > 0) && <button className='Menu' onClick={() => updateModel()} value='Save'>Update current model</button> }
+        { (models.length > 0 && selectedModelId > 0) && <button className='Menu' onClick={() => removeModel()} value='Remove'>Remove current model</button> }
       </div>
       <Board/>
     </div>
