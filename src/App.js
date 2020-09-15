@@ -58,6 +58,7 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
       }
     } else {
       setShowModelName(true)
+      transformAction.clearTransforms()
     }
   }
 
@@ -111,7 +112,7 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
         <button className='Menu' onClick={() => loadTransformations()} value='Save'>Load transformations</button>
 
         { showModelName && <input className='Menu' placeholder='Type model name' value={modelName} onChange={(e)=>setModelName(e.target.value)} ></input>}
-        <button className='Menu' onClick={() => saveModel()} value='Save'>Create new model</button>
+        <button className='Menu' onClick={() => saveModel()} value='Save'>{ showModelName ? 'Save model' : 'Create new model' }</button>
 
         <button className='Menu' onClick={() => loadModelList()} value='Save'>Load all models</button>
 
