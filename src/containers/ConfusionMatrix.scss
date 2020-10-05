@@ -1,0 +1,41 @@
+@import '../constants/Styles.scss';
+
+.confusion-matrix {
+  margin-top: 4rem;
+
+  table {
+    width: 100%;
+    margin-top: 1rem;
+    border-collapse: collapse;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+  }
+
+  thead {
+    background-color: $primary;
+  }
+
+  th, td {
+    text-align: center; 
+    font-size: 1.2rem;
+    padding: 0.3rem;
+    border-left: solid #eee 1px;
+    border-top: solid #eee 1px;
+  }
+
+  th {
+    background-color: $primary;
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 500;
+    font-family: Montserrat;
+    padding: 0.8rem;
+  }
+
+  td {
+    color: white;
+    font-size: 1.2rem;
+    font-family: Montserrat;
+    font-weight: 400;
+  }
+}

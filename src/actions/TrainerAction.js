@@ -4,7 +4,7 @@ import { createTask, FAILED, PROCESSING, SUCCESS } from './TaskAction'
 import { getColumns, parseGraphList } from '../model/GraphData'
 import { getMetricMeta } from '../model/MetricData'
 import { BaseUrl } from './Constants'
-import { AlgorithmTypes, Classification, Clustering, Regression } from '../components/TransformParameters'
+import { AlgorithmTypes, Classification, Clustering, Regression } from '../constants/TransformParameters'
 
 
 export const loadTrainerSettings = () => {

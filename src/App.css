@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
 .App {
   display: flex;
   flex-direction: column;
@@ -8,15 +10,23 @@
 
 .Header {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
-}
-
-.Header h2 {
-  margin-bottom: 0.6rem;
 }
 
 .Menu {
   margin-left: 2rem;
   margin-bottom: -1rem;
+}
+
+.MenuContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+.Title {
+  color: #57d0ff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2.5rem;
+  padding-left: 24px;
 }

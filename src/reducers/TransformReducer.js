@@ -1,5 +1,5 @@
 import * as types from "../redux/ActionTypes"
-import { IDS } from "../components/ItemTypes";
+import { IDS } from "../constants/ItemTypes";
 
 const initialState = {
   transforms: [{

@@ -1,0 +1,92 @@
+@import '../constants/Styles.scss';
+
+.PropertyWidget {
+  z-index: 2;
+  padding-left: 0.6rem;
+  display: flex;
+}
+
+.PropertyWidget-Inner {
+  width: 24rem;
+  min-width: 13rem;
+  padding: 0.6rem;
+  font-size: 1rem;
+}
+
+.PropertyWidget-Header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.Properties-Container {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.Property-Item-Container {
+  background-color: #f0f0f0;
+  padding: 0.6rem;
+  margin-top: 0.6rem;
+  margin-bottom: 0.6rem;
+  border-radius: 0.6rem;
+  
+}
+
+.columns {
+  max-height: 28vh;
+  overflow-y: scroll;
+}
+
+.Property-Item-Header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.Property-Item {
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+}
+
+.Property-Item-Row {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.3rem;
+}
+
+.input-normal {
+  width: 10rem
+}
+
+.input-right {
+  text-align: right;
+  margin-left: 1.5rem
+}
+
+input, select, button {
+  font: 400 1rem Arial;
+}
+
+input[type='checkbox'] {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+p {
+  margin-top: 0.3rem;
+}
+
+.SmallTitle {
+  margin-left: 1.4rem;
+  font-size: 1.4rem;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  color: $primary;
+}
+
+.PropertyWidget-Header {
+  border-top: 1px solid #d6d6d6;
+  border-bottom: 1px solid #b6b6b6;
+  padding-top: 0.8rem;
+  padding-bottom: 0.7rem;
+}

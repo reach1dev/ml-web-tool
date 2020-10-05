@@ -1,6 +1,6 @@
 import { TRAINER_LOAD_SETTINGS, TRAINER_SAVE_SETTINGS, TRAINER_STARTED, TRAINER_FINISHED, TRAINER_FAILED, CLEAR_ALL, GET_TRANSFORM_DATA_START, OPTIMIZER_FINISHED } from '../redux/ActionTypes'
-import { TransformParameters } from '../components/TransformParameters'
-import { IDS } from '../components/ItemTypes'
+import { TransformParameters } from '../constants/TransformParameters'
+import { IDS } from '../constants/ItemTypes'
 
 
 const initialState = {

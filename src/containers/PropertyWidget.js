@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react'
-import './PropertyWidget.css'
+import './PropertyWidget.scss'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as TransformAction from '../actions/TransformAction'
 import * as TrainerAction from '../actions/TrainerAction'
 import * as OptimizerAction from '../actions/OptimizerAction'
-import { IDS } from './ItemTypes'
-import { TransformParameters, AlgorithmTypes, Classification, Regression } from './TransformParameters'
+import { IDS } from '../constants/ItemTypes'
+import { TransformParameters, AlgorithmTypes, Classification, Regression } from '../constants/TransformParameters'
 import OptimizeWidget from './OptimizeWidget'
 import { TR_IDS } from './TransformationTools'
+import SmallButton from '../components/SmallButton'
+import Button from '../components/Button'
 
 function PropertyWidget({
+  onDrawClicked,
   sampleCount, hide, setHide, uploading, inputFile, inputFileId, transforms, transform, 
   algParams, indexColumn,
   TransformAction, TrainerAction, OptimizerAction}) {
@@ -120,12 +123,14 @@ function PropertyWidget({
 
       setParameters(allParams)
       TrainerAction.startTrainer(inputFileId, transforms, allParams, indexColumn)
+      onDrawClicked()
     } else {
       window.alert('Please upload input file.')
     }
   }
 
   const drawGraph = () => {
+    onDrawClicked()
     if (inputFileId) {
       TransformAction.getTransformData(inputFileId, transforms, transform.id, indexColumn)
     } else{
@@ -307,7 +312,7 @@ function PropertyWidget({
     return (
       <div className='Property-Item-Container' key={0}>
         <p style={{display: 'flex', justifyContent: 'space-between'}}><b>Input Data: {uploading ? 'uploading...' : inputFile} </b> 
-          <input type='button' onClick={uploadFile} value='Upload' /></p>
+          <SmallButton type='button' onClick={uploadFile} value='Upload' /></p>
         <div style={{display: 'flex', alignItems: 'center', marginBottom: 10, marginLeft: -4}}>
           <input type="checkbox" onChange={(e)=>{setHasIndex(e.target.checked)}} checked={hasIndex}></input>
           <span>Has index</span>
@@ -315,11 +320,11 @@ function PropertyWidget({
         <input id='files' type='file' onChange={(e) => setFile(e.target.files[0])} />
         <p style={{color: 'red'}}>{error && !file ? 'Please select file' : ''}</p>
 
-        <p style={{display: 'flex', justifyContent: 'space-between'}}>
+        <p style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 60}}>
         <select onChange={(e) => {setSelectedServerFile(e.target.value)}}>
           <option value="data_BCRaw">&nbsp;&nbsp;BCRaw.txt&nbsp;&nbsp;</option>
         </select>
-        <input type='button' onClick={selectFile} value='Select server file' />
+        <SmallButton type='button' onClick={selectFile} value='Select server file' />
         </p>
       </div>
     )
@@ -327,6 +332,7 @@ function PropertyWidget({
 
   const _renderColumns2Transform = () => {
     const inputParameters = transform.inputParameters.filter((p, i) => p !== 'Date' && p !== 'Time')
+    console.log(inputParameters)
     return (
       <div className='Property-Item-Container columns' key={5}>
         <p className='Property-Item-Header'>
@@ -550,24 +556,33 @@ function PropertyWidget({
     <div className='PropertyWidget'>
       <div className='PropertyWidget-Inner'>
         <div className='PropertyWidget-Header'>
-          <b>Properties {transform ? ' of ' + transform.tool.shortName : ''}</b>
-          <b style={{cursor: 'pointer'}} onClick={() => setHide(true)}>Hide</b>
+          <b className='SmallTitle'>Properties {transform ? ' of ' + transform.tool.shortName : ''}</b>
         </div>
         <div className='Properties-Container'>
         {
           transform ?
           <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-            { transform.id > IDS.InputData && transform.id < IDS.MLAlgorithm && <input type='button' onClick={removeNode} value='Remove' /> }
+            { transform.id > IDS.InputData && transform.id < IDS.MLAlgorithm && 
+              <SmallButton type='button' onClick={removeNode} value='Remove' /> }
             <span style={{width: 10}}></span>
-            { transform.id > IDS.InputData && transform.id < IDS.MLAlgorithm && <input type='button' onClick={saveTransformation} value='Save' /> }
-            { transform.id === IDS.MLAlgorithm && <input type='button' onClick={saveMLAlgorithm} value='Save' /> }
+            { transform.id > IDS.InputData && transform.id < IDS.MLAlgorithm && 
+              <SmallButton type='button' onClick={saveTransformation} value='Save' /> }
+            { transform.id === IDS.MLAlgorithm && 
+              <SmallButton type='button' onClick={saveMLAlgorithm} value='Save' /> }
             <span style={{width: 10}}></span>
-            { transform.id >= IDS.InputData && transform.id < IDS.MLAlgorithm && <input type='button' onClick={drawGraph} value='Draw' /> }
-            { transform.id === IDS.MLAlgorithm && <input type='button' onClick={() => trainAndTest(false)} value='Train & Test' /> }
           </div> : null
         }
         
         { transform ? _render() : null }
+
+        { transform ? <div className='Properties-Container'>
+          <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+            { transform.id >= IDS.InputData && transform.id < IDS.MLAlgorithm && 
+              <Button type='button' onClick={drawGraph} value='Draw' /> }
+            { transform.id === IDS.MLAlgorithm && 
+              <Button type='button' onClick={() => trainAndTest(false)} value='Train & Test' /> }
+          </div>
+        </div> : null }
         </div>
       </div>
     </div>

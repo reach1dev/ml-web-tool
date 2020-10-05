@@ -1,0 +1,21 @@
+@import '../constants/Styles.scss';
+
+.InlineButton:hover {
+  color: $primary;
+}
+
+.InlineButton {
+  cursor: pointer;
+
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border-radius: 5px;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  color: black;
+  font-size: 1.4rem;
+  font-family: 'Montserrat';
+  font-weight: 600,
+}

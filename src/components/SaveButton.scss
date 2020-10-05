@@ -1,0 +1,20 @@
+@import '../constants/Styles.scss';
+
+.SaveButton {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 50px;
+}
+
+.Icon {
+  color: $primary-dark;
+  cursor: pointer;
+}
+
+.Cancel {
+  color: $secondary;
+}

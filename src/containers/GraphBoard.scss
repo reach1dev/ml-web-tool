@@ -1,0 +1,78 @@
+@import '../constants/Styles.scss';
+
+.GraphBoard {
+  z-index: 2;
+  flex: 1;
+  min-width: 360px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-left: 0.5rem;
+  margin-left: 4rem;
+  margin-top: 2rem;
+  margin-bottom: 6rem;
+}
+
+.GraphBoardContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+.Graph {
+  padding: 8px;
+  font-size: 0.8rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.Table-Row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: fit-content;
+}
+
+.Table-Cell {
+  color: black;
+  font-size: 14px;
+  margin: 6px;
+  text-align: left;
+  width: 180px;
+  height: fit-content;
+}
+
+.Table-Head {
+  color: black;
+  font-size: 14px;
+  margin: 4px;
+  text-align: left;
+  width: 150px;
+  height: fit-content;
+}
+
+.Table-Row:first-child {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  background-color: $primary;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1rem;
+  border-bottom: 0px;
+}
+
+.Table-Row:first-child span {
+  color: white;
+  font-family: Montserrat;
+  font-weight: 500;
+  font-size: medium;
+}
+
+.Table-Row {
+  background-color: white;
+  border-bottom: 1px solid $inactive;
+}
+
+.GoBackIcon {
+  transform: rotate(180deg) translateY(-0.2rem) scaleX(1.4);
+  margin-right: 0.5rem;
+}

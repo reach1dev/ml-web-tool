@@ -1,0 +1,13 @@
+@import '../constants/Styles.scss';
+
+.TextField {
+  border-radius: 4px;
+  border-color: $primary;
+  margin-left: 20px;
+  padding: 8px;
+  border-width: 1px;
+}
+
+.TextField:focus {
+  outline-color: $primary-dark;
+}

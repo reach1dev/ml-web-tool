@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
-import Board from './components/Board';
+import Board from './containers/Board';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as TransformAction from './actions/TransformAction';
@@ -8,6 +8,11 @@ import * as TrainerAction from './actions/TrainerAction';
 import { savePredictModel } from './dbapis/PredictModel';
 import { removePredictModel, updatePredictModel } from './dbapis/PredictModel';
 import { getPredictModels } from './dbapis/PredictModel';
+import Colors from './constants/Colors';
+import Button from './components/Button';
+import TextField from './components/TextField';
+import SaveButton from './components/SaveButton';
+import InlineButton from './components/InlineButton';
 
 function App({transforms, trainOptions, transformAction, trainerAction}) {
 
@@ -51,6 +56,7 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
   const saveModel = () => {
     if (showModelName) {
       if (modelName !== '') {
+        transformAction.clearTransforms()
         savePredictModel(modelName, transforms, trainOptions)
         setShowModelName(false)
       } else {
@@ -58,8 +64,11 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
       }
     } else {
       setShowModelName(true)
-      transformAction.clearTransforms()
     }
+  }
+
+  const cancelSave = () => {
+    setShowModelName(false)
   }
 
   const removeModel = () => {
@@ -103,28 +112,34 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
   return (
     <div className="App">
       <div className="Header">
-        <h2>Machine Learning Tool</h2>
+        <h2 className="Title">Machine Learning Tool</h2>
 
-        <a ref={linkRef} style={{display: 'none'}}>Download transformations</a>
-        <button className='Menu' onClick={() => saveTransformations()} >Save transformations</button>
+        <div className="MenuContainer">
+          <a ref={linkRef} style={{display: 'none'}}>Download transformations</a>
+          
+          <InlineButton onClick={() => saveTransformations()}>Save transformation</InlineButton>
 
-        <input type="file" onChange={(e) => loadFile(e.target.files[0])} id="file" ref={uploadFileRef} style={{display: "none"}}/>
-        <button className='Menu' onClick={() => loadTransformations()} value='Save'>Load transformations</button>
+          <input type="file" onChange={(e) => loadFile(e.target.files[0])} id="file" ref={uploadFileRef} style={{display: "none"}}/>
+          <InlineButton onClick={() => loadTransformations()}>Load transformation</InlineButton>
 
-        { showModelName && <input className='Menu' placeholder='Type model name' value={modelName} onChange={(e)=>setModelName(e.target.value)} ></input>}
-        <button className='Menu' onClick={() => saveModel()} value='Save'>{ showModelName ? 'Save model' : 'Create new model' }</button>
+          <InlineButton onClick={() => loadModelList()}>Load all models</InlineButton>
 
-        <button className='Menu' onClick={() => loadModelList()} value='Save'>Load all models</button>
+          { showModelName && 
+          <TextField placeholder='Type model name' value={modelName} onChange={(e)=>setModelName(e.target.value)} ></TextField> }
+          
+          { !showModelName && <Button onClick={() => saveModel()}>Create new model</Button> }
+          { showModelName && <SaveButton onSave={() => saveModel()} onCancel={() => cancelSave()} /> }
 
-        {models.length > 0 && <select className='Menu' onChange={(e) => onModelSelected(e.target.value)}>
-          <option>Select model</option>
-          { models.map((model) => (
-            <option value={model.model_id}>{model.model_name}</option>
-          )) }
-        </select> }
+          {models.length > 0 && <select className='Menu' onChange={(e) => onModelSelected(e.target.value)}>
+            <option>Select model</option>
+            { models.map((model) => (
+              <option value={model.model_id}>{model.model_name}</option>
+            )) }
+          </select> }
 
-        { (models.length > 0 && selectedModelId > 0) && <button className='Menu' onClick={() => updateModel()} value='Save'>Update current model</button> }
-        { (models.length > 0 && selectedModelId > 0) && <button className='Menu' onClick={() => removeModel()} value='Remove'>Remove current model</button> }
+          { (models.length > 0 && selectedModelId > 0) && <button className='Menu' onClick={() => updateModel()} value='Save'>Update current model</button> }
+          { (models.length > 0 && selectedModelId > 0) && <button className='Menu' onClick={() => removeModel()} value='Remove'>Remove current model</button> }
+        </div>
       </div>
       <Board/>
     </div>

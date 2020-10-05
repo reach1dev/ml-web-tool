@@ -1,0 +1,8 @@
+.Drop {
+  width: 14rem;
+  height: 5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 1rem;
+}

@@ -1,5 +1,5 @@
 import { Env } from "../config"
-import { AlgorithmTypes, Analyse } from "../components/TransformParameters"
+import { AlgorithmTypes, Analyse } from "../constants/TransformParameters"
 
 export const parseGraphList = (algType, list, columns, indexColumn = 'Date', extra = {}) => {
   let data = []

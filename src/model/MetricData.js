@@ -1,4 +1,4 @@
-import { AlgorithmTypes, Classification, Regression } from "../components/TransformParameters"
+import { AlgorithmTypes, Classification, Regression } from "../constants/TransformParameters"
 
 export const getMetricMeta = (algType, featureColumns, extra = {}) => {
   let metricMeta = null

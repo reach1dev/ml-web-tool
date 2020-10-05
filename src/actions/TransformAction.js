@@ -2,7 +2,7 @@ import { UPLOADING_INPUT_DATA, UPLOADING_INPUT_DATA_SUCCESS, UPLOADING_INPUT_DAT
 import axios from 'axios'
 import { BaseUrl } from "./Constants"
 import { UPDATE_TRANSFORMS, REMOVE_TRANSFORM_FROM_MLA, REMOVE_TRANSFORM, APPLY_TRANSFORM_SETTINGS, SELECT_TRANSFORM, CLEAR_ALL, ADD_TRANSFORM, ADD_TRANSFORM_TO_MLA, MOVE_TRANSFORM, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_FAILED } from "../redux/ActionTypes";
-import { IDS } from "../components/ItemTypes";
+import { IDS } from "../constants/ItemTypes";
 import { Env } from "../config";
 
 

@@ -1,4 +1,4 @@
-import { TR_IDS } from "./TransformationTools";
+import { TR_IDS } from "../containers/TransformationTools";
 
 export const Clustering = 0
 export const Classification = 1
