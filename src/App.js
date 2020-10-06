@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './App.css';
+import './App.scss';
 import Board from './containers/Board';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';

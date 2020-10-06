@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+@import './constants/Styles.scss';
+
+.App {
+  display: flex;
+  flex-direction: column;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+  height: 100%;
+}
+
+.Header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.Menu {
+  margin-left: 2rem;
+  margin-bottom: -1rem;
+}
+
+.MenuContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+.Title {
+  color: $primary;
+  font-family: $mainFont, sans-serif;
+  font-size: 2.5rem;
+  padding-left: 24px;
+}
+
+select {
+  height: 2rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border: 1px solid $inactive;
+  font-size: 1rem !important;
+  font-family: "Montserrat" !important;
+  width: 16rem;
+  border-radius: 0.5rem;
+}
+
+select:focus {
+  border-color: $primary-dark;
+}
+
+select:hover {
+  border-color: $primary-dark;
+}
+
+input[type="checkbox"]:focus {
+  outline: none;
+}
+
+input[type="checkbox"] {
+  background: url(./checkbox-unchecked.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  appearance: none;
+  transform: scale(1.2);
+}
+
+input[type="checkbox"]:checked {
+  background: url(./checkbox-checked.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.Checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.Checkbox input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+.SelectFile {
+  border-radius: 0.5rem;
+  background-color: $primary;
+  padding: 0.5rem;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: $mainFont;
+  text-align: center;
+  cursor: pointer;
+}
+
+.SelectFile:hover {
+  background-color: $primary-dark;
+}
+
+.SelectFile input[type="file"] {
+  opacity: 0;
+  position: absolute;
+  cursor: pointer;
+  margin-left: -5rem;
+  padding-right: 4rem;
+}

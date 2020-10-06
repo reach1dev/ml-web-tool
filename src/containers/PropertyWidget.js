@@ -11,6 +11,7 @@ import OptimizeWidget from './OptimizeWidget'
 import { TR_IDS } from './TransformationTools'
 import SmallButton from '../components/SmallButton'
 import Button from '../components/Button'
+import InlineButton from '../components/InlineButton'
 
 function PropertyWidget({
   onDrawClicked,
@@ -276,7 +277,8 @@ function PropertyWidget({
           {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
         </p>
         { (inputParameters).map((param, idx) => (
-          <div key={idx}><input type='checkbox' checked={filterChanged>0 && inputFilters[idx]} onChange={(e) => changeInputFilter(idx)} /> {param} </div>
+          <div key={idx}>
+          <input type='checkbox' checked={filterChanged>0 && inputFilters[idx]} onChange={(e) => changeInputFilter(idx)} /> {param} </div>
         ))}
       </div>
     )
@@ -301,7 +303,7 @@ function PropertyWidget({
         </p>
         <div>
         { (params).map((param, idx) => (
-          <div key={idx}><input type='checkbox' checked={filterChanged>0 && features[param]} onChange={(e) => changeFeature(param)} /> {param} </div>
+          <div key={idx} className='Checkbox' ><input type='checkbox' checked={filterChanged>0 && features[param]} onChange={(e) => changeFeature(param)} /> {param} </div>
         ))}
         </div>
       </div>
@@ -317,7 +319,10 @@ function PropertyWidget({
           <input type="checkbox" onChange={(e)=>{setHasIndex(e.target.checked)}} checked={hasIndex}></input>
           <span>Has index</span>
         </div>
-        <input id='files' type='file' onChange={(e) => setFile(e.target.files[0])} />
+        <div className='SelectFile'>
+          <input id='file2upload' type='file' onChange={(e) => setFile(e.target.files[0])} />
+          <span>{file ? file.name : 'Select file to upload'}</span>
+        </div>
         <p style={{color: 'red'}}>{error && !file ? 'Please select file' : ''}</p>
 
         <p style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 60}}>
@@ -340,11 +345,11 @@ function PropertyWidget({
         </p>
         { inputParameters.map((param, idx) => (
           <p className='Property-Item-Row' style={param.length > 6 ? {flexDirection: 'column'} : {flexDirection: 'row'}}>
-            <div style={{paddingBottom: 4}}>
+            <div className='Checkbox' style={{paddingBottom: 4}}>
               <input type='checkbox' checked={filterChanged>0 && transform.outputParameters[param] !== undefined} onClick={()=>addOrRemoveOutputParam(param)} /> {param} 
             </div>
             { transform.outputParameters[param] !== undefined ? 
-              <input type="text" className={param.length > 6 ? 'input-right' : 'input-normal'} value={transform.outputParameters[param]} 
+              <input type="text" className={param.length > 6 ? 'TextField input-right' : 'TextField input-normal'} value={transform.outputParameters[param]} 
                 onChange={(e)=>changeOutputParam(param, e.target.value)}  /> : null}
           </p>
         ))}
@@ -357,8 +362,8 @@ function PropertyWidget({
       const params = parameterTypes[algorithmType].parameters
       return params.map((param, idx) => (
         <div key={idx} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
-          <label style={{marginRight: 10}}>{param.name}{param.desc ? ' (' + param.desc + ')' : ''}</label>
-          <input type={param.type==='boolean' ? 'checkbox' : 'text'} style={param.type==='boolean' ? {} : {width: '100%', maxWidth: 180}} checked={param.type==='boolean'?parameters[param.name]:false} value={parameters[param.name]} onChange={(e)=> changeParameter(param.name, param.type==='boolean' ? e.target.checked : e.target.value, param.type)}></input>
+          <label className='Label' style={{marginRight: 10}}>{param.name}{param.desc ? ' (' + param.desc + ')' : ''}</label>
+          <input className='TextField' type={param.type==='boolean' ? 'checkbox' : 'text'} style={param.type==='boolean' ? {} : {width: '100%', maxWidth: 180}} checked={param.type==='boolean'?parameters[param.name]:false} value={parameters[param.name]} onChange={(e)=> changeParameter(param.name, param.type==='boolean' ? e.target.checked : e.target.value, param.type)}></input>
         </div>
       ))
     }
@@ -410,10 +415,10 @@ function PropertyWidget({
         <div className='Property-Item'>
           { parameters && parameterTypes ? parameterTypes.map((param) => (
             <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
-              <label style={{marginRight: 10}}>{param.name}</label>
-              <input style={{width: '100%', maxWidth: 180}} value={parameters[param.name]} disabled={(typeof param.required !== 'undefined' && !param.required) && typeof parameters[param.name] === 'undefined'} placeholder={param.placeholder} onChange={(e)=> changeParameter(param.name, e.target.value, param.type)}></input>
+              <label className='Label' style={{marginRight: 10}}>{param.name}</label>
+              <input className='TextField' style={{width: '100%', maxWidth: 180}} value={parameters[param.name]} disabled={(typeof param.required !== 'undefined' && !param.required) && typeof parameters[param.name] === 'undefined'} placeholder={param.placeholder} onChange={(e)=> changeParameter(param.name, e.target.value, param.type)}></input>
               { (typeof param.required !== 'undefined' && !param.required) && 
-                <input type="checkbox" onChange={(e) => changeParameter(param.name, e.target.checked ? param.default : '', param.type)} checked={typeof parameters[param.name] !== 'undefined'} style={{width: 20, height: 20}}></input> }
+                <input className='Checkbox' type="checkbox" onChange={(e) => changeParameter(param.name, e.target.checked ? param.default : '', param.type)} checked={typeof parameters[param.name] !== 'undefined'} style={{width: 20, height: 20}}></input> }
             </div>
           )) : null }
         </div>
@@ -447,7 +452,7 @@ function PropertyWidget({
         </p>
         { !disableSplit && <p className='Property-Item-Row'>
           <span>Train sample count: </span>
-          <input style={{width: 50}} value={trainSampleCount} onChange={(e) => {
+          <input className='TextField' style={{width: 50}} value={trainSampleCount} onChange={(e) => {
             const val = parseInt(e.target.value)
             if (val > 0 && val < sampleCount) {
               setTrainSampleCount(val)
@@ -481,9 +486,9 @@ function PropertyWidget({
   const _renderTripleBarrierOptions = () => {
     return (
       <div style={{marginLeft: 10}}>
-        <p className='Property-Item-Row'><span>up: </span> <input style={{width: 110}} value={tripleUp} onChange={(e) => setTripleUp(parseInt(e.target.value))} /></p>
-        <p className='Property-Item-Row'><span>down: </span> <input style={{width: 110}} value={tripleDown} onChange={(e) => setTripleDown(parseInt(e.target.value))} /></p>
-        <p className='Property-Item-Row'><span>maxhold: </span><input style={{width: 110}} value={tripleMaxHold} onChange={(e) => setTripleMaxHold(parseInt(e.target.value))} /></p>
+        <p className='Property-Item-Row'><span>up: </span> <input className='TextField' value={tripleUp} onChange={(e) => setTripleUp(parseInt(e.target.value))} /></p>
+        <p className='Property-Item-Row'><span>down: </span> <input className='TextField' value={tripleDown} onChange={(e) => setTripleDown(parseInt(e.target.value))} /></p>
+        <p className='Property-Item-Row'><span>maxhold: </span><input className='TextField' value={tripleMaxHold} onChange={(e) => setTripleMaxHold(parseInt(e.target.value))} /></p>
       </div>
     )
   }
@@ -496,7 +501,7 @@ function PropertyWidget({
         </p>
         <p className='Property-Item-Row'>
           <span>Target column: </span>
-          <select style={{width: 120}} value={trainLabel} onChange={(e) => setTrainLabel(e.target.value)}>
+          <select value={trainLabel} onChange={(e) => setTrainLabel(e.target.value)}>
             <option key={0} value='triple_barrier'>Triple Barrier</option>
             { transform.inputParameters && transform.inputParameters.map((p, idx) => (
               <option key={idx} value={p} style={{width: 120}}>&nbsp;{p}&nbsp;</option>
@@ -506,13 +511,13 @@ function PropertyWidget({
         { trainLabel === 'triple_barrier' ? _renderTripleBarrierOptions() : (
           <p className='Property-Item-Row'>
             <span>Test shift: </span>
-            <input style={{width: 110}} value={testShift} onChange={(e) => setTestShift(parseInt(e.target.value))} />
+            <input className='TextField' style={{width: 110}} value={testShift} onChange={(e) => setTestShift(parseInt(e.target.value))} />
           </p>
         )}
 
         <p className='Property-Item-Row'>
           <span>Resampling: </span>
-          <select style={{width: 120}} value={resampling} onChange={(e) => setResampling(e.target.value)}>
+          <select value={resampling} onChange={(e) => setResampling(e.target.value)}>
             <option key={0} value='none'>None</option>
             <option key={1} value='undersampling'>Undersampling</option>
             <option key={2} value='oversampling'>Oversampling</option>

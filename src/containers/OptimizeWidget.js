@@ -4,6 +4,9 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as OptimizerAction from '../actions/OptimizerAction'
 import { AlgorithmTypes, Classification } from '../constants/TransformParameters'
+import SmallButton from '../components/SmallButton'
+import InlineButton from '../components/InlineButton'
+import Button from '../components/Button'
 
 const OptimizeWidget = ({OptimizerAction, inputFileId, transforms, algorithmType, algParams, parameters, optimizeOpened, getParams}) => {
   const [optParams, setOptParams] = useState({})
@@ -75,19 +78,20 @@ const OptimizeWidget = ({OptimizerAction, inputFileId, transforms, algorithmType
   const _renderOptimizer = () => {
     return (
       <div style={{display: 'flex', alignItems: 'stretch', flexDirection: 'column'}}>
-        <div style={{display: 'flex', justifyContent: 'space-between'}}>
-          <button 
-            onClick={() => startOptimizer()} 
-            style={{marginTop: 8, marginBottom: 6, flex: 1}} >Start optimize</button>
+        <div style={{display: 'flex', justifyContent: 'space-between', paddingTop: 10, paddingBottom: 20, paddingLeft: 40}}>
+          <SmallButton 
+            onClick={() => startOptimizer()}
+            size='small' value='Start optimize'></SmallButton>
           <span style={{width: 20}} />
-          <button 
-            onClick={() => OptimizerAction.cancelOptimizer()} 
-            style={{marginTop: 8, marginBottom: 6}} >Cancel</button>
+          <SmallButton 
+            onClick={() => OptimizerAction.cancelOptimizer()}
+            value='Cancel'></SmallButton>
         </div>
         { parameters.map((param, idx) => (
           <div key={idx} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
-            <label style={{marginRight: 10}}>{param.name}{param.desc ? ' (' + param.desc + ')' : ''}</label>
+            <label className='Label' style={{marginRight: 10}}>{param.name}{param.desc ? ' (' + param.desc + ')' : ''}</label>
             <input 
+              className='TextField'
               type={param.type==='boolean' ? 'checkbox' : 'text'} 
               style={param.type==='boolean' ? {} : {width: '100%', maxWidth: 180}} 
               value={status >= 0 && optParams[param.name]} 
@@ -102,7 +106,7 @@ const OptimizeWidget = ({OptimizerAction, inputFileId, transforms, algorithmType
   return (
     <div className='Property-Item-Header' style={{justifyContent: 'flex-end'}}>
       { optimizeOpened ? _renderOptimizer() : (
-        <button onClick={() => OptimizerAction.openOptimizer(algParams.type)} >Optimize parameters</button>
+        <SmallButton onClick={() => OptimizerAction.openOptimizer(algParams.type)} value='Optimize parameters' ></SmallButton>
       ) }
     </div>
   )

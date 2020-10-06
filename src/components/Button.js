@@ -1,11 +1,11 @@
 import React from 'react';
 import './Button.scss';
 
-export default function({onClick, value, children}) {
+export default function({onClick, value, size, children}) {
   
   return (
     <div className='Button' onClick={onClick}>
-      <span>{ value || children }</span>
+      <span style={{fontSize: size}}>{ value || children }</span>
     </div>
   )
 }

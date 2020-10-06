@@ -4,10 +4,12 @@
   z-index: 2;
   padding-left: 0.6rem;
   display: flex;
+  height: 70rem;
+  overflow-y: scroll;
 }
 
 .PropertyWidget-Inner {
-  width: 24rem;
+  width: 30rem;
   min-width: 13rem;
   padding: 0.6rem;
   font-size: 1rem;
@@ -24,11 +26,10 @@
 }
 
 .Property-Item-Container {
-  background-color: #f0f0f0;
+  border-top: 1px solid #ccc;
   padding: 0.6rem;
   margin-top: 0.6rem;
   margin-bottom: 0.6rem;
-  border-radius: 0.6rem;
   
 }
 
@@ -40,6 +41,9 @@
 .Property-Item-Header {
   display: flex;
   justify-content: space-between;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: $mainFont;
 }
 
 .Property-Item {
@@ -79,7 +83,7 @@ p {
 .SmallTitle {
   margin-left: 1.4rem;
   font-size: 1.4rem;
-  font-family: 'Montserrat';
+  font-family: $mainFont;
   font-weight: 700;
   color: $primary;
 }
