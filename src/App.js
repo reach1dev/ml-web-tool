@@ -128,15 +128,15 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
           { showModelName && 
           <TextField placeholder='Type model name' value={modelName} onChange={(e)=>setModelName(e.target.value)} ></TextField> }
 
-          {models.length > 0 && <select className='Menu' onChange={(e) => onModelSelected(e.target.value)}>
+          {models.length > 0 && <select className='Menu MenuInside' onChange={(e) => onModelSelected(e.target.value)}>
             <option>Select model</option>
             { models.map((model) => (
               <option value={model.model_id}>{model.model_name}</option>
             )) }
           </select> }
 
-          { (models.length > 0 && selectedModelId > 0) && <SmallButton className='Menu' onClick={() => updateModel()} value='Save'>Update current model</SmallButton> }
-          { (models.length > 0 && selectedModelId > 0) && <SmallButton className='Menu' onClick={() => removeModel()} value='Remove'>Remove current model</SmallButton> }
+          { (models.length > 0 && selectedModelId > 0) && <SmallButton className='MenuButton' onClick={() => updateModel()} value='Update'>Update current model</SmallButton> }
+          { (models.length > 0 && selectedModelId > 0) && <SmallButton className='MenuButton' onClick={() => removeModel()} value='Remove'>Remove current model</SmallButton> }
 
           { !showModelName && <Button onClick={() => saveModel()}>Create new model</Button> }
           { showModelName && <SaveButton onSave={() => saveModel()} onCancel={() => cancelSave()} /> }

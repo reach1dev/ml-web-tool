@@ -1,10 +1,10 @@
 import React from 'react';
 import './SmallButton.scss';
 
-export default function({onClick, value}) {
+export default function({onClick, className, value}) {
   
   return (
-    <div className='SmallButton' onClick={onClick}>
+    <div className={className ? ('SmallButton ' + className) : 'SmallButton'}  onClick={onClick}>
       <span>{ value }</span>
     </div>
   )
