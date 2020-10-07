@@ -135,10 +135,11 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
           { (models.length > 0 && selectedModelId > 0) && <SmallButton className='MenuButton' onClick={() => updateModel()} value='Update'>Update current model</SmallButton> }
           { (models.length > 0 && selectedModelId > 0) && <SmallButton className='MenuButton' onClick={() => removeModel()} value='Remove'>Remove current model</SmallButton> }
 
-          { showModelName && 
-          <TextField placeholder='Type model name' value={modelName} onChange={(e)=>setModelName(e.target.value)} ></TextField> }
           { !showModelName && <Button onClick={() => saveModel()}>Create new model</Button> }
-          { showModelName && <SaveButton onSave={() => saveModel()} onCancel={() => cancelSave()} /> }
+
+          { showModelName && 
+          <TextField className='MenuInside' placeholder='Type model name' value={modelName} onChange={(e)=>setModelName(e.target.value)} ></TextField> }
+          { showModelName && <SaveButton className='MenuInside' onSave={() => saveModel()} onCancel={() => cancelSave()} /> }
         </div>
       </div>
       <Board/>
