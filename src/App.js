@@ -13,6 +13,7 @@ import Button from './components/Button';
 import TextField from './components/TextField';
 import SaveButton from './components/SaveButton';
 import InlineButton from './components/InlineButton';
+import SmallButton from './components/SmallButton';
 
 function App({transforms, trainOptions, transformAction, trainerAction}) {
 
@@ -126,9 +127,6 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
 
           { showModelName && 
           <TextField placeholder='Type model name' value={modelName} onChange={(e)=>setModelName(e.target.value)} ></TextField> }
-          
-          { !showModelName && <Button onClick={() => saveModel()}>Create new model</Button> }
-          { showModelName && <SaveButton onSave={() => saveModel()} onCancel={() => cancelSave()} /> }
 
           {models.length > 0 && <select className='Menu' onChange={(e) => onModelSelected(e.target.value)}>
             <option>Select model</option>
@@ -137,8 +135,11 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
             )) }
           </select> }
 
-          { (models.length > 0 && selectedModelId > 0) && <button className='Menu' onClick={() => updateModel()} value='Save'>Update current model</button> }
-          { (models.length > 0 && selectedModelId > 0) && <button className='Menu' onClick={() => removeModel()} value='Remove'>Remove current model</button> }
+          { (models.length > 0 && selectedModelId > 0) && <SmallButton className='Menu' onClick={() => updateModel()} value='Save'>Update current model</SmallButton> }
+          { (models.length > 0 && selectedModelId > 0) && <SmallButton className='Menu' onClick={() => removeModel()} value='Remove'>Remove current model</SmallButton> }
+
+          { !showModelName && <Button onClick={() => saveModel()}>Create new model</Button> }
+          { showModelName && <SaveButton onSave={() => saveModel()} onCancel={() => cancelSave()} /> }
         </div>
       </div>
       <Board/>
