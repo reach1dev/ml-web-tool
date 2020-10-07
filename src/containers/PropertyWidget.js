@@ -532,14 +532,16 @@ function PropertyWidget({
     const type = transform.tool.id
     let items = []
     if (type === IDS.InputData) {
-      items = [_renderInputData()]
+      items = [
+        _renderInputData(),
+        _renderTrainTargetSplit()
+      ]
     } else if (type === IDS.MLAlgorithm) {
       const type = AlgorithmTypes[algorithmType]
       const showTarget = (type === Classification || (type === Regression && parameters && !parameters['multiple']))
       items = [
         _renderMLParameters(),
         _renderFeatureSelect(),
-        _renderTrainTargetSplit(),
         showTarget ? _renderTargetParam() : null
       ]
     } else {

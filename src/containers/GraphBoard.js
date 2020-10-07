@@ -61,7 +61,7 @@ function GraphBoard({charts, metrics, loading, width, height, indexColumn, hideM
             }</div> }
         </p>
 
-        <div style={{overflowX: 'scroll', maxWidth: '100%', marginTop: 50}}>
+        <div style={{overflowX: 'scroll', maxWidth: '100%', marginTop: 5}}>
           <div className='Table-Row' style={{width: '96%'}}>
             <span className='Table-Head'>{ meta ? meta.main : (data.length === 1 ? 'Metric Type' : 'Cluster')}</span>
             { _renderMetricRow(meta) }
@@ -97,7 +97,7 @@ function GraphBoard({charts, metrics, loading, width, height, indexColumn, hideM
             title={'Train & test comparison'}
             chart={selectedGraph >= 0 && charts[selectedGraph]}
             indexColumn={indexColumn}
-            width={width}
+            width={width-100}
             height={height}
           />
           { charts.length > 1 ? (
@@ -143,7 +143,7 @@ function GraphBoard({charts, metrics, loading, width, height, indexColumn, hideM
       { _render() }
       </div>
 
-      <InlineButton onClick={hideMe}><ArrowRightAltIcon className='GoBackIcon' />Back</InlineButton>
+      <InlineButton onClick={hideMe}><ArrowRightAltIcon className='GoBackIcon' />Back to Properties</InlineButton>
     </div>
   )
 }
