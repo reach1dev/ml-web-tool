@@ -20,7 +20,7 @@
     padding-left: 1.5rem;
     padding-right: 1.5rem;
     color: white;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 500;
     text-align: left;
     width: 20rem;
@@ -53,6 +53,11 @@
     text-decoration: blink;
     padding: 1px;
     color: black;
+  }
+
+  .TableContainer {
+    width: 43rem;
+    overflow-x: scroll;
   }
 
 }

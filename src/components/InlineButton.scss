@@ -18,3 +18,18 @@
   font-family: $mainFont;
   font-weight: 600,
 }
+
+.InlineButton-Small {
+  cursor: pointer;
+
+  padding-top: 0.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border-radius: 5px;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  color: black;
+  font-size: 1rem;
+  font-family: $mainFont;
+  font-weight: 600,
+}

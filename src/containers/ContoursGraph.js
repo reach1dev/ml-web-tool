@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { ComposedChart, Scatter, XAxis, YAxis, ZAxis, ReferenceArea, Legend, Rectangle, Tooltip, Label } from 'recharts'
+import SmallButton from '../components/SmallButton'
 
 export default function({contours, features, showGraph, columns, colors, width, height, targets, targetColumn, showData}) {
   const [showTrain, setShowTrain] = useState(true)
@@ -48,9 +49,9 @@ export default function({contours, features, showGraph, columns, colors, width, 
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12}}>
         <b>Decision boundaries</b>
         <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-          <input type='button' onClick={() => showGraph()} value='Show target graph' />
+          <SmallButton type='button' onClick={() => showGraph()} value='Show target graph' />
           <span style={{width: 10}}></span>
-          <input type='button' onClick={() => showData()} value='Show values' />
+          <SmallButton type='button' onClick={() => showData()} value='Show values' />
         </div>
       </div>
 

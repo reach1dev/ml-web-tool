@@ -139,7 +139,7 @@ function GraphBoard({charts, metrics, loading, width, height, indexColumn, hideM
 
   return (
     <div className='GraphBoard'>
-      <div className='GraphBoardContainer'>
+      <div className={loading ? 'GraphBoardContainer GraphBoardContainer-Center' : 'GraphBoardContainer'}>
       { _render() }
       </div>
 

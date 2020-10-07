@@ -233,7 +233,7 @@ export default function({title, chart, indexColumn, width, height}) {
     <div className='Graph' style={{marginBottom: 4, height: 'fit-content', alignItems: 'stretch', flex: 1}}>
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12}}>
         <b className='SmallTitle'>{chart.title || title}</b>
-        { (showZoomOut) ? <input type='button' onClick={() => zoomOut()} value='Zoom out' /> : null }
+        { (showZoomOut) ? <SmallButton type='button' onClick={() => zoomOut()} value='Zoom out' /> : null }
         <div style={{display: 'flex', justifyContent: 'flex-end'}}>
           <SmallButton type='button' onClick={() => showValues()} value='Show values' />
           { chart.features && chart.features.length > 0 &&

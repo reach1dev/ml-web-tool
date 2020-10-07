@@ -8,14 +8,17 @@
   flex-direction: column;
   justify-content: space-between;
   padding-left: 0.5rem;
-  margin-left: 4rem;
-  margin-top: 2rem;
+  margin-left: 2rem;
   margin-bottom: 6rem;
 }
 
 .GraphBoardContainer {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+}
+
+.GraphBoardContainer-Center {
+  margin: auto;
 }
 
 .Graph {

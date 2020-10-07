@@ -20,19 +20,19 @@ export default function DataView({title, data, columns, showGraph}) {
       <div style={{display: 'flex', justifyContent: 'space-between'}}>
         <b className='SmallTitle'>{title}</b>
         <div style={{display: 'flex'}}>
-          <CSVLink data={newData} filename={title + ".csv"} className="InlineButton">Download CSV</CSVLink>
+          <CSVLink data={newData} filename={title + ".csv"} className="InlineButton-Small">Download CSV</CSVLink>
           &nbsp;
           <SmallButton type='button' onClick={() => showGraph()} value='Show graph' />
         </div>
       </div>
-      <div>
+      <div className='TableContainer'>
         <table style={{width: '99%', marginTop: 10}}>
           <thead>
             {columns.map(c => (
               <th>{c}</th>
             ))}
           </thead>
-          <tbody style={{maxHeight: 600, display: 'block', overflow: 'scroll', margin: 'auto'}}>
+          <tbody style={{maxHeight: 300, display: 'block', overflow: 'scroll', margin: 'auto'}}>
           {
             newData.map(row => (
               <tr className='row'>

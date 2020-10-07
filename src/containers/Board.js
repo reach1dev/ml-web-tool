@@ -16,9 +16,13 @@ import { bindActionCreators } from 'redux'
 import * as TransformAction from '../actions/TransformAction'
 import { TransformParameters } from '../constants/TransformParameters'
 
-let width = 9
-let height = Math.floor((window.innerHeight-200)/50)
+let width = 6
+let height = Math.floor((window.innerHeight-200)/60)
 
+
+function min(a,b) {
+  return (a<b) ? a : b
+}
 
 function renderGridItem(i, dragItems, moveDragNode, setDragNode, checkDraggable, setSelectedDrag, selectedDrag) {
   const x = i % width
@@ -26,7 +30,7 @@ function renderGridItem(i, dragItems, moveDragNode, setDragNode, checkDraggable,
   let dragItem = null
 
   for (var j=0; j<dragItems.length; j++) {
-    if (dragItems[j] && dragItems[j].x === x && dragItems[j].y === y) {
+    if (dragItems[j] && min(dragItems[j].x, width-1) === x && dragItems[j].y === y) {
       if (dragItems[j].visible) {
         dragItem = dragItems[j]
         break
@@ -74,14 +78,14 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
   let selectedTool = null
   const [propertiesHide, setPropertiesHide] = useState(false)
   const [chartHide, setChartHide] = useState(true)
-  const [graphWidth, setGraphWidth] = useState(window.innerWidth * 0.4)
-  const [graphHeight, setGraphHeight] = useState(window.innerHeight * 0.5)
+  const [graphWidth, setGraphWidth] = useState(window.innerWidth * 0.3)
+  const [graphHeight, setGraphHeight] = useState(window.innerHeight * 0.23)
 
 
   useEffect(() => {
     window.addEventListener('resize', () => {
-      setGraphWidth(window.innerWidth*(propertiesHide ? 0.4 : 0.5 ))
-      setGraphHeight(window.innerHeight*0.24)
+      setGraphWidth(window.innerWidth*(propertiesHide ? 0.3 : 0.3 ))
+      setGraphHeight(window.innerHeight*0.23)
     })
   }, [propertiesHide])
   
@@ -269,7 +273,7 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
         moveDragNode, setDragNode, checkDraggable, (id) => 
           transformAction.selectTransform(
           id),  //transforms[idx].inputData === null && transforms[idx].outputData === null ? 
-          selectedTransform ? selectedTransform.id : -1)
+          selectedTransform ? selectedTransform.id : -1),
       )
     }
     grid.push(gridRow)
@@ -303,9 +307,9 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
       <DndProvider backend={Backend}>
         <div className={chartHide ? 'Board-Left Board-Left-Max' : 'Board-Left'}>
           <ToolBox tools={tools} toolSelector={selectTool} showProperties={() => hideProperties(!propertiesHide)}></ToolBox>
-          { chartHide && <div 
+          <div 
             className='Board-Scroll' onScroll={forceUpdate}>
-            <div className='Board-Col'>
+            <div className={!chartHide ? 'Board-Col' : 'Board-Col Board-Padding' }>
               { grid.map((gridRow, idx) => (
                 <div key={idx} className='Board-Row'>
                   {gridRow}
@@ -327,7 +331,7 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
                 ))
               }
             </div>
-          </div> }
+          </div>
         </div>
       </DndProvider>
 
