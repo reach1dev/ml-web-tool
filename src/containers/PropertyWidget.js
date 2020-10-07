@@ -277,7 +277,7 @@ function PropertyWidget({
           {/* <input type='button' onClick={applyFilters} value='Apply' /> */}
         </p>
         { (inputParameters).map((param, idx) => (
-          <div key={idx}>
+          <div key={idx} className='Checkbox'>
           <input type='checkbox' checked={filterChanged>0 && inputFilters[idx]} onChange={(e) => changeInputFilter(idx)} /> {param} </div>
         ))}
       </div>
