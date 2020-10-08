@@ -18,7 +18,7 @@ export default function({open, setOpen, modelName, setModelName, models, modelLo
         {  models.map((model) => (
           <div className='Model-Item'>
             <span className='Label-Center'>{model.model_name}</span>
-            <InlineButton noTopMargin={true} onClick={() => updateModel()} value='Save here'></InlineButton>
+            <InlineButton noTopMargin={true} onClick={() => { updateModel(); setOpen(false) } } value='Save here'></InlineButton>
           </div>
         ))}
       </div> : <Spinner type='simple' loading={!modelLoaded}></Spinner> }

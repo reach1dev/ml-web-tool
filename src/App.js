@@ -16,6 +16,8 @@ import InlineButton from './components/InlineButton';
 import { Env } from './config';
 import ModelSavePopup from './containers/ModelSavePopup';
 import ModelLoadPopup from './containers/ModelLoadPopup';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App({transforms, trainOptions, transformAction, trainerAction}) {
 
@@ -62,7 +64,7 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
 
   const saveModel = () => {
     if (modelName !== '') {
-      savePredictModel(modelName, transforms, trainOptions)
+      savePredictModel(modelName, transforms, trainOptions, toast)
     } else {
       window.alert('Please input model name.')
     }
@@ -77,7 +79,7 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
   }
 
   const updateModel = () => {
-      updatePredictModel(selectedModelId, transforms, trainOptions)
+      updatePredictModel(selectedModelId, transforms, trainOptions, toast)
   }
 
   const loadModelList = () => {
@@ -130,6 +132,7 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
         <h2 className="Title">Machine Learning Tool</h2>
 
         <div className="MenuContainer">
+          <ToastContainer></ToastContainer>
           <a ref={linkRef} style={{display: 'none'}}>Download transformations</a>          
 
           <input type="file" onChange={(e) => loadFile(e.target.files[0])} id="file" ref={uploadFileRef} style={{display: "none"}}/>

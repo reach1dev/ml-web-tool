@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { BaseUrl } from '../actions/Constants'
 
-export const savePredictModel = (modelName, transforms, parameters) => {
+export const savePredictModel = (modelName, transforms, parameters, toast = null) => {
   
   axios.defaults.baseURL = BaseUrl
   axios.post('/save-model', {
@@ -10,19 +10,33 @@ export const savePredictModel = (modelName, transforms, parameters) => {
     parameters: parameters,
   }).then((res) => {
     if (res.status === 200 && res.data.success === true) {
-      window.alert('Model \"' + modelName + '\" has been saved.')
+      if (toast) {
+        toast('Model \"' + modelName + '\" has been saved on cloud.')
+      }
+    }
+  }).catch((err) => {
+    console.log(err)
+    if (toast) {
+      toast('Error in saving model.')
     }
   })
 }
 
-export const updatePredictModel = (modelId, transforms, parameters) => {
+export const updatePredictModel = (modelId, transforms, parameters, toast = null) => {
   axios.defaults.baseURL = BaseUrl
   axios.put('/update-model/' + modelId, {
     transforms: transforms,
     parameters: parameters,
   }).then((res) => {
     if (res.status === 200 && res.data.success === true) {
-      window.alert('Model #' + modelId + ' has been updated.')
+      if (toast) {
+        toast('Model #' + modelId + ' has been updated.')
+      }
+    }
+  }).catch((err) => {
+    console.log(err)
+    if (toast) {
+      toast('Error in saving model.')
     }
   })
 }
