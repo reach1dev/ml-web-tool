@@ -104,7 +104,6 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
     getPredictModels().then((res) => {
       if (res.success) {
         setModels(res.models)
-        window.alert('Loaded models successfully, select model to load.')
       } else {
         window.alert('Loaded models failed.')
       }
@@ -114,7 +113,7 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
 
   const onModelSelected = (modelId) => {
     console.log('model id = ' + modelId)
-    const models1 = models.filter((m) => (""+m.model_id) === modelId)
+    const models1 = models.filter((m) => m.model_id === modelId)
     if (models1.length > 0) {
       const option = JSON.parse(models1[0].model_options)
       try {
