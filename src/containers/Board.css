@@ -15,16 +15,14 @@
 
 .Board-Left-Max {
   min-width: 72rem;
+  width: 74%;
+  justify-content: space-between;
 }
 
 .Board-Scroll {
   height: 100%;
   margin-left: 3rem;
   box-shadow: 2px 2px 8px 0 rgba(0, 0, 0, 0.1), 0 2px 20px 0 rgba(0, 0, 0, 0.13);
-}
-
-.Board-Padding {
-  margin-left: 10rem;
 }
 
 .Board-Col {

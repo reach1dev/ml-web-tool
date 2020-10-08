@@ -11,7 +11,7 @@ export const savePredictModel = (modelName, transforms, parameters, toast = null
   }).then((res) => {
     if (res.status === 200 && res.data.success === true) {
       if (toast) {
-        toast('Model \"' + modelName + '\" has been saved on cloud.')
+        toast('The Model \"' + modelName + '\" has been saved to the cloud.')
       }
     }
   }).catch((err) => {
@@ -30,7 +30,7 @@ export const updatePredictModel = (modelId, transforms, parameters, toast = null
   }).then((res) => {
     if (res.status === 200 && res.data.success === true) {
       if (toast) {
-        toast('Model #' + modelId + ' has been updated.')
+        toast('The model has been updated.')
       }
     }
   }).catch((err) => {

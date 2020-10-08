@@ -34,7 +34,7 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
 
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [openLoadDialog, setOpenLoadDialog] = useState(false)
-  const [modelLoaded, setModelLoaded] = useState(false)
+  const [modelLoaded, setModelLoaded] = useState(0)
 
   const saveTransformations = () => {
     const href = JsonFileHeader + encodeURIComponent(JSON.stringify(transforms));
@@ -84,26 +84,26 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
 
   const loadModelList = () => {
     if (Env.mode ===  'debug') {
-      setModelLoaded(false)
+      setModelLoaded(1)
       setTimeout(() => {
         setModels([{
           model_id: 1,
           model_name: 'transformations1',
           model_options: ''
         }])
-        setModelLoaded(true)
+        setModelLoaded(2)
       }, 1000);
       return
     }
     
-    setModelLoaded(false)
+    setModelLoaded(1)
     getPredictModels().then((res) => {
       if (res.success) {
         setModels(res.models)
       } else {
         window.alert('Loaded models failed.')
       }
-      setModelLoaded(true)
+      setModelLoaded(2)
     })
   }
 
@@ -136,7 +136,7 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
           <a ref={linkRef} style={{display: 'none'}}>Download transformations</a>          
 
           <input type="file" onChange={(e) => loadFile(e.target.files[0])} id="file" ref={uploadFileRef} style={{display: "none"}}/>
-          <InlineButton onClick={() => setOpenLoadDialog(true)}>Load Model</InlineButton>
+          <InlineButton onClick={() => {setOpenLoadDialog(true); setModelLoaded(0)}}>Load Model</InlineButton>
           <ModelLoadPopup
             open={openLoadDialog}
             setOpen={setOpenLoadDialog}
@@ -149,7 +149,7 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
             onModelSelected={(id) => onModelSelected(id)}
           ></ModelLoadPopup>
 
-          <InlineButton onClick={() => setOpenSaveDialog(true)}>Save Model</InlineButton>
+          <InlineButton onClick={() => {setOpenSaveDialog(true); setModelLoaded(0)}}>Save Model</InlineButton>
           <ModelSavePopup
             open={openSaveDialog}
             setOpen={setOpenSaveDialog}
