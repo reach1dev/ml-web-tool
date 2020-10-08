@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.scss';
 import Board from './containers/Board';
 import { connect } from 'react-redux';
@@ -18,7 +18,7 @@ import ModelSavePopup from './containers/ModelSavePopup';
 import ModelLoadPopup from './containers/ModelLoadPopup';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import {isMobile, isTablet, isSmartTV} from 'react-device-detect';
 function App({transforms, trainOptions, transformAction, trainerAction}) {
 
 
@@ -125,6 +125,14 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
       console.log('No model found.')
     }
   }
+
+  useEffect(() => {
+    if (isMobile || isTablet || isSmartTV) {
+      toast('The application is not 100% supported on this device yet', {
+        type: "error"
+      })
+    } 
+  })
 
   return (
     <div className="App">
