@@ -26,19 +26,19 @@ export default function DataView({title, data, columns, showGraph}) {
         </div>
       </div>
       <div className='TableContainer'>
-        <table style={{width: '99%', marginTop: 10}}>
+        <table style={{marginTop: 10}}>
           <thead>
             {columns.map(c => (
               <th>{c}</th>
             ))}
           </thead>
-          <tbody style={{maxHeight: 300, display: 'block', overflow: 'scroll', margin: 'auto'}}>
+          <tbody style={{display: 'block', margin: 'auto'}}>
           {
             newData.map(row => (
               <tr className='row'>
                 {
                   columns.map(c => (
-                    <td style={{minWidth: c === 'No.' ? 30 : 50}}>{c === 'No.' ? row[c] : typeof row[c] === 'number' ? row[c].toFixed(4) : row[c]}</td>
+                    <td style={{minWidth: c === 'No.' ? 30 : 30}}>{c === 'No.' ? row[c] : typeof row[c] === 'number' ? row[c].toFixed(1) : row[c]}</td>
                   ))
                 }
               </tr>
