@@ -113,3 +113,12 @@ input[type="checkbox"]:checked {
   height: 1.5rem;
   margin-top: 0.2rem;
 }
+
+.Model-Item {
+  display: flex;
+  flex-direction: row;
+  margin-top: 1rem;
+  border: 1px solid;
+  border-radius: 0.5rem;
+  padding: 0.4rem;
+}

@@ -263,6 +263,11 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
     selectedTool = tool
   }
 
+  const selectTransform = (id) => {
+    transformAction.selectTransform(id)
+    setChartHide(true)
+  }
+
   
   const grid = []
   for (let i=0; i<height; i++) {
@@ -270,10 +275,9 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
     for (let j=0; j<width; j++) {
       gridRow.push(renderGridItem(
         i*width+j, transforms, 
-        moveDragNode, setDragNode, checkDraggable, (id) => 
-          transformAction.selectTransform(
-          id),  //transforms[idx].inputData === null && transforms[idx].outputData === null ? 
-          selectedTransform ? selectedTransform.id : -1),
+        moveDragNode, setDragNode, checkDraggable, 
+        (id) => selectTransform(id),
+        selectedTransform ? selectedTransform.id : -1),
       )
     }
     grid.push(gridRow)
@@ -308,8 +312,8 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
         <div className={chartHide ? 'Board-Left Board-Left-Max' : 'Board-Left'}>
           <ToolBox tools={tools} toolSelector={selectTool} showProperties={() => hideProperties(!propertiesHide)}></ToolBox>
           <div 
-            className='Board-Scroll' onScroll={forceUpdate}>
-            <div className={!chartHide ? 'Board-Col' : 'Board-Col Board-Padding' }>
+            className={!chartHide ? 'Board-Scroll' : 'Board-Scroll Board-Padding' } onScroll={forceUpdate}>
+            <div className='Board-Col'>
               { grid.map((gridRow, idx) => (
                 <div key={idx} className='Board-Row'>
                   {gridRow}

@@ -13,7 +13,9 @@ import Button from './components/Button';
 import TextField from './components/TextField';
 import SaveButton from './components/SaveButton';
 import InlineButton from './components/InlineButton';
-import SmallButton from './components/SmallButton';
+import { Env } from './config';
+import ModelSavePopup from './containers/ModelSavePopup';
+import ModelLoadPopup from './containers/ModelLoadPopup';
 
 function App({transforms, trainOptions, transformAction, trainerAction}) {
 
@@ -23,15 +25,19 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
   const JsonFileHeader = "text/json;charset=utf-8,";
 
   const [showModelName, setShowModelName] = useState(false)
-  const [modelName, setModelName] = useState("")
+  const [modelName, setModelName] = useState("transformations")
 
   const [models, setModels] = useState([])
   const [selectedModelId, setSelectedModelId] = useState(0)
 
+  const [openSaveDialog, setOpenSaveDialog] = useState(false)
+  const [openLoadDialog, setOpenLoadDialog] = useState(false)
+  const [modelLoaded, setModelLoaded] = useState(false)
+
   const saveTransformations = () => {
     const href = JsonFileHeader + encodeURIComponent(JSON.stringify(transforms));
     const a = linkRef.current;
-    a.download = 'transformations.json';
+    a.download = modelName + '.json';
     a.href = 'data:' + href;
     a.click();
     a.href = '';
@@ -81,6 +87,20 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
   }
 
   const loadModelList = () => {
+    if (Env.mode ===  'debug') {
+      setModelLoaded(false)
+      setTimeout(() => {
+        setModels([{
+          model_id: 1,
+          model_name: 'transformations1',
+          model_options: ''
+        }])
+        setModelLoaded(true)
+      }, 1000);
+      return
+    }
+    
+    setModelLoaded(false)
     getPredictModels().then((res) => {
       if (res.success) {
         setModels(res.models)
@@ -88,6 +108,7 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
       } else {
         window.alert('Loaded models failed.')
       }
+      setModelLoaded(true)
     })
   }
 
@@ -116,29 +137,40 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
         <h2 className="Title">Machine Learning Tool</h2>
 
         <div className="MenuContainer">
-          <a ref={linkRef} style={{display: 'none'}}>Download transformations</a>
-          
-          <InlineButton onClick={() => saveTransformations()}>Save transformation</InlineButton>
+          <a ref={linkRef} style={{display: 'none'}}>Download transformations</a>          
 
           <input type="file" onChange={(e) => loadFile(e.target.files[0])} id="file" ref={uploadFileRef} style={{display: "none"}}/>
-          <InlineButton onClick={() => loadTransformations()}>Load transformation</InlineButton>
+          <InlineButton onClick={() => setOpenLoadDialog(true)}>Load Model</InlineButton>
+          <ModelLoadPopup
+            open={openLoadDialog}
+            setOpen={setOpenLoadDialog}
+            modelName={modelName}
+            setModelName={setModelName}
+            models={models}
+            modelLoaded={modelLoaded}
+            loadModelList={loadModelList}
+            loadTransformations={loadTransformations}
+            onModelSelected={(id) => onModelSelected(id)}
+          ></ModelLoadPopup>
 
-          <InlineButton onClick={() => loadModelList()}>Load all models</InlineButton>
+          <InlineButton onClick={() => setOpenSaveDialog(true)}>Save Model</InlineButton>
+          <ModelSavePopup
+            open={openSaveDialog}
+            setOpen={setOpenSaveDialog}
+            modelName={modelName}
+            setModelName={setModelName}
+            models={models}
+            modelLoaded={modelLoaded}
+            updateModel={updateModel}
+            createModel={saveModel}
+            loadModelList={loadModelList}
+            saveModelToPC={saveTransformations}
+          ></ModelSavePopup>
 
-          {models.length > 0 && <select className='Menu MenuInside' onChange={(e) => onModelSelected(e.target.value)}>
-            <option>Select model</option>
-            { models.map((model) => (
-              <option value={model.model_id}>{model.model_name}</option>
-            )) }
-          </select> }
-
-          { (models.length > 0 && selectedModelId > 0) && <SmallButton className='MenuButton' onClick={() => updateModel()} value='Update'>Update current model</SmallButton> }
-          { (models.length > 0 && selectedModelId > 0) && <SmallButton className='MenuButton' onClick={() => removeModel()} value='Remove'>Remove current model</SmallButton> }
-
-          { !showModelName && <Button onClick={() => saveModel()}>Create new model</Button> }
+          { !showModelName && <Button onClick={() => transformAction.clearTransforms()}>Create Model</Button> }
 
           { showModelName && 
-          <TextField className='MenuInside' placeholder='Type model name' value={modelName} onChange={(e)=>setModelName(e.target.value)} ></TextField> }
+          <TextField className='MenuInside' placeholder='Database model name' value={modelName} onChange={(e)=>setModelName(e.target.value)} ></TextField> }
           { showModelName && <SaveButton className='MenuInside' onSave={() => saveModel()} onCancel={() => cancelSave()} /> }
         </div>
       </div>
