@@ -10,19 +10,19 @@ html, body {
   }
 }
 
-@media (max-width: 1560px) {
+@media (max-width: 1599px) {
   html {
     font-size: 10px;
   }
 }
-/* 
-@media (max-width: 1350px) {
-  html {
-    font-size: 9px;
-  }
-} */
 
-@media (max-width: 1250px) {
+@media (max-width: 1446px) {
+  html {
+    font-size: 8.5px;
+  }
+}
+
+@media (max-width: 1290px) {
   html {
     font-size: 7px;
   }
