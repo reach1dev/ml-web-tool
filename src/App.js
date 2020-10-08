@@ -61,16 +61,10 @@ function App({transforms, trainOptions, transformAction, trainerAction}) {
   }
 
   const saveModel = () => {
-    if (showModelName) {
-      if (modelName !== '') {
-        transformAction.clearTransforms()
-        savePredictModel(modelName, transforms, trainOptions)
-        setShowModelName(false)
-      } else {
-        window.alert('Please input model name.')
-      }
+    if (modelName !== '') {
+      savePredictModel(modelName, transforms, trainOptions)
     } else {
-      setShowModelName(true)
+      window.alert('Please input model name.')
     }
   }
 
