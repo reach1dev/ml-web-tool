@@ -6,11 +6,11 @@ html, body {
 
 @media (max-width: 1750px) {
   html {
-    font-size: 11px;
+    font-size: 10.5px;
   }
 }
 
-@media (max-width: 1599px) {
+@media (max-width: 1640px) {
   html {
     font-size: 10px;
   }
@@ -30,7 +30,7 @@ html, body {
 
 @media (max-width: 1050px) {
   html {
-    font-size: 7px;
+    font-size: 5.8px;
   }
 }
 
