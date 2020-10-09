@@ -50,7 +50,7 @@ export default function({title, chart, indexColumn, width, height}) {
     for(var i=0; i<ranges.length-1; i++) {
       const rate = ranges[i][1]/ranges[i+1][1]
       axis[ranges[i][0]] = 1;
-      if (columns[0].startsWith('C-') || rate>2) {
+      if (columns[0].startsWith('C-') || rate>1.2) {
         return [ranges[0][0], ranges[i+1][0], axis]
       }
     }
