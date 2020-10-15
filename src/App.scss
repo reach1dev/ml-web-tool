@@ -25,11 +25,20 @@
   flex-direction: row;
 }
 
+.Header-Left {
+  display: flex;
+  flex-direction: row;
+  padding-top: 2.5rem;
+  padding-bottom: 1.5rem;
+}
+
 .Title {
   color: $primary;
   font-family: $mainFont, sans-serif;
   font-size: 2.5rem;
-  padding-left: 24px;
+  padding-left: 1rem;
+  font-weight: 700;
+  vertical-align: middle;
 }
 
 select {
@@ -90,6 +99,7 @@ input[type="checkbox"]:checked {
   font-family: $mainFont;
   text-align: center;
   cursor: pointer;
+  align-self: center;
 }
 
 .SelectFile:hover {
@@ -121,4 +131,18 @@ input[type="checkbox"]:checked {
   border: 1px solid;
   border-radius: 0.5rem;
   padding: 0.4rem;
+}
+
+.OrangeAvatar {
+  background-color: #ff5722;
+  color: white;
+  font-weight: 700;
+  font-family: $mainFont;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 3.2rem;
+  padding: 0.8rem;
+  text-align: center;
+  font-size: 1.2rem;
+  cursor: pointer;
 }

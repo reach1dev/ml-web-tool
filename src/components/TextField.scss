@@ -46,3 +46,8 @@
   margin: auto;
   padding-right: 1rem;
 }
+
+.TextField[error=yes] {
+  outline: -webkit-focus-ring-color auto 1px;
+  outline-color: red;
+}

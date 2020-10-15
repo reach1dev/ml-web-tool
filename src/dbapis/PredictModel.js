@@ -1,9 +1,10 @@
 import axios from 'axios'
 import { BaseUrl } from '../actions/Constants'
 
-export const savePredictModel = (modelName, transforms, parameters, toast = null) => {
+export const savePredictModel = (token, modelName, transforms, parameters, toast = null) => {
   
   axios.defaults.baseURL = BaseUrl
+  axios.defaults.headers.common = {'Authorization': `bearer ${token}`}
   axios.post('/save-model', {
     modelName: modelName,
     transforms: transforms,
@@ -22,8 +23,9 @@ export const savePredictModel = (modelName, transforms, parameters, toast = null
   })
 }
 
-export const updatePredictModel = (modelId, transforms, parameters, toast = null) => {
+export const updatePredictModel = (token, modelId, transforms, parameters, toast = null) => {
   axios.defaults.baseURL = BaseUrl
+  axios.defaults.headers.common = {'Authorization': `bearer ${token}`}
   axios.put('/update-model/' + modelId, {
     transforms: transforms,
     parameters: parameters,
@@ -50,8 +52,9 @@ export const removePredictModel = (modelId) => {
   })
 }
 
-export const getPredictModels = async () => {
+export const getPredictModels = async (token) => {
   axios.defaults.baseURL = BaseUrl
+  axios.defaults.headers.common = {'Authorization': `bearer ${token}`}
   const res = await axios.get('/list-model')
   if (res.status === 200) {
     return res.data

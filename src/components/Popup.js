@@ -6,8 +6,8 @@ export default function({open, close, position, title, children}) {
   if (open) {
     return (
       <div className='Popup-Background' onClick={close}>
-        <div className='Popup' style={{left: position}} onClick={(e) => e.stopPropagation()}>
-          <span className='Title'>{title}</span>
+        <div className={position ? 'Popup' : 'Popup Popup-Center'} style={position ? {left: position} : {}} onClick={(e) => e.stopPropagation()}>
+          { title && <span className='Title'>{title}</span> }
           <div className='Popup-Body'> 
             {children }
           </div>

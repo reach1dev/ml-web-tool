@@ -15,7 +15,7 @@
   position: absolute;
   box-shadow: 2px 2px 8px 0 rgba(0, 0, 0, 0.1), 0 2px 20px 0 rgba(0, 0, 0, 0.13); 
   padding: 1rem;
-  min-width: 20rem;
+  min-width: 12rem;
   top: 6rem;
   left: 75%;
   background-color: white;
@@ -28,14 +28,21 @@
     font-size: 1.2rem;
     font-family: $mainFont;
     font-weight: 600;
-    margin-bottom: 2rem;
+    margin-top: 0.6rem;
+    margin-bottom: 1.4rem;
     text-align: center;
     padding-left: 0 !important;
   }
 
   .Popup-Body {
-    padding-left: 1rem;
     display: flex;
     flex-direction: column;
   }
+}
+
+.Popup-Center {
+  margin: auto;
+  margin-top: 20rem;
+  position: initial;
+  width: fit-content;
 }
