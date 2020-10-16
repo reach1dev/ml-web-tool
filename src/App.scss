@@ -146,3 +146,18 @@ input[type="checkbox"]:checked {
   font-size: 1.2rem;
   cursor: pointer;
 }
+
+.__react_component_tooltip .multi-line {
+  text-align: left !important;
+}
+
+.ToolTip-Custom {
+  box-shadow: 4px 4px 8px 0 rgba(0, 0, 0, 0.1), 0 2px 20px 0 rgba(0, 0, 0, 0.13) !important;
+  font-size: 1.2rem;
+  font-weight: 500;  
+  font-family: $mainFont, sans-serif;
+}
+
+.Custom-Title {
+  width: 30rem !important;
+}

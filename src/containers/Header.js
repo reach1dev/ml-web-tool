@@ -21,6 +21,7 @@ import AccountPopup from './AccountPopup';
 import LoginPopup from './LoginPopup';
 import SignupPopup from './SignupPopup';
 import MyAccountPopup from './MyAccountPopup';
+import CreateModelPopup from './CreateModelPopup';
 import { loginService, signupService, updateAccountService, uploadUsersFile } from '../service/AuthService';
 
 function Header({transforms, trainOptions, transformAction, trainerAction}) {
@@ -43,6 +44,7 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
 
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [openLoadDialog, setOpenLoadDialog] = useState(false)
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false)
   const [modelLoaded, setModelLoaded] = useState(0)
 
   const saveTransformations = () => {
@@ -299,7 +301,13 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
           saveModelToPC={saveTransformations}
         ></ModelSavePopup>
 
-        { !showModelName && <Button onClick={() => transformAction.clearTransforms()}>Create Model</Button> }
+        <CreateModelPopup 
+          open={openConfirmDialog}
+          setOpen={setOpenConfirmDialog}
+          onYes={() => transformAction.clearTransforms()}
+        ></CreateModelPopup>
+
+        { !showModelName && <Button onClick={() => setOpenConfirmDialog(true)}>Create Model</Button> }
 
         { showModelName && 
         <TextField className='MenuInside' placeholder='Database model name' value={modelName} onChange={(e)=>setModelName(e.target.value)} ></TextField> }
