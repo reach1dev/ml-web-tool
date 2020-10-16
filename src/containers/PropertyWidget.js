@@ -240,12 +240,7 @@ function PropertyWidget({
       delete(parameters[name])
     } else {
       if (type === 'number') {
-        try {
-          parameters[name] = parseFloat(value)
-        } catch (error) {
-          console.log(error)
-          parameters[name] = value
-        }
+        parameters[name] = value
       } else {
         parameters[name] = value
       }
