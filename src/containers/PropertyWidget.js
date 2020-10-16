@@ -240,7 +240,12 @@ function PropertyWidget({
       delete(parameters[name])
     } else {
       if (type === 'number') {
-        parameters[name] = value //parseFloat(value)
+        try {
+          parameters[name] = parseFloat(value)
+        } catch (error) {
+          console.log(error)
+          parameters[name] = value
+        }
       } else {
         parameters[name] = value
       }
@@ -363,7 +368,9 @@ function PropertyWidget({
       return params.map((param, idx) => (
         <div key={idx} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
           <label className='Label' style={{marginRight: 10}}>{param.name}{param.desc ? ' (' + param.desc + ')' : ''}</label>
-          <input className='TextField' type={param.type==='boolean' ? 'checkbox' : 'text'} style={param.type==='boolean' ? {} : {width: '100%', maxWidth: 180}} checked={param.type==='boolean'?parameters[param.name]:false} value={parameters[param.name]} onChange={(e)=> changeParameter(param.name, param.type==='boolean' ? e.target.checked : e.target.value, param.type)}></input>
+          <input className='TextField' type={param.type==='boolean' ? 'checkbox' : 'text'} style={param.type==='boolean' ? {} : {width: '100%', maxWidth: 180}} 
+            checked={param.type==='boolean'?parameters[param.name]:false} value={parameters[param.name]} 
+            onChange={(e)=> changeParameter(param.name, param.type==='boolean' ? e.target.checked : e.target.value, param.type)}></input>
         </div>
       ))
     }
@@ -416,9 +423,15 @@ function PropertyWidget({
           { parameters && parameterTypes ? parameterTypes.map((param) => (
             <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
               <label className='Label' style={{marginRight: 10}}>{param.name}</label>
-              <input className='TextField' style={{width: '100%', maxWidth: 180}} value={parameters[param.name]} disabled={(typeof param.required !== 'undefined' && !param.required) && typeof parameters[param.name] === 'undefined'} placeholder={param.placeholder} onChange={(e)=> changeParameter(param.name, e.target.value, param.type)}></input>
+              <input className='TextField' style={{width: '100%', maxWidth: 180}} value={parameters[param.name]} 
+                disabled={(typeof param.required !== 'undefined' && !param.required) && typeof parameters[param.name] === 'undefined'} 
+                placeholder={param.placeholder} 
+                onChange={(e)=> changeParameter(param.name, e.target.value, param.type)}></input>
+
               { (typeof param.required !== 'undefined' && !param.required) && 
-                <input className='Checkbox' type="checkbox" onChange={(e) => changeParameter(param.name, e.target.checked ? param.default : '', param.type)} checked={typeof parameters[param.name] !== 'undefined'} style={{width: 20, height: 20}}></input> }
+                <input className='Checkbox' type="checkbox" 
+                  onChange={(e) => changeParameter(param.name, e.target.checked ? param.default : '', param.type)} 
+                  checked={typeof parameters[param.name] !== 'undefined'} style={{width: 20, height: 20}}></input> }
             </div>
           )) : null }
         </div>
