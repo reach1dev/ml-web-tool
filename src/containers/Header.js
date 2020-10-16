@@ -250,6 +250,7 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
 
   return (
     <div className="Header">
+      <ToastContainer></ToastContainer>
       <div className="Header-Left">
         { authTokens && (
           <div className='OrangeAvatar' style={{display: 'inline-grid'}} onClick={() => setOpenAccountPopup(true)}>{ getStartChar(authTokens.fullName || authTokens.username) }</div>
@@ -270,7 +271,6 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
         onUpdate={(email, fullName) => { updateAccount(email, fullName);  setOpenMyAccountPopup(false) }}></MyAccountPopup> }
 
       { authTokens ? <div className="MenuContainer">
-        <ToastContainer></ToastContainer>
         <a ref={linkRef} style={{display: 'none'}}>Download transformations</a>          
 
         <input type="file" onChange={(e) => loadFile(e.target.files[0])} id="file" ref={uploadFileRef} style={{display: "none"}}/>
