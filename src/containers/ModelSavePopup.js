@@ -7,7 +7,7 @@ import Spinner from '../containers/Spinner';
 
 export default function({open, setOpen, modelName, setModelName, models, modelLoaded, updateModel, createModel, loadModelList, saveModelToPC}) {
   return (
-    <Popup open={open} close={() => setOpen(false)} position='80%' title='Where do you want to save?'>
+    <Popup open={open} close={() => setOpen(false)} position='77%' title='Where do you want to save?'>
       <div style={{display: 'flex', flexDirection: 'row', marginBottom: modelLoaded > 0 ? 10 : 0}}>
         <span className='Label-Center'>Model name: </span>
         <input type='text' className='TextField-Class' placeholder='Type model name' 

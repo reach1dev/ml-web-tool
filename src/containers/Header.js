@@ -250,16 +250,14 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
 
   return (
     <div className="Header">
-      <ToastContainer></ToastContainer>
       <div className="Header-Left">
-        { authTokens && (
-          <div className='OrangeAvatar' style={{display: 'inline-grid'}} onClick={() => setOpenAccountPopup(true)}>{ getStartChar(authTokens.fullName || authTokens.username) }</div>
-        ) }
         <span className="Title" >Machine Learning Tool</span>
         { (authTokens && authTokens.username === 'admin' ) && <div className='SelectFile' style={{marginLeft: 50}}>
           <input id='users_file' type='file' onChange={(e) => onSelectUsersFile(e.target.files[0])} />
           <span>Upload customer csv file</span>
         </div> }
+        
+      <ToastContainer></ToastContainer>
       </div>
       <AccountPopup open={openAccountPopup} setOpen={setOpenAccountPopup} 
         onViewProfile={() => {setOpenAccountPopup(false); setOpenMyAccountPopup(true)}}
@@ -306,6 +304,8 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
         { showModelName && 
         <TextField className='MenuInside' placeholder='Database model name' value={modelName} onChange={(e)=>setModelName(e.target.value)} ></TextField> }
         { showModelName && <SaveButton className='MenuInside' onSave={() => saveModel()} onCancel={() => cancelSave()} /> }
+
+        <div className='OrangeAvatar' style={{display: 'inline-grid'}} onClick={() => setOpenAccountPopup(true)}>{ getStartChar(authTokens.fullName || authTokens.username) }</div> 
       </div> : (
       <div className="MenuContainer">
         <InlineButton onClick={() => setOpenLoginPopup(true) }>Login</InlineButton>
@@ -315,6 +315,7 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
         <SignupPopup open={openSignupPopup} setOpen={setOpenSignupPopup} onSignup={(username, email, fullName, password) => signup(username, email, fullName, password)}></SignupPopup>
       </div>
     )}
+    
     </div>
   )
 }

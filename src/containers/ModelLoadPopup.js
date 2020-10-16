@@ -7,7 +7,7 @@ import Spinner from './Spinner';
 
 export default function({open, setOpen, models, modelLoaded, loadModelList, loadTransformations, onModelSelected}) {
   return (
-    <Popup open={open} close={() => setOpen(false)} position='74%' title='Where do you want to load?'>
+    <Popup open={open} close={() => setOpen(false)} position='71%' title='Where do you want to load?'>
       { modelLoaded > 0 && <div style={{display: 'flex', flexDirection: 'column'}}>
         <span className='Label-Center' style={{marginBottom: 5}}>=== Your models saved on cloud ===</span>
         {  models.map((model) => (
