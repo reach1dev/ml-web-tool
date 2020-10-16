@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import InlineButton from '../components/InlineButton';
 import SmallButton from '../components/SmallButton';
@@ -15,6 +15,22 @@ export default function({open, setOpen, onSignup}) {
   const [dirty, setDirty] = useState(false)
   const [loading, setLoading] = useState(false)
   const [failedReason, setFailedReason] = useState(' ')
+  
+  let textInput = null
+
+  useEffect(() => {
+    if (open) {
+      if (textInput !== null) {
+        textInput.focus()
+      }
+      setUsername('')
+      setPassword('')
+      setFullName('')
+      setEmail('')
+      setFailedReason('')
+      setDirty(false)
+    }
+  }, [open])
 
   const validateEmail = (email) => {
     return /.+@.+\.[A-Za-z]+$/.test(email)
@@ -52,7 +68,7 @@ export default function({open, setOpen, onSignup}) {
 
       <div className='TextFieldContainer'>
         <span className='Label'>Username:</span>
-        <TextField value={username} required={dirty && username===''} onChange={(e) => setUsername(e.target.value)} ></TextField>
+        <TextField value={username} required={dirty && username===''} onChange={(e) => setUsername(e.target.value)} setRef={(input) => textInput = input} setFocus={true}></TextField>
       </div>
 
       <div className='TextFieldContainer'>

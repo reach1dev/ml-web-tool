@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import InlineButton from '../components/InlineButton';
 import SmallButton from '../components/SmallButton';
@@ -14,6 +14,20 @@ export default function({open, setOpen, onLogin}) {
   const [dirty, setDirty] = useState(false)
   const [loading, setLoading] = useState(false)
   const [failedReason, setFailedReason] = useState(' ')
+
+  let textInput = null
+
+  useEffect(() => {
+    if (open) {
+      if (textInput !== null) {
+        textInput.focus()
+      }
+      setUsername('')
+      setPassword('')
+      setFailedReason('')
+      setDirty(false)
+    }
+  }, [open])
 
   const validate = () => {
     if (username === '' || password === '') {
@@ -47,7 +61,7 @@ export default function({open, setOpen, onLogin}) {
 
       <div className='TextFieldContainer'>
         <span className='Label'>Username:</span>
-        <TextField value={username} onChange={(e) => setUsername(e.target.value)} required={dirty && username === ''} ></TextField>
+        <TextField value={username} onChange={(e) => setUsername(e.target.value)} setRef={(input) => textInput = input } required={dirty && username === ''} ></TextField>
       </div>
       
       <div className='TextFieldContainer'>

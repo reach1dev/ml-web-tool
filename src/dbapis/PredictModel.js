@@ -1,45 +1,37 @@
 import axios from 'axios'
 import { BaseUrl } from '../actions/Constants'
 
-export const savePredictModel = (token, modelName, transforms, parameters, toast = null) => {
+export const savePredictModel = async (token, modelName, transforms, parameters) => {
   
   axios.defaults.baseURL = BaseUrl
   axios.defaults.headers.common = {'Authorization': `bearer ${token}`}
-  axios.post('/save-model', {
+  return axios.post('/save-model', {
     modelName: modelName,
     transforms: transforms,
     parameters: parameters,
   }).then((res) => {
     if (res.status === 200 && res.data.success === true) {
-      if (toast) {
-        toast('The Model \"' + modelName + '\" has been saved to the cloud.')
-      }
+      return true
     }
   }).catch((err) => {
     console.log(err)
-    if (toast) {
-      toast('Error in saving model.')
-    }
+    return false
   })
 }
 
-export const updatePredictModel = (token, modelId, transforms, parameters, toast = null) => {
+export const updatePredictModel = async (token, modelId, transforms, parameters) => {
   axios.defaults.baseURL = BaseUrl
   axios.defaults.headers.common = {'Authorization': `bearer ${token}`}
-  axios.put('/update-model/' + modelId, {
+  return axios.put('/update-model/' + modelId, {
     transforms: transforms,
     parameters: parameters,
   }).then((res) => {
     if (res.status === 200 && res.data.success === true) {
-      if (toast) {
-        toast('The model has been updated.')
-      }
+      return true
     }
   }).catch((err) => {
     console.log(err)
-    if (toast) {
-      toast('Error in saving model.')
-    }
+    return false
   })
 }
 

@@ -71,9 +71,22 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
     }
   }
 
+  const onSessionExpired = () => {
+    setAuthTokens(null)
+    toast('Session is expired, please login again', {
+      type: 'error'
+    })
+  }
+
   const saveModel = () => {
     if (modelName !== '') {
-      savePredictModel(authTokens.token, modelName, transforms, trainOptions, toast)
+      savePredictModel(authTokens.token, modelName, transforms, trainOptions, toast).then((res) => {
+        if (res) {
+          toast('The Model \"' + modelName + '\" has been saved to the cloud.')
+        } else {
+          onSessionExpired()
+        }
+      })
     } else {
       window.alert('Please input model name.')
     }
@@ -88,7 +101,13 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
   }
 
   const updateModel = () => {
-      updatePredictModel(selectedModelId, transforms, trainOptions, toast)
+      updatePredictModel(selectedModelId, transforms, trainOptions, toast).then((res) => {
+        if (res) {
+          toast('The Model has been updated to the cloud.')
+        } else {
+          onSessionExpired()
+        }
+      })
   }
 
   const loadModelList = () => {
@@ -110,9 +129,14 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
       if (res.success) {
         setModels(res.models)
       } else {
-        window.alert('Loaded models failed.')
+        toast('Loading models failed.', {type: 'error'})
       }
       setModelLoaded(2)
+    }).catch((err) => {
+      console.log(err)
+      setOpenSaveDialog(false)
+      setOpenLoadDialog(false)
+      onSessionExpired()
     })
   }
 
@@ -197,6 +221,8 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
       } else {
         toast(res ? ('Login failed, ' + res.reason) : 'Login failed, server error')
       }
+    }).catch((err) => {
+      setAuthTokens(null)
     })
   }
 
@@ -210,8 +236,15 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
 
   const onSelectUsersFile = (file) => {
     uploadUsersFile(authTokens.token, file).then((res) => {
-      toast('Users are added')
+      if (res.success) {
+        toast(`${res.added_users} users are added/updated.`)
+      } else {
+        toast('Upload failed.', {type: 'error'})
+      }
       document.getElementById('users_file').value = ""
+    }).catch((err) => {
+      console.log(err)
+      onSessionExpired()
     })
   }
 
