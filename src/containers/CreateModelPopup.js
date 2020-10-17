@@ -15,7 +15,7 @@ export default function({open, setOpen, onYes}) {
     <Popup open={open} close={() => setOpen(false)} customTitle={true} position='79%' title='Are you sure you want to start a new model? You will lose any unsaved work.'>
 
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
-        <InlineButton onClick={() => onYes()} value='Yes, I am sure'></InlineButton>
+        <InlineButton onClick={() => { onYes(); setOpen(false) } } value='Yes, I am sure'></InlineButton>
         <SmallButton onClick={() => setOpen(false)} value='No, cancel'></SmallButton>
       </div>
     </Popup>

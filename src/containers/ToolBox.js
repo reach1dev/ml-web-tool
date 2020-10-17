@@ -3,6 +3,7 @@ import './ToolBox.scss'
 import DragNode from './DragNode'
 import InlineButton from '../components/InlineButton'
 import ReactTooltip from 'react-tooltip'
+import InfoIcon from '@material-ui/icons/Info'
 
 export default function renderToolBox({tools, toolSelector, showProperties}) {
   return (
@@ -10,6 +11,7 @@ export default function renderToolBox({tools, toolSelector, showProperties}) {
       <ReactTooltip className='ToolTip-Custom' multiline={true} backgroundColor='white' arrowColor='white' textColor='black' />
       <div className='ToolBox-Header' data-tip="- Drag any transformation to the main area to add to your ML pipeline.<br/>- Please note it is suggested to select your data first by clicking on the 'Input Data' button in the main area.">
         <b className='SubTitle'>Toolbox</b>
+        <InfoIcon color='action' />
       </div>
       <div>
         <div className='ToolBox-Container'>

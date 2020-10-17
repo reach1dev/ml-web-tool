@@ -12,7 +12,7 @@ import { TR_IDS } from './TransformationTools'
 import SmallButton from '../components/SmallButton'
 import Button from '../components/Button'
 import ReactTooltip from 'react-tooltip'
-import InlineButton from '../components/InlineButton'
+import InfoIcon from '@material-ui/icons/Info'
 
 function PropertyWidget({
   onDrawClicked,
@@ -571,6 +571,7 @@ function PropertyWidget({
   const toolTipForInputData = `- Import any custom data file or use built-in data from the Build Alpha server.<br/> Steps: <br/> 1. Choose your file and press 'Upload'.<br/> 2. To visualize your data press 'Draw' <br/>- Enable your Train/Test split below before you begin.`
   const toolTipForTransform = `- To remove this transform please click Remove.<br/>- To save this transform and add the results to the Trainer please click Save.<br/>   Adding features/targets to the Trainer allow the features to be used by the Machine Learning Algorithm.<br/>- To visualize and view graph(s) please click Draw.`
   const toolTipForTrainer = `- Choose and configure a machine learning algorithm or dimensionality reduction technique.<br/>- Please click Save to save a model.<br/>- Press click Train & Test to run the model after properly choosing values.`
+  const toolTip = (transform && transform.id === IDS.InputData) ? toolTipForInputData : ((transform && transform.id === IDS.MLAlgorithm) ? toolTipForTrainer : (transform?toolTipForTransform:''))
 
   return (
     <div className='PropertyWidget'>
@@ -578,8 +579,9 @@ function PropertyWidget({
         
         <ReactTooltip multiline={true} backgroundColor='white' arrowColor='white' textColor='black' />
         <div className='PropertyWidget-Header' 
-          data-tip={ (transform && transform.id === IDS.InputData) ? toolTipForInputData : ((transform && transform.id === IDS.MLAlgorithm) ? toolTipForTrainer : (transform?toolTipForTransform:'')) }>
+          data-tip={ toolTip }>
           <b className='SmallTitle'>Properties {transform ? ' of ' + transform.tool.shortName : ''}</b>
+          { toolTip && <InfoIcon color='action' /> }
         </div>
         <div className='Properties-Container'>
         {
