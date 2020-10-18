@@ -578,10 +578,9 @@ function PropertyWidget({
       <div className='PropertyWidget-Inner'>
         
         <ReactTooltip multiline={true} backgroundColor='white' arrowColor='white' textColor='black' />
-        <div className='PropertyWidget-Header' 
-          data-tip={ toolTip }>
+        <div className='PropertyWidget-Header'>
           <b className='SmallTitle'>Properties {transform ? ' of ' + transform.tool.shortName : ''}</b>
-          { toolTip && <InfoIcon color='action' /> }
+          { toolTip && <InfoIcon color='action' data-tip={ toolTip } /> }
         </div>
         <div className='Properties-Container'>
         {
