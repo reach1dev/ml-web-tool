@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AuthContext } from './context/auth';
 import './App.scss';
 import Board from './containers/Board';
+import AlertContainer from './containers/AlertContainer';
 import 'react-toastify/dist/ReactToastify.css';
 import Header from './containers/Header';
 
@@ -19,6 +20,7 @@ export default function App() {
       <div className="App">
         <Header/>
         <Board/>
+        <AlertContainer/>
       </div>
     </AuthContext.Provider>
   );

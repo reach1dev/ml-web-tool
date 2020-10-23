@@ -34,6 +34,17 @@ export const updateAccountService = async (token, email, fullName) => {
   return res.data
 }
 
+export const updateAlertSettingsService = async (token, webAlerts, emailAlerts) => {
+  axios.defaults.baseURL = BaseUrl
+  axios.defaults.headers.common = {'Authorization': `bearer ${token}`}
+  const res = await axios.put('/account/alerts', {
+    webAlerts: webAlerts,
+    emailAlerts: emailAlerts
+  })
+    
+  return res.data
+}
+
 export const uploadUsersFile = async (token, file) => {
 
   const formData = new FormData();

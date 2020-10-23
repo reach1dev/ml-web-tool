@@ -43,14 +43,17 @@ export default function({open, setOpen, onLogin}) {
       setLoading(true)
       onLogin(username, password).then((res) => {
         setLoading(false)
-        if (res !== 'success') {
-          if (res === 'no_account') {
+        if (res.type !== 'success') {
+          if (res.reason === 'no_account') {
             setFailedReason('Username or password is invalid.')
-          } else if (res === 'signup_required') {
+          } else if (res.reason === 'signup_required') {
             setFailedReason('Please signup to login.')
           } else {
             setFailedReason('Login failed.')
           }
+        } else {
+          const redirectUri = `https://api-ml-web-tool.herokuapp.com/account/tsapi_callback/${res.token}`
+          window.open(`https://api.tradestation.com/v2/authorize/?redirect_uri=${redirectUri}&client_id=AC853ED3-F818-4BC8-88DA-E7990DCA235F&response_type=code`, '_parent')  
         }
       })
     }

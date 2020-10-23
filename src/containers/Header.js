@@ -22,7 +22,9 @@ import LoginPopup from './LoginPopup';
 import SignupPopup from './SignupPopup';
 import MyAccountPopup from './MyAccountPopup';
 import CreateModelPopup from './CreateModelPopup';
-import { loginService, signupService, updateAccountService, uploadUsersFile } from '../service/AuthService';
+import { loginService, signupService, updateAccountService, updateAlertSettingsService, uploadUsersFile } from '../service/AuthService';
+import SmallButton from '../components/SmallButton';
+import AlertSettingsPopup from './AlertSettingsPopup';
 
 function Header({transforms, trainOptions, transformAction, trainerAction}) {
 
@@ -45,6 +47,7 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [openLoadDialog, setOpenLoadDialog] = useState(false)
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false)
+  const [openAlertSettings, setOpenAlertSettings] = useState(false)
   const [modelLoaded, setModelLoaded] = useState(0)
 
   const saveTransformations = () => {
@@ -177,15 +180,20 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
           username: username,
           fullName: res.fullName,
           email: res.email,
+          webAlerts: res.webAlerts,
+          emailAlerts: res.emailAlerts,
           token: res.token
         })        
         setOpenLoginPopup(false)
-        return 'success'
+        return {
+          type: 'success',
+          token: res.token
+        }
       } else {
-        return res.reason
+        return {type: 'error', reason: res.reason}
       }
     }).catch((err) => {
-      return 'server_error'
+      return {type: 'error', reason: 'server_error'}
     })
   }
 
@@ -196,6 +204,8 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
           username: username,
           fullName: fullName,
           email: email,
+          webAlerts: true,
+          emailAlerts: true,
           token: res.token
         })
         setOpenSignupPopup(false)
@@ -250,20 +260,44 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
     })
   }
 
+  const saveAlertSettings = (webAlerts, emailAlerts) => {
+    updateAlertSettingsService(authTokens.token, webAlerts, emailAlerts).then((res) => {
+      if (res && res.success) {        
+        setAuthTokens({
+          ...authTokens,
+          webAlerts: webAlerts,
+          emailAlerts: emailAlerts, 
+        })
+      } else {
+        toast('Update alert settings failed', {type: 'error'})
+      }
+    }).catch((err) => {
+      onSessionExpired()
+    })
+  }
+
   return (
     <div className="Header">
       <div className="Header-Left">
         <span className="Title" >Machine Learning Tool</span>
-        { (authTokens && authTokens.username === 'admin' ) && <div className='SelectFile' style={{marginLeft: 50}}>
+        { (authTokens && authTokens.username === 'admin' ) && <div className='SelectFile' style={{marginLeft: 20}}>
           <input id='users_file' type='file' onChange={(e) => onSelectUsersFile(e.target.files[0])} />
           <span>Upload customer csv file</span>
         </div> }
+
+        <span style={{width: 20}}></span>
+        <SmallButton value='Prediction alerts' ></SmallButton>
         
-      <ToastContainer></ToastContainer>
       </div>
       <AccountPopup open={openAccountPopup} setOpen={setOpenAccountPopup} 
+        onAlertSettings={() => {setOpenAccountPopup(false); setOpenAlertSettings(true)}}
         onViewProfile={() => {setOpenAccountPopup(false); setOpenMyAccountPopup(true)}}
         onLogout={() => {logout(); setOpenAccountPopup(false)}} ></AccountPopup>
+      { authTokens && <AlertSettingsPopup open={openAlertSettings} setOpen={setOpenAlertSettings}
+        onSave={(webAlerts, emailAlerts) => saveAlertSettings(webAlerts, emailAlerts)}
+        emailAlertsInit={authTokens.emailAlerts}
+        webAlertsInit={authTokens.webAlerts}
+      ></AlertSettingsPopup> }
       { authTokens && <MyAccountPopup open={openMyAccountPopup} setOpen={setOpenMyAccountPopup} 
         username={authTokens.username}
         emailOriginal={authTokens.email}
