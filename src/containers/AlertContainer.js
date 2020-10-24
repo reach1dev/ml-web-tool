@@ -20,7 +20,7 @@ export default function({}) {
           }
         }).catch((err) => {
           setAuthTokens(null)
-          toast('Session is expired, please login again', {type: 'error'})
+          toast('Session is expired, please login again', {type: 'error', autoClose: false})
         })
       }
     }, 3600000)
