@@ -23,7 +23,7 @@ export default function({}) {
           toast('Session is expired, please login again', {type: 'error', autoClose: false})
         })
       }
-    }, 3600000)
+    }, 300000)
 
     return () => {
       clearInterval(subs)
