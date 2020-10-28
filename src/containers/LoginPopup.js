@@ -7,6 +7,7 @@ import Spinner from './Spinner';
 import TextField from '../components/TextField';
 import './LoginPopup.css'
 import { toast } from 'react-toastify';
+import ConfirmTSLoginPopup from './ConfirmTSLoginPopup';
 
 export default function({open, setOpen, onLogin}) {
   const [username, setUsername] = useState('')
@@ -14,6 +15,9 @@ export default function({open, setOpen, onLogin}) {
   const [dirty, setDirty] = useState(false)
   const [loading, setLoading] = useState(false)
   const [failedReason, setFailedReason] = useState(' ')
+
+  const [openConfirmDlg, setOpenConfirmDlg] = useState(false)
+  const [token, setToken] = useState(null)
 
   let textInput = null
 
@@ -43,7 +47,11 @@ export default function({open, setOpen, onLogin}) {
       setLoading(true)
       onLogin(username, password).then((res) => {
         setLoading(false)
-        if (res.type !== 'success') {
+        if (res.type === 'success') {
+          setToken(res.token)
+          setOpenConfirmDlg(true)
+          setOpen(false)
+        } else {
           if (res.reason === 'no_account') {
             setFailedReason('Username or password is invalid.')
           } else if (res.reason === 'signup_required') {
@@ -51,32 +59,49 @@ export default function({open, setOpen, onLogin}) {
           } else {
             setFailedReason('Login failed.')
           }
-        } else {
-          const redirectUri = `https://api-ml-web-tool.herokuapp.com/account/tsapi_callback/${res.token}`
-          window.open(`https://api.tradestation.com/v2/authorize/?redirect_uri=${redirectUri}&client_id=AC853ED3-F818-4BC8-88DA-E7990DCA235F&response_type=code`, '_parent')  
         }
       })
     }
   }
+
+  const loginToTS = () => {
+    setOpen(false)
+    setOpenConfirmDlg(false)
+    if (token) {
+      const redirectUri = `https://api-ml-web-tool.herokuapp.com/account/tsapi_callback/${token}`
+      window.open(`https://api.tradestation.com/v2/authorize/?redirect_uri=${redirectUri}&client_id=AC853ED3-F818-4BC8-88DA-E7990DCA235F&response_type=code`, '_parent')
+    }
+  }
+
+  if (!open && !openConfirmDlg) {
+    return null
+  }
   
   return (
-    <Popup open={open} close={() => setOpen(false)} title='Login'>
+    <div className='Popup-Background' >
+      <ConfirmTSLoginPopup
+        setOpen={setOpenConfirmDlg}
+        open={openConfirmDlg}
+        onYes={loginToTS}
+      ></ConfirmTSLoginPopup>
+      <Popup open={open} close={() => setOpen(false)} title='Login'>
 
-      <div className='TextFieldContainer'>
-        <span className='Label'>Username:</span>
-        <TextField value={username} onChange={(e) => setUsername(e.target.value)} setRef={(input) => textInput = input } required={dirty && username === ''} ></TextField>
-      </div>
+        <div className='TextFieldContainer'>
+          <span className='Label'>Username:</span>
+          <TextField value={username} onChange={(e) => setUsername(e.target.value)} setRef={(input) => textInput = input } required={dirty && username === ''} ></TextField>
+        </div>
+        
+        <div className='TextFieldContainer'>
+          <span className='Label'>Password:</span>
+          <TextField type='password' value={password} onChange={(e) => setPassword(e.target.value)} required={dirty && password === ''} ></TextField>
+        </div>
       
-      <div className='TextFieldContainer'>
-        <span className='Label'>Password:</span>
-        <TextField type='password' value={password} onChange={(e) => setPassword(e.target.value)} required={dirty && password === ''} ></TextField>
-      </div>
-    
-      <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-        <Spinner loading={loading} type='simple'></Spinner>
-        <span style={{color: 'red'}}>{failedReason}</span>
-        <SmallButton onClick={() => login()} value='Login'></SmallButton>
-      </div>
-    </Popup>
+        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+          <Spinner loading={loading} type='simple'></Spinner>
+          <span style={{color: 'red'}}>{failedReason}</span>
+          <SmallButton onClick={() => login()} value='Login'></SmallButton>
+        </div>
+      </Popup>
+    </div>
   )
 }

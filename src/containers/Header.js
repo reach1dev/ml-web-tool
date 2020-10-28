@@ -185,8 +185,7 @@ function Header({transforms, trainOptions, transformAction, trainerAction, input
           webAlerts: res.webAlerts,
           emailAlerts: res.emailAlerts,
           token: res.token
-        })        
-        setOpenLoginPopup(false)
+        })
         return {
           type: 'success',
           token: res.token
@@ -352,11 +351,11 @@ function Header({transforms, trainOptions, transformAction, trainerAction, input
         <InlineButton onClick={() => setOpenLoginPopup(true) }>Login</InlineButton>
         <Button onClick={() => setOpenSignupPopup(true) } >Signup</Button>
 
-        <LoginPopup open={openLoginPopup} setOpen={setOpenLoginPopup} onLogin={(username, password) => login(username, password)}></LoginPopup>
-        <SignupPopup open={openSignupPopup} setOpen={setOpenSignupPopup} onSignup={(username, email, fullName, password) => signup(username, email, fullName, password)}></SignupPopup>
+        
       </div>
     )}
-    
+    <LoginPopup open={openLoginPopup} setOpen={setOpenLoginPopup} onLogin={(username, password) => login(username, password)}></LoginPopup>
+        <SignupPopup open={openSignupPopup} setOpen={setOpenSignupPopup} onSignup={(username, email, fullName, password) => signup(username, email, fullName, password)}></SignupPopup>
     </div>
   )
 }
