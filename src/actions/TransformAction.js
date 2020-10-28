@@ -79,7 +79,7 @@ function getChartData(data, columns, offset, indexColumn) {
     // }
     const obj = {
       Time: data[i][1],
-      [indexColumn]: indexColumn === 'Date' ? Date.parse(data[i][0]) : data[i][0]
+      [indexColumn]: indexColumn === 'Date' ? Date.parse(data[i][0] + ' ' + data[i][1]) : data[i][0]
     }
     k ++
     
@@ -197,7 +197,7 @@ export const removeTransform = (transformId) => {
   }
 }
 
-export const selectServerFile = (fileId) => {
+export const selectServerFile = (fileId, token) => {
   return (dispatch) => {
     dispatch({
       type: UPLOADING_INPUT_DATA,
@@ -205,6 +205,7 @@ export const selectServerFile = (fileId) => {
 
 
     axios.defaults.baseURL = BaseUrl
+    axios.defaults.headers.common = {'Authorization': `bearer ${token}`}
     axios
       .post("/select-input-data/" + fileId)
       .then(res => {

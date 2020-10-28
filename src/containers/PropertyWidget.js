@@ -13,6 +13,9 @@ import SmallButton from '../components/SmallButton'
 import Button from '../components/Button'
 import ReactTooltip from 'react-tooltip'
 import InfoIcon from '@material-ui/icons/Info'
+import { toast } from 'react-toastify'
+import { useAuth } from '../context/auth'
+import TextField from '../components/TextField'
 
 function PropertyWidget({
   onDrawClicked,
@@ -45,7 +48,18 @@ function PropertyWidget({
 
   const [hasIndex, setHasIndex] = useState(true)
 
-  const [selectedServerFile, setSelectedServerFile] = useState('data_BCRaw')
+  const [selectedSymbol, setSelectedSymbol] = useState(inputFileId.startsWith("TSData_") ? inputFileId.split("_")[1] : "")
+  const [selectedFrequency, setSelectedFrequency] = useState(inputFileId.startsWith("TSData_") ? inputFileId.split("_")[2] : "")
+
+  const [alertThreshold, setAlertThreshold] = useState(0)
+  const [alertCondition, setAlertCondition] = useState('equal')
+
+  const {authTokens, setAuthTokens} = useAuth()
+
+  useEffect(() => {
+    setSelectedSymbol(inputFileId.startsWith("TSData_") ? inputFileId.split("_")[1] : "")
+    setSelectedFrequency(inputFileId.startsWith("TSData_") ? inputFileId.split("_")[2] : "")
+  }, [inputFileId])
   
   useEffect(() => {
     if (transform && transform.id !== IDS.MLAlgorithm) {
@@ -65,6 +79,8 @@ function PropertyWidget({
       setTrainSampleCount(algParams.trainSampleCount || Math.floor(sampleCount*0.7))
       setParameters(algParams.parameters || {} )
       setParameterTypes(TransformParameters[transform.tool.id] || [])
+      setAlertThreshold(algParams.alertThreshold)
+      setAlertCondition(algParams.alertCondition)
     }
   }, [transform, algParams, sampleCount])
 
@@ -89,7 +105,11 @@ function PropertyWidget({
   }
 
   const selectFile = () => {
-    TransformAction.selectServerFile(selectedServerFile)
+    if (selectedSymbol !== '' && selectedFrequency !== '') {
+      TransformAction.selectServerFile('TSData_' + selectedSymbol + '_' + selectedFrequency, authTokens.token)
+    } else {
+      toast('Select symbol and frequency', {type: 'error'})
+    }
   }
 
   const removeNode = () => {
@@ -181,7 +201,9 @@ function PropertyWidget({
       randomSelect: randomSelect,
       parameters: parameters,
       kFold: kFoldCV ? kFold : 0,
-      resampling: resampling
+      resampling: resampling,
+      alertThreshold: alertThreshold,
+      alertCondition: alertCondition
     }
   }
 
@@ -326,12 +348,25 @@ function PropertyWidget({
         </div>
         <p style={{color: 'red'}}>{error && !file ? 'Please select file' : ''}</p>
 
-        <p style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 60}}>
-        <select onChange={(e) => {setSelectedServerFile(e.target.value)}}>
-          <option value="data_BCRaw">&nbsp;&nbsp;BCRaw.txt&nbsp;&nbsp;</option>
-        </select>
-        <SmallButton type='button' onClick={selectFile} value='Select server file' />
-        </p>
+        { authTokens && <p style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 60}}>
+          <div className='Server-Model-Options'>
+            <input className='TextField-Class' placeholder='Type symbol name' value={selectedSymbol} onChange={(e) => setSelectedSymbol(e.target.value)}></input>
+            <span style={{width: 20}}></span>
+            <select onChange={(e) => {setSelectedFrequency(e.target.value)}} value={selectedFrequency}>
+              <option value="">&nbsp; Select frequency &nbsp;</option>
+              <option value="5m">&nbsp; 5 minutes &nbsp;</option>
+              <option value="15m">&nbsp; 15 minutes &nbsp;</option>
+              <option value="30m">&nbsp; 30 minutes &nbsp;</option>
+              <option value="1h">&nbsp; 1 hour &nbsp;</option>
+              <option value="2h">&nbsp; 2 hours &nbsp;</option>
+              <option value="1D">&nbsp; 1 day &nbsp;</option>
+              <option value="1W">&nbsp; 1 week &nbsp;</option>
+              <option value="1M">&nbsp; 1 month &nbsp;</option>
+            </select>
+          </div>
+
+          <SmallButton type='button' onClick={selectFile} value='Load from TradeStation API' />
+        </p> }
       </div>
     )
   }
@@ -404,6 +439,31 @@ function PropertyWidget({
               kFold: kFoldCV ? kFold : 0
             }
           }}  /> }
+      </div>
+    )
+  }
+
+  const _renderAlertSettings = () => {
+    if (authTokens === null) {
+      return null
+    }
+    return (
+      <div className='Property-Item-Container' key={2}>
+        <p className='Property-Item-Header'>
+          <b>Web & email alerts</b> 
+        </p>
+        <p className='Property-Item-Header'>
+          <b>Class/threshold:</b> 
+          <TextField onChange={(e) => setAlertThreshold(e.target.value)} value={alertThreshold}></TextField>
+        </p>
+        <p className='Property-Item-Header'>
+          <b>Condition</b> 
+          <select onChange={(e) => setAlertCondition(e.target.value)} value={alertCondition} >
+            <option value="below">Below</option>
+            <option value="equal">Equal</option>
+            <option value="above">Above</option>
+          </select>
+        </p>
       </div>
     )
   }
@@ -550,6 +610,7 @@ function PropertyWidget({
       const showTarget = (type === Classification || (type === Regression && parameters && !parameters['multiple']))
       items = [
         _renderMLParameters(),
+        _renderAlertSettings(),
         _renderFeatureSelect(),
         showTarget ? _renderTargetParam() : null
       ]

@@ -8,7 +8,14 @@ export default function DataView({title, data, columns, showGraph}) {
   const newData = data.map((d, idx) => {
     let k = {...d}
     if (typeof d['Date'] !== 'undefined') {
-      k['Date'] = moment(d['Date']).format('MM/DD/YYYY')
+      if (columns.filter((c) => c==='Time').length > 0) {
+        k['Date'] = moment(d['Date']).format('MM/DD/YYYY')
+      } else {
+        k['Date'] = moment(d['Date']).format('MM/DD/YYYY HH:mm:ss')
+      }
+      if (k['Date'] === 'Invalid date') {
+        k['Date'] = 'Next'
+      }
     }
     if (columns[0] === 'No.') {
       k['No.'] = (idx+1)

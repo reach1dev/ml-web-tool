@@ -1,12 +1,13 @@
 import axios from 'axios'
 import { BaseUrl } from '../actions/Constants'
 
-export const savePredictModel = async (token, modelName, transforms, parameters) => {
+export const savePredictModel = async (token, modelName, inputFileId, transforms, parameters) => {
   
   axios.defaults.baseURL = BaseUrl
   axios.defaults.headers.common = {'Authorization': `bearer ${token}`}
   return axios.post('/save-model', {
     modelName: modelName,
+    inputFileId: inputFileId,
     transforms: transforms,
     parameters: parameters,
   }).then((res) => {
@@ -19,12 +20,13 @@ export const savePredictModel = async (token, modelName, transforms, parameters)
   })
 }
 
-export const updatePredictModel = async (token, modelId, transforms, parameters) => {
+export const updatePredictModel = async (token, modelId, inputFileId, transforms, parameters) => {
   axios.defaults.baseURL = BaseUrl
   axios.defaults.headers.common = {'Authorization': `bearer ${token}`}
   return axios.put('/update-model/' + modelId, {
     transforms: transforms,
     parameters: parameters,
+    inputFileId: inputFileId,
   }).then((res) => {
     if (res.status === 200 && res.data.success === true) {
       return true

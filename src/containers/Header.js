@@ -26,7 +26,7 @@ import { loginService, signupService, updateAccountService, updateAlertSettingsS
 import SmallButton from '../components/SmallButton';
 import AlertSettingsPopup from './AlertSettingsPopup';
 
-function Header({transforms, trainOptions, transformAction, trainerAction}) {
+function Header({transforms, trainOptions, transformAction, trainerAction, inputFileId}) {
 
   const {authTokens, setAuthTokens} = useAuth();
   const [openAccountPopup, setOpenAccountPopup] = useState(false);
@@ -85,7 +85,7 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
 
   const saveModel = () => {
     if (modelName !== '') {
-      savePredictModel(authTokens.token, modelName, transforms, trainOptions, toast).then((res) => {
+      savePredictModel(authTokens.token, modelName, inputFileId, transforms, trainOptions, toast).then((res) => {
         if (res) {
           toast('The Model \"' + modelName + '\" has been saved to the cloud.')
         } else {
@@ -105,8 +105,8 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
       removePredictModel(selectedModelId)
   }
 
-  const updateModel = () => {
-      updatePredictModel(selectedModelId, transforms, trainOptions, toast).then((res) => {
+  const updateModel = (modelId) => {
+      updatePredictModel(authTokens.token, modelId, inputFileId, transforms, trainOptions, toast).then((res) => {
         if (res) {
           toast('The Model has been updated to the cloud.')
         } else {
@@ -156,6 +156,7 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
         transformAction.loadTransforms(option.transforms)
         trainerAction.saveTrainerSettings(option.parameters)
         setSelectedModelId(modelId)      
+        transformAction.selectServerFile('TSData_' + models1[0].symbol + '_' + models1[0].frequency, authTokens.token)
       } catch (error) {
         console.log(error)        
       }
@@ -175,7 +176,8 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
   const login = async (username, password) => {
     
     return loginService(username, password).then((res) => {
-      if (res && res.success) {        
+      if (res && res.success) {
+        console.log(res.token)    
         setAuthTokens({
           username: username,
           fullName: res.fullName,
@@ -284,9 +286,6 @@ function Header({transforms, trainOptions, transformAction, trainerAction}) {
           <input id='users_file' type='file' onChange={(e) => onSelectUsersFile(e.target.files[0])} />
           <span>Upload customer csv file</span>
         </div> }
-
-        <span style={{width: 20}}></span>
-        <SmallButton value='Prediction alerts' ></SmallButton>
         
       </div>
       <AccountPopup open={openAccountPopup} setOpen={setOpenAccountPopup} 
@@ -367,6 +366,7 @@ const mapStateToProps = (state) => {
   return {
     transforms: state.transforms.transforms,
     trainOptions: state.trainer.options,
+    inputFileId: state.transforms.fileId,
   }
 }
 

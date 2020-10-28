@@ -3,10 +3,12 @@ import axios from 'axios'
 import { useAuth } from '../context/auth'
 import { BaseUrl } from '../actions/Constants'
 import { toast, ToastContainer } from 'react-toastify'
+import { connect } from 'react-redux';
 
 
-export default function({}) {
+function AlertContainer({inputFileId}) {
   const { authTokens, setAuthTokens } = useAuth()
+  
 
   useEffect(() => {
     const subs = setInterval(() => {
@@ -16,19 +18,36 @@ export default function({}) {
         axios.get('/account/web-alert').then((res) => {
           if (res.status === 200 && res.data) {
             alert = res.data.alert_content
-            toast(<div style={{color: 'black'}} dangerouslySetInnerHTML={{__html: alert}} />, {autoClose: false, position: 'bottom-right'})
+            toast(<div style={{color: 'black'}} dangerouslySetInnerHTML={{__html: alert}} />, {className:'Toast-Large', autoClose: false, position: 'bottom-right'})
           }
         }).catch((err) => {
           setAuthTokens(null)
           toast('Session is expired, please login again', {type: 'error', autoClose: false})
         })
       }
-    }, 300000)
+    }, 5*60*1000)
 
     return () => {
       clearInterval(subs)
     }
   })
   
-  return <ToastContainer className='Toast' style={{width: 400}}></ToastContainer>
+  return <ToastContainer className='Toast'></ToastContainer>
 }
+
+
+
+const mapStateToProps = (state) => {
+  return {
+    inputFileId: state.transforms.fileId,
+  }
+}
+
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+  }
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(AlertContainer)

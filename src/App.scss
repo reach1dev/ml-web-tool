@@ -169,10 +169,21 @@ input[type="checkbox"]:checked {
   color: $secondary !important;
 }
 
-.Toast {
+.Toastify__toast {
+  min-height: 30px !important;
+}
+
+.Toast-Large {
+  width: 500px !important;
+  
   box-shadow: 4px 4px 8px 0 $primary-dark, -2px -2px 6px 2px $primary !important;
 
   table {
     width: 100%;
   }
+}
+
+.Toastify__toast-container {
+  width: fit-content !important;
+  min-width: 320px !important;
 }
