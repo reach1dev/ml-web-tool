@@ -40,7 +40,10 @@ export default function({title, chart, indexColumn, width, height}) {
         if (!chart.maxes) {
           return [0, 0, [ ]]
         }
-        ranges.push([col, chart.maxes[col] - chart.mins[col]]);
+        let delta = chart.maxes[col] - chart.mins[col]
+        delta = Math.log2(chart.maxes[col]) * delta
+        delta = delta > 0 ? delta : -delta
+        ranges.push([col, delta > 0 ? delta : -delta]);
       }
     })
     ranges.sort(function(a, b) {
@@ -263,7 +266,7 @@ export default function({title, chart, indexColumn, width, height}) {
         </defs>
         <CartesianGrid stroke="#C5C5f5" />
         <XAxis 
-          allowDataOverflow={true}
+          //allowDataOverflow={true}
           dataKey={showDate && indexColumn === "Date" ? "Date" : (indexColumn === 'Date' ? 'Time' : indexColumn)}
           tickFormatter={showDate && indexColumn === "Date" ? formatXAxis : null}
           domain={[state.left, state.right]}

@@ -4,6 +4,7 @@ import { BaseUrl } from "./Constants"
 import { UPDATE_TRANSFORMS, REMOVE_TRANSFORM_FROM_MLA, REMOVE_TRANSFORM, APPLY_TRANSFORM_SETTINGS, SELECT_TRANSFORM, CLEAR_ALL, ADD_TRANSFORM, ADD_TRANSFORM_TO_MLA, MOVE_TRANSFORM, GET_TRANSFORM_DATA_START, GET_TRANSFORM_DATA_SUCCESS, GET_TRANSFORM_DATA_FAILED } from "../redux/ActionTypes";
 import { IDS } from "../constants/ItemTypes";
 import { Env } from "../config";
+import { toast } from "react-toastify";
 
 
 export const clearTransforms = () => {
@@ -207,21 +208,46 @@ export const selectServerFile = (fileId, token) => {
     axios.defaults.baseURL = BaseUrl
     axios.defaults.headers.common = {'Authorization': `bearer ${token}`}
     axios
-      .post("/select-input-data/" + fileId, null, {
-        timeout: 5*60*1000
-      })
+      .post("/select-input-data/" + fileId)
       .then(res => {
         if (res.status === 200) {
-          dispatch({
-            type: UPLOADING_INPUT_DATA_SUCCESS,
-            payload: {
-              file: fileId,
-              fileId: fileId,
-              sampleCount: res.data.sample_count,
-              columns: res.data.columns,
-              indexColumn: res.data.index
+          let totalTime = 0
+          const timer = setInterval(() => {
+            if (totalTime > 400) {
+              clearInterval(timer)
+              toast('It takes to long to load data.', {type: 'error'})
             }
-          })
+            axios.post("/get-input-data/" + fileId).then((res) => {
+              if (res.status === 200) {
+                if (res.data.status === 'success') {
+                  dispatch({
+                    type: UPLOADING_INPUT_DATA_SUCCESS,
+                    payload: {
+                      file: fileId,
+                      fileId: fileId,
+                      sampleCount: res.data.sample_count,
+                      columns: res.data.columns,
+                      indexColumn: res.data.index
+                    }
+                  })
+                  clearInterval(timer)
+                } else if (res.data.status === 'waiting') {
+                  return
+                } else {
+                  dispatch({
+                    type: UPLOADING_INPUT_DATA_FAILED,
+                  })
+                  clearInterval(timer)
+                }
+              }
+            }).catch((err) => {
+              dispatch({
+                type: UPLOADING_INPUT_DATA_FAILED,
+              })
+              clearInterval(timer)
+            })
+          }, 3000)
+          
         } else {
           dispatch({
             type: UPLOADING_INPUT_DATA_FAILED,

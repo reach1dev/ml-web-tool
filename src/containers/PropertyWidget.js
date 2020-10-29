@@ -469,7 +469,7 @@ function PropertyWidget({
       return null
     }
     return (
-      <div className='Property-Item-Container' key={2}>
+      <div className='Property-Item-Container' key={21}>
         <p className='Property-Item-Header'>
           <b>Web & email alerts</b> 
         </p>
