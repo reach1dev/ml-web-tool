@@ -17,6 +17,7 @@ import { toast } from 'react-toastify'
 import { useAuth } from '../context/auth'
 import TextField from '../components/TextField'
 import moment from 'moment'
+import InlineButton from '../components/InlineButton'
 
 function PropertyWidget({
   onDrawClicked,
@@ -532,6 +533,8 @@ function PropertyWidget({
       <div className='Property-Item-Container' key={6}>
         <p className='Property-Item-Header'>
           <b>Train/target split</b> 
+
+          <InlineButton value="Save" onClick={saveMLAlgorithm}></InlineButton>
         </p>
         <p className='Property-Item-Row'>
           <span>Sample count: </span><b>{sampleCount}</b>
