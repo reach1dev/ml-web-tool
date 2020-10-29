@@ -207,7 +207,9 @@ export const selectServerFile = (fileId, token) => {
     axios.defaults.baseURL = BaseUrl
     axios.defaults.headers.common = {'Authorization': `bearer ${token}`}
     axios
-      .post("/select-input-data/" + fileId)
+      .post("/select-input-data/" + fileId, null, {
+        timeout: 5*60*1000
+      })
       .then(res => {
         if (res.status === 200) {
           dispatch({
