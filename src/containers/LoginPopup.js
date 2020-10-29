@@ -8,6 +8,7 @@ import TextField from '../components/TextField';
 import './LoginPopup.css'
 import { toast } from 'react-toastify';
 import ConfirmTSLoginPopup from './ConfirmTSLoginPopup';
+import { useAuth } from '../context/auth';
 
 export default function({open, setOpen, onLogin}) {
   const [username, setUsername] = useState('')
@@ -18,6 +19,7 @@ export default function({open, setOpen, onLogin}) {
 
   const [openConfirmDlg, setOpenConfirmDlg] = useState(false)
   const [token, setToken] = useState(null)
+  const {authTokens, setAuthTokens} = useAuth()
 
   let textInput = null
 
@@ -70,6 +72,10 @@ export default function({open, setOpen, onLogin}) {
     if (token) {
       const redirectUri = `https://api-ml-web-tool.herokuapp.com/account/tsapi_callback/${token}`
       window.open(`https://api.tradestation.com/v2/authorize/?redirect_uri=${redirectUri}&client_id=AC853ED3-F818-4BC8-88DA-E7990DCA235F&response_type=code`, '_parent')
+      setAuthTokens({
+        ...authTokens,
+        tsDataAvailable: true
+      })
     }
   }
 

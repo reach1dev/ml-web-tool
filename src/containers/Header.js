@@ -177,14 +177,15 @@ function Header({transforms, trainOptions, transformAction, trainerAction, input
     
     return loginService(username, password).then((res) => {
       if (res && res.success) {
-        console.log(res.token)    
+        console.log(res.token)
         setAuthTokens({
           username: username,
           fullName: res.fullName,
           email: res.email,
           webAlerts: res.webAlerts,
           emailAlerts: res.emailAlerts,
-          token: res.token
+          token: res.token,
+          tsDataAvailable: false
         })
         return {
           type: 'success',

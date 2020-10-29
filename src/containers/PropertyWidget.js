@@ -348,7 +348,7 @@ function PropertyWidget({
         </div>
         <p style={{color: 'red'}}>{error && !file ? 'Please select file' : ''}</p>
 
-        { authTokens && <p style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 60}}>
+        { (authTokens && authTokens.tsDataAvailable) && <p style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 60}}>
           <div className='Server-Model-Options'>
             <input className='TextField-Class' placeholder='Type symbol name' value={selectedSymbol} onChange={(e) => setSelectedSymbol(e.target.value)}></input>
             <span style={{width: 20}}></span>
