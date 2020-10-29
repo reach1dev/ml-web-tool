@@ -18,7 +18,7 @@ export const parseGraphList = (algType, list, columns, indexColumn = 'Date', ext
         let label =  columns[j]
         if (columns[j] === indexColumn) {
           if (indexColumn === 'Date') {
-            row[label] = Date.parse(list[j][i])
+            row[label] = Date.parse(list[j][i]) || 'Next'
           } else {
             row[label] = list[j][i]
           }          

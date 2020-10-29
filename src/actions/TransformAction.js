@@ -79,7 +79,7 @@ function getChartData(data, columns, offset, indexColumn) {
     // }
     const obj = {
       Time: data[i][1],
-      [indexColumn]: indexColumn === 'Date' ? Date.parse(data[i][0] + ' ' + data[i][1]) : data[i][0]
+      [indexColumn]: indexColumn === 'Date' ? (Date.parse(data[i][0] + ' ' + data[i][1]) || 'Next') : data[i][0]
     }
     k ++
     

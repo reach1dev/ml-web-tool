@@ -111,7 +111,8 @@ export default function({title, chart, indexColumn, width, height}) {
   }
 
   const formatXAxis = (time) => {
-    return moment(time).format('MM/DD/YYYY hh/mm/ss')
+    const mt = moment(time)
+    return mt.isValid() ? mt.format('MM/DD/YYYY hh/mm/ss') : 'Next'
   }
 
   const showValues = () => {
@@ -266,7 +267,8 @@ export default function({title, chart, indexColumn, width, height}) {
           dataKey={showDate && indexColumn === "Date" ? "Date" : (indexColumn === 'Date' ? 'Time' : indexColumn)}
           tickFormatter={showDate && indexColumn === "Date" ? formatXAxis : null}
           domain={[state.left, state.right]}
-          type={indexColumn === 'Date' || indexColumn === 'Time ' ? 'number' : 'category'}
+          interval='preserveStartEnd'
+          type={'category'} //indexColumn === 'Date' || indexColumn === 'Time ' ? 'number' : 
         />
         <YAxis
           allowDataOverflow={true}
