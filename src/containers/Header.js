@@ -208,7 +208,8 @@ function Header({transforms, trainOptions, transformAction, trainerAction, input
           email: email,
           webAlerts: true,
           emailAlerts: true,
-          token: res.token
+          token: res.token,
+          tsDataAvailable: false
         })
         setOpenSignupPopup(false)
         return 'success'

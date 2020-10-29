@@ -18,7 +18,6 @@ export default function({open, setOpen, onLogin}) {
   const [failedReason, setFailedReason] = useState(' ')
 
   const [openConfirmDlg, setOpenConfirmDlg] = useState(false)
-  const [token, setToken] = useState(null)
   const {authTokens, setAuthTokens} = useAuth()
 
   let textInput = null
@@ -50,7 +49,6 @@ export default function({open, setOpen, onLogin}) {
       onLogin(username, password).then((res) => {
         setLoading(false)
         if (res.type === 'success') {
-          setToken(res.token)
           setOpenConfirmDlg(true)
           setOpen(false)
         } else {
@@ -69,14 +67,12 @@ export default function({open, setOpen, onLogin}) {
   const loginToTS = () => {
     setOpen(false)
     setOpenConfirmDlg(false)
-    if (token) {
-      const redirectUri = `https://api-ml-web-tool.herokuapp.com/account/tsapi_callback/${token}`
-      window.open(`https://api.tradestation.com/v2/authorize/?redirect_uri=${redirectUri}&client_id=AC853ED3-F818-4BC8-88DA-E7990DCA235F&response_type=code`, '_parent')
-      setAuthTokens({
-        ...authTokens,
-        tsDataAvailable: true
-      })
-    }
+    const redirectUri = `https://api-ml-web-tool.herokuapp.com/account/tsapi_callback/${authTokens.token}`
+    window.open(`https://api.tradestation.com/v2/authorize/?redirect_uri=${redirectUri}&client_id=AC853ED3-F818-4BC8-88DA-E7990DCA235F&response_type=code`, '_parent')
+    setAuthTokens({
+      ...authTokens,
+      tsDataAvailable: true
+    })
   }
 
   if (!open && !openConfirmDlg) {

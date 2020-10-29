@@ -16,6 +16,7 @@ import InfoIcon from '@material-ui/icons/Info'
 import { toast } from 'react-toastify'
 import { useAuth } from '../context/auth'
 import TextField from '../components/TextField'
+import moment from 'moment'
 
 function PropertyWidget({
   onDrawClicked,
@@ -50,6 +51,7 @@ function PropertyWidget({
 
   const [selectedSymbol, setSelectedSymbol] = useState(inputFileId.startsWith("TSData_") ? inputFileId.split("_")[1] : "")
   const [selectedFrequency, setSelectedFrequency] = useState(inputFileId.startsWith("TSData_") ? inputFileId.split("_")[2] : "")
+  const [selectedStartDate, setSelectedStartDate] = useState(inputFileId.startsWith("TSData_") ? inputFileId.split("_")[3] : "")
 
   const [alertThreshold, setAlertThreshold] = useState(0)
   const [alertCondition, setAlertCondition] = useState('equal')
@@ -59,6 +61,7 @@ function PropertyWidget({
   useEffect(() => {
     setSelectedSymbol(inputFileId.startsWith("TSData_") ? inputFileId.split("_")[1] : "")
     setSelectedFrequency(inputFileId.startsWith("TSData_") ? inputFileId.split("_")[2] : "")
+    setSelectedStartDate(inputFileId.startsWith("TSData_") ? inputFileId.split("_")[3] : "")
   }, [inputFileId])
   
   useEffect(() => {
@@ -84,6 +87,14 @@ function PropertyWidget({
     }
   }, [transform, algParams, sampleCount])
 
+  const loginToTSAccount = () => {
+    const redirectUri = `https://api-ml-web-tool.herokuapp.com/account/tsapi_callback/${authTokens.token}`
+    window.open(`https://api.tradestation.com/v2/authorize/?redirect_uri=${redirectUri}&client_id=AC853ED3-F818-4BC8-88DA-E7990DCA235F&response_type=code`, '_parent')
+    setAuthTokens({
+      ...authTokens,
+      tsDataAvailable: true
+    })
+  }
 
   const changeAlgorithmType = (type) => {
     setAlgorithmType(type)
@@ -105,10 +116,14 @@ function PropertyWidget({
   }
 
   const selectFile = () => {
-    if (selectedSymbol !== '' && selectedFrequency !== '') {
-      TransformAction.selectServerFile('TSData_' + selectedSymbol + '_' + selectedFrequency, authTokens.token)
+    if (selectedSymbol !== '' && selectedFrequency !== '' && selectedStartDate !== '') {
+      if (moment(selectedStartDate, 'MM-DD-YYYY', true).isValid()) {
+        TransformAction.selectServerFile('TSData_' + selectedSymbol + '_' + selectedFrequency + '_' + selectedStartDate, authTokens.token)
+      } else {
+        toast('Input start date in correct format', {type: 'error'})
+      }      
     } else {
-      toast('Select symbol and frequency', {type: 'error'})
+      toast('Input symbol, time frame, and start date', {type: 'error'})
     }
   }
 
@@ -348,12 +363,14 @@ function PropertyWidget({
         </div>
         <p style={{color: 'red'}}>{error && !file ? 'Please select file' : ''}</p>
 
-        { (authTokens && authTokens.tsDataAvailable) && <p style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 60}}>
+        { (authTokens ) && ( authTokens.tsDataAvailable ? <p style={{display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between', height: 60}}>
+          <span style={{marginBottom: 5, textAlign: 'center'}}>Ex. Symbol: @BTC, Time frame: 15m, Start date: 12-30-2010</span>
+          
           <div className='Server-Model-Options'>
-            <input className='TextField-Class' placeholder='Type symbol name' value={selectedSymbol} onChange={(e) => setSelectedSymbol(e.target.value)}></input>
-            <span style={{width: 20}}></span>
+            <input className='TextField-Class' placeholder='Symbol' value={selectedSymbol} onChange={(e) => setSelectedSymbol(e.target.value)}></input>
+            
             <select onChange={(e) => {setSelectedFrequency(e.target.value)}} value={selectedFrequency}>
-              <option value="">&nbsp; Select frequency &nbsp;</option>
+              <option value="">Select time frame</option>
               <option value="5m">&nbsp; 5 minutes &nbsp;</option>
               <option value="15m">&nbsp; 15 minutes &nbsp;</option>
               <option value="30m">&nbsp; 30 minutes &nbsp;</option>
@@ -363,10 +380,14 @@ function PropertyWidget({
               <option value="1W">&nbsp; 1 week &nbsp;</option>
               <option value="1M">&nbsp; 1 month &nbsp;</option>
             </select>
+
+            <input className='TextField-Class' placeholder='Start date' value={selectedStartDate} onChange={(e) => setSelectedStartDate(e.target.value)}></input>
           </div>
 
-          <SmallButton type='button' onClick={selectFile} value='Load from TradeStation API' />
-        </p> }
+          <SmallButton style={{marginRight: 0}} type='button' onClick={selectFile} value='Load from TradeStation API' />
+        </p> : (
+          <SmallButton style={{marginRight: 0}} type='button' onClick={loginToTSAccount} value='Login to your TradeStation account' />
+        ))}
       </div>
     )
   }
