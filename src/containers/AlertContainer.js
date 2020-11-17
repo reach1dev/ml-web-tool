@@ -10,7 +10,7 @@ function AlertContainer({inputFileId}) {
   const { authTokens, setAuthTokens } = useAuth()
   
   const getWebAlert = () => {
-    if (authTokens) {
+    if (authTokens && authTokens.tsDataAvailable) {
       axios.defaults.baseURL = BaseUrl
       axios.defaults.headers.common = {'Authorization': `bearer ${authTokens.token}`}
       axios.get('/account/web-alert').then((res) => {
