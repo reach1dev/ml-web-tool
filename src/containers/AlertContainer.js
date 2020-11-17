@@ -27,7 +27,7 @@ function AlertContainer({inputFileId}) {
   useEffect(() => {
     const subs = setInterval(() => {
       getWebAlert()
-    }, 5*60*1000)
+    }, 1*60*1000)
 
     return () => {
       clearInterval(subs)
