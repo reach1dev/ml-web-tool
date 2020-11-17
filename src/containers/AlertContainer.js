@@ -9,28 +9,33 @@ import { connect } from 'react-redux';
 function AlertContainer({inputFileId}) {
   const { authTokens, setAuthTokens } = useAuth()
   
-
+  const getWebAlert = () => {
+    if (authTokens) {
+      axios.defaults.baseURL = BaseUrl
+      axios.defaults.headers.common = {'Authorization': `bearer ${authTokens.token}`}
+      axios.get('/account/web-alert').then((res) => {
+        if (res.status === 200 && res.data) {
+          alert = res.data.alert_content
+          toast(<div style={{color: 'black'}} dangerouslySetInnerHTML={{__html: alert}} />, {className:'Toast-Large', autoClose: false, position: 'bottom-right'})
+        }
+      }).catch((err) => {
+        setAuthTokens(null)
+        toast('Session is expired, please login again', {type: 'error', autoClose: false})
+      })
+    }
+  }
   useEffect(() => {
     const subs = setInterval(() => {
-      if (authTokens) {
-        axios.defaults.baseURL = BaseUrl
-        axios.defaults.headers.common = {'Authorization': `bearer ${authTokens.token}`}
-        axios.get('/account/web-alert').then((res) => {
-          if (res.status === 200 && res.data) {
-            alert = res.data.alert_content
-            toast(<div style={{color: 'black'}} dangerouslySetInnerHTML={{__html: alert}} />, {className:'Toast-Large', autoClose: false, position: 'bottom-right'})
-          }
-        }).catch((err) => {
-          setAuthTokens(null)
-          toast('Session is expired, please login again', {type: 'error', autoClose: false})
-        })
-      }
+      getWebAlert()
     }, 5*60*1000)
+
+    getWebAlert()
 
     return () => {
       clearInterval(subs)
     }
   })
+  
   
   return <ToastContainer className='Toast'></ToastContainer>
 }
