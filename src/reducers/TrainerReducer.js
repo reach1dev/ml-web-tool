@@ -32,7 +32,10 @@ export default function(state = initialState, action) {
     case TRAINER_SAVE_SETTINGS: {
       return {
         ...state,
-        options: action.payload.options
+        options: {
+          ...state.options,
+          ...action.payload.options
+        }
       }
     }
     case TRAINER_STARTED: {

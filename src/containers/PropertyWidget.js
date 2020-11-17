@@ -201,31 +201,36 @@ function PropertyWidget({
     TransformAction.applySettings(transform.id, settings)
   }
 
-  const getCurrentParams = () => {
-    return {
-      type: algorithmType,
-      inputFilters: transform.inputParameters.map((p, i) => i<inputFilters.length?inputFilters[i]: false),
-      features: transform.inputParameters,
-      trainLabel: trainLabel,//AlgorithmTypes[algorithmType] !== Clustering ? trainLabel : '',
-      tripleOptions: {
-        up: tripleUp,
-        down: tripleDown,
-        maxHold: tripleMaxHold
-      },
-      testShift: testShift,
-      disableSplit: disableSplit,
-      trainSampleCount: trainSampleCount,
-      randomSelect: randomSelect,
-      parameters: parameters,
-      kFold: kFoldCV ? kFold : 0,
-      resampling: resampling,
-      alertThreshold: alertThreshold,
-      alertCondition: alertCondition
+  const getCurrentParams = (type = 0) => {
+    if (type === 0) {
+      return {
+        type: algorithmType,
+        inputFilters: transform.inputParameters.map((p, i) => i<inputFilters.length?inputFilters[i]: false),
+        features: transform.inputParameters,
+        trainLabel: trainLabel,//AlgorithmTypes[algorithmType] !== Clustering ? trainLabel : '',
+        tripleOptions: {
+          up: tripleUp,
+          down: tripleDown,
+          maxHold: tripleMaxHold
+        },
+        testShift: testShift,
+        parameters: parameters,
+        resampling: resampling,
+        alertThreshold: alertThreshold,
+        alertCondition: alertCondition
+      }
+    } else {
+      return {
+        disableSplit: disableSplit,
+        trainSampleCount: trainSampleCount,
+        randomSelect: randomSelect,
+        kFold: kFoldCV ? kFold : 0,
+      }
     }
   }
 
-  const saveMLAlgorithm = () => {
-    TrainerAction.saveTrainerSettings(getCurrentParams())
+  const saveMLAlgorithm = (type = 0) => {
+    TrainerAction.saveTrainerSettings(getCurrentParams(type))
   }
 
   const changeOutputParam = (inputParam, outputParam) => {
@@ -535,7 +540,7 @@ function PropertyWidget({
         <p className='Property-Item-Header'>
           <b>Train/target split</b> 
 
-          <InlineButton value="Save" onClick={saveMLAlgorithm}></InlineButton>
+          <InlineButton value="Save" onClick={() => saveMLAlgorithm(1)}></InlineButton>
         </p>
         <p className='Property-Item-Row'>
           <span>Sample count: </span><b>{sampleCount}</b>
@@ -678,7 +683,7 @@ function PropertyWidget({
             { transform.id > IDS.InputData && transform.id < IDS.MLAlgorithm && 
               <SmallButton type='button' onClick={saveTransformation} value='Save' /> }
             { transform.id === IDS.MLAlgorithm && 
-              <SmallButton type='button' onClick={saveMLAlgorithm} value='Save' /> }
+              <SmallButton type='button' onClick={() => saveMLAlgorithm(0)} value='Save' /> }
 
             { transform.id === IDS.InputData && (
               <>

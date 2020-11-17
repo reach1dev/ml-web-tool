@@ -45,7 +45,11 @@ export default function DataView({title, data, columns, showGraph}) {
               <tr className='row'>
                 {
                   columns.map(c => (
-                    <td style={{minWidth: c === 'No.' ? 30 : 30}}>{c === 'No.' ? row[c] : typeof row[c] === 'number' ? row[c].toFixed(1) : row[c]}</td>
+                    <td style={{minWidth: c === 'No.' ? 30 : 30}}>
+                    { c === 'No.' ? row[c] : 
+                      typeof row[c] === 'undefined' ? '---' : 
+                      (typeof row[c] === 'number' ? row[c].toFixed(1) : row[c])
+                    }</td>
                   ))
                 }
               </tr>
