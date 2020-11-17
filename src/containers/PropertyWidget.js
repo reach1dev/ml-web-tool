@@ -18,6 +18,7 @@ import { useAuth } from '../context/auth'
 import TextField from '../components/TextField'
 import moment from 'moment'
 import InlineButton from '../components/InlineButton'
+import Spinner from './Spinner'
 
 function PropertyWidget({
   onDrawClicked,
@@ -352,7 +353,7 @@ function PropertyWidget({
   const _renderInputData = () => {
     return (
       <div className='Property-Item-Container' key={0}>
-        <p style={{display: 'flex', justifyContent: 'space-between'}}><b>Input Data: {uploading ? 'uploading...' : inputFile} </b> 
+        <p style={{display: 'flex', justifyContent: 'space-between'}}><b>Input Data: {inputFile} </b> 
           <SmallButton type='button' onClick={uploadFile} value='Upload' /></p>
         <div style={{display: 'flex', alignItems: 'center', marginBottom: 10, marginLeft: -4}}>
           <input type="checkbox" onChange={(e)=>{setHasIndex(e.target.checked)}} checked={hasIndex}></input>
@@ -678,6 +679,12 @@ function PropertyWidget({
               <SmallButton type='button' onClick={saveTransformation} value='Save' /> }
             { transform.id === IDS.MLAlgorithm && 
               <SmallButton type='button' onClick={saveMLAlgorithm} value='Save' /> }
+
+            { transform.id === IDS.InputData && (
+              <>
+              { uploading ? <Spinner type="simple" loading={true}></Spinner> : null }
+              </>
+            )}
             <span style={{width: 10}}></span>
           </div> : null
         }

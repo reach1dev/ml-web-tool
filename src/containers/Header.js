@@ -156,7 +156,7 @@ function Header({transforms, trainOptions, transformAction, trainerAction, input
         transformAction.loadTransforms(option.transforms)
         trainerAction.saveTrainerSettings(option.parameters)
         setSelectedModelId(modelId)      
-        transformAction.selectServerFile('TSData_' + models1[0].symbol + '_' + models1[0].frequency + models1[0].start_date, authTokens.token)
+        transformAction.selectServerFile('TSData_' + models1[0].symbol + '_' + models1[0].frequency + '_' + models1[0].start_date, authTokens.token)
       } catch (error) {
         console.log(error)        
       }
