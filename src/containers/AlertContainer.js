@@ -29,8 +29,6 @@ function AlertContainer({inputFileId}) {
       getWebAlert()
     }, 5*60*1000)
 
-    getWebAlert()
-
     return () => {
       clearInterval(subs)
     }
