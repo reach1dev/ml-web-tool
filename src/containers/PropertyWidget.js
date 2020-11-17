@@ -366,7 +366,7 @@ function PropertyWidget({
         <p style={{color: 'red'}}>{error && !file ? 'Please select file' : ''}</p>
 
         { (authTokens ) && ( authTokens.tsDataAvailable ? <p style={{display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between', height: 60}}>
-          <span style={{marginBottom: 5, textAlign: 'center'}}>Ex. Symbol: @BTC, Time frame: 15m, Start date: 12-30-2010</span>
+          <span style={{marginBottom: 5, textAlign: 'center'}}>Ex. Symbol: @BTC, Time frame: 15m, Start date: MM-DD-YYYY</span>
           
           <div className='Server-Model-Options'>
             <input className='TextField-Class' placeholder='Symbol' value={selectedSymbol} onChange={(e) => setSelectedSymbol(e.target.value)}></input>

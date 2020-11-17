@@ -309,7 +309,7 @@ function Board({fileId, transforms, getTransformLoading, transformAction, select
   return (
     <div className='Board' >
       <DndProvider backend={Backend}>
-        <div className={chartHide ? 'Board-Left Board-Left-Max' : 'Board-Left'}>
+        <div className={chartHide ? 'Board-Left' : 'Board-Left'}>
           <ToolBox tools={tools} toolSelector={selectTool} showProperties={() => hideProperties(!propertiesHide)}></ToolBox>
           <div 
             className={!chartHide ? 'Board-Scroll' : 'Board-Scroll Board-Padding' } onScroll={forceUpdate}>
