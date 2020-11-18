@@ -19,6 +19,7 @@ import TextField from '../components/TextField'
 import moment from 'moment'
 import InlineButton from '../components/InlineButton'
 import Spinner from './Spinner'
+import AlertSettingPopup from './AlertSettingPopup'
 
 function PropertyWidget({
   onDrawClicked,
@@ -59,6 +60,8 @@ function PropertyWidget({
   const [alertCondition, setAlertCondition] = useState('equal')
 
   const {authTokens, setAuthTokens} = useAuth()
+
+  const [openAlertSettingPopup, setOpenAlertSettingPopup] = useState(false)
 
   useEffect(() => {
     setSelectedSymbol(inputFileId.startsWith("TSData_") ? inputFileId.split("_")[1] : "")
@@ -640,7 +643,7 @@ function PropertyWidget({
       const showTarget = (type === Classification || (type === Regression && parameters && !parameters['multiple']))
       items = [
         _renderMLParameters(),
-        _renderAlertSettings(),
+        //_renderAlertSettings(),
         _renderFeatureSelect(),
         showTarget ? _renderTargetParam() : null
       ]
@@ -676,7 +679,9 @@ function PropertyWidget({
         <div className='Properties-Container'>
         {
           transform ?
-          <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+          <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center'}}>
+            { transform.id === IDS.MLAlgorithm && 
+              <InlineButton type='button' onClick={() => setOpenAlertSettingPopup(true)} value='Set Alert' /> }
             { transform.id > IDS.InputData && transform.id < IDS.MLAlgorithm && 
               <SmallButton type='button' onClick={removeNode} value='Remove' /> }
             <span style={{width: 10}}></span>
@@ -697,13 +702,18 @@ function PropertyWidget({
         { transform ? _render() : null }
 
         { transform ? <div className='Properties-Container'>
-          <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+          <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center'}}>
             { transform.id >= IDS.InputData && transform.id < IDS.MLAlgorithm && 
               <Button type='button' onClick={drawGraph} value='Draw' /> }
             { transform.id === IDS.MLAlgorithm && 
               <Button type='button' onClick={() => trainAndTest(false)} value='Train & Test' /> }
           </div>
         </div> : null }
+
+        <AlertSettingPopup open={openAlertSettingPopup} setOpen={setOpenAlertSettingPopup} 
+          setAlert={saveMLAlgorithm}
+          alertThreshold={alertThreshold} setAlertThreshold={setAlertThreshold}
+          alertCondition={alertCondition} setAlertCondition={setAlertCondition}></AlertSettingPopup>
         </div>
       </div>
     </div>

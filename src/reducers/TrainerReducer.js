@@ -11,6 +11,8 @@ const initialState = {
     testShift: 1,
     trainSampleCount: 0,
     randomSelect: false,
+    alertThreshold: '',
+    alertCondition: '',
     parameters: TransformParameters[IDS.MLAlgorithm][0].parameters.reduce((params, p) => {
       return {
         ...params,
